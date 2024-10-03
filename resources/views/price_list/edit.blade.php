@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="container py-3">
-        <h2>Sửa bảng giá</h2>
         <form action="{{ route('price_list.update', $priceListVangLai->time_slot_id) }}" method="POST">
             @csrf
             @method('post') <!-- Thay đổi thành PUT để phản ánh chính xác phương thức HTTP -->

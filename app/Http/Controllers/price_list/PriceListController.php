@@ -157,6 +157,6 @@ class PriceListController extends Controller
         $Timeslot = Timeslot::findOrFail($id);
         $Timeslot->delete();
 
-        return redirect()->route('price_list.index')->with('success', 'Xóa thành công!');
+        return redirect()->route('price_list.index')->with('success', 'Xóa bảng giá thành công');
     }
 }

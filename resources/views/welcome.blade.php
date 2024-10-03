@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal hiển thị sân -->
     <div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Thêm lớp modal-lg -->

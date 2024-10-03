@@ -172,7 +172,7 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('booking.calendar') ? 'active' : '' }}"
-                                        href="{{ route('booking.calendar') }}">
+                                        href="{{ route('booking.calendar', ['date' => now()->format('Y-m-d')]) }}">
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- Lịch tổng quan --}}

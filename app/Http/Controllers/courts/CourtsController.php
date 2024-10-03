@@ -109,14 +109,4 @@ class CourtsController extends Controller
 
         return response()->json(['message' => 'Đã xảy ra lỗi.']);
     }
-
-    public function bookingCalendar()
-    {
-        // Lấy danh sách sân và giờ đã đặt
-        $courts = Court::all();
-        $bookings = Booking::all(); // Lấy tất cả đặt sân
-        $title = "Lịch";
-
-        return view('booking.calendar', compact('courts', 'bookings', 'title'));
-    }
 }
