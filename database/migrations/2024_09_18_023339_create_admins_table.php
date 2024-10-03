@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateAdminsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('admins', function (Blueprint $table) {
+            $table->id('Admin_id');
+            $table->integer('Admin_code');
+            $table->foreignId('user_id')->constrained('users', 'User_id')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('admins');
+    }
+}
