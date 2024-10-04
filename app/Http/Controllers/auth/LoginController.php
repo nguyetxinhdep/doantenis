@@ -47,6 +47,7 @@ class LoginController extends Controller
                     ->where('branches.Status', 3)
                     ->select(
                         'branches.*',
+                        'users.*'
                     ) // Chọn các cột cần thiết
                     ->get();
 

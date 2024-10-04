@@ -72,9 +72,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/branch/register-emails-exists', [BranchController::class, 'registerBranchEmaiExists'])->name('branch.email.exists.post');
 
     // ---------------------------------------------------------------------------------------
+    // // Nhóm quản lý chi nhánh
+    // Route::prefix('manage-branches')->group(function () {
+    //     Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
+    // });
+
     // Nhóm quản lý chi nhánh
     Route::prefix('manage-branches')->group(function () {
         Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
+        // admin quản lí chi nhánh
+        Route::get('detail/{id}', [BranchController::class, 'getBranchDtl'])->name('admin.manage-branches.detail');
+        Route::post('detail/{id}/update', [BranchController::class, 'updateBranch'])->name('manage-branches.update');
+        // manager cập nhật thông tin chi nhánh
+        Route::get('branch/detail', [BranchController::class, 'managerGetBranchDtl'])->name('manage-branches.detail');
     });
 
     // Nhóm quản lý sân (courts)
@@ -91,7 +101,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('bulk-create', [CourtsController::class, 'CourtCreate'])->name('bulk.court.create');
     });
 
-    // Nhóm quản lý giá sân (courts)
+    // Nhóm quản lý bảng giá (courts)
     Route::prefix('manage-price-list')->group(function () {
         // route hiển thị danh sách bảng giá
         Route::get('/', [PriceListController::class, 'index'])->name('price_list.index');

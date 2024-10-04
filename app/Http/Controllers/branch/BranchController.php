@@ -416,4 +416,164 @@ class BranchController extends Controller
         // Trả về phản hồi
         return redirect()->back();
     }
+
+    // admin quản lý chi nhánh 
+    public function getBranchDtl($branch_id)
+    {
+        $branch = Branch::select(
+            'branches.*',
+            'branches.Name as branch_name',
+            // 'staff.*',
+            'users.Name as user_name',
+            'users.Email as user_email',
+            'users.User_id as user_id',
+            'users.Phone as user_phone',
+            'users.Address as user_address',
+        )
+            ->join('managers', function ($q) {
+                $q->on('branches.manager_id', '=', 'managers.Manager_id');
+            })
+            ->join('users', function ($join) {
+                $join->on('managers.user_id', '=', 'users.User_id');
+            })->where('branches.Status', 3)
+            ->where('Branch_id', $branch_id)
+            ->first();
+        return view('branch.viewDetail', [
+            'title' => 'DS Chi nhánh',
+            'data' => $branch,
+        ]);
+    }
+    // quản lý cập nhật thông tin chi nhánh 
+    public function managerGetBranchDtl()
+    {
+        $branch_id = session('branch_active')->Branch_id;
+        $branch = Branch::select(
+            'branches.*',
+            'branches.Name as branch_name',
+            // 'staff.*',
+            'users.Name as user_name',
+            'users.Email as user_email',
+            'users.User_id as user_id',
+            'users.Phone as user_phone',
+            'users.Address as user_address',
+        )
+            ->join('managers', function ($q) {
+                $q->on('branches.manager_id', '=', 'managers.Manager_id');
+            })
+            ->join('users', function ($join) {
+                $join->on('managers.user_id', '=', 'users.User_id');
+            })->where('branches.Status', 3)
+            ->where('Branch_id', $branch_id)
+            ->first();
+        return view('branch.viewDetail', [
+            'title' => 'DS Chi nhánh',
+            'data' => $branch,
+        ]);
+    }
+
+    public function updateBranch(Request $request)
+    {
+        $userIdManager = session('branch_active')->User_id;
+        // dd($userIdManager);
+        $branch_id = session('branch_active')->Branch_id;
+
+        $userManager = User::find($userIdManager);
+
+        $this->validate(
+            $request,
+            [
+                'Email' => 'email|unique:users,Email,' . $userIdManager . ',User_id',
+                'Image' => 'file|mimes:jpg,png,pdf|max:2048',
+                'Cover_image' => 'file|mimes:jpg,png,pdf|max:2048',
+            ],
+            [
+                'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+                'Image.file' => 'Ảnh bìa không phải phải là file',
+                'Image.mimes' => 'Ảnh bìa phải có phần mở rộng là jpg,png,pdf',
+                'Cover_image.file' => 'Ảnh bìa không phải phải là file',
+                'Cover_image.mimes' => 'Ảnh bìa phải có phần mở rộng là jpg,png,pdf',
+            ]
+        );
+        // if ($request->file('Image')) {
+        //     # code...
+        // }
+
+        // dd($request->all(), $userManager);
+
+        try {
+            DB::beginTransaction();
+
+            if ($request->input('user_name')) {
+                $userManager->Name = $request->input('user_name');
+            }
+
+            if ($request->input('user_email')) {
+                $userManager->Email = $request->input('user_email');
+            }
+
+            if ($request->input('user_address')) {
+                $userManager->Address = $request->input('user_address');
+            }
+
+            if ($request->input('user_phone')) {
+                $userManager->Phone = $request->input('user_phone');
+            }
+
+            $userManager->save();
+            // update branch
+
+            $branch = Branch::find($branch_id);
+
+            if ($request->file('Image')) {
+                $originalName = $request->file('Image')->getClientOriginalName();
+                $urlImage = "/images/khachhang/chinhanh/$originalName";
+                if (file_exists(public_path('images/khachhang/chinhanh/') . $originalName)) {
+                    unlink(public_path('images/khachhang/chinhanh/') . $originalName);
+                }
+                $path = $request->file('Image')->move(public_path('images/khachhang/chinhanh/'), $originalName);;
+                $branch->Image = $urlImage;
+            }
+
+            if ($request->file('Cover_image')) {
+                $originalName = $request->file('Cover_image')->getClientOriginalName();
+                $urlCover_image = "/images/khachhang/chinhanh/$originalName";
+                if (file_exists(public_path('images/khachhang/chinhanh/') . $originalName)) {
+                    unlink(public_path('images/khachhang/chinhanh/') . $originalName);
+                }
+                $path = $request->file('Cover_image')->move(public_path('images/khachhang/chinhanh/'), $originalName);;
+                $branch->Cover_image = $urlCover_image;
+            }
+
+            if ($request->input('Name')) {
+                $branch->Name = $request->input('Name');
+            }
+
+            if ($request->input('Location')) {
+                $branch->Location = $request->input('Location');
+            }
+
+            if ($request->input('Phone')) {
+                $branch->Phone = $request->input('Phone');
+            }
+
+            if ($request->input('Email')) {
+                $branch->Email = $request->input('Email');
+            }
+
+            if ($request->input('link_map')) {
+                $branch->link_map = $request->input('link_map');
+            }
+
+            $branch->save();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "Cập nhật thành công");
+
+            //code...
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+    }
 }
