@@ -2,41 +2,37 @@
 
 @section('content')
     <div class="container-fluid py-3">
-        <h1>Đặt lịch ngày trực quan</h1>
-
-        <form method="GET" action="">
-            <label for="selected_date">Chọn ngày:</label>
-            <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
-            <button type="submit" class="btn btn-primary">Xem lịch</button>
-        </form>
-
         @php
             // Lấy ngày người dùng chọn, hoặc mặc định là ngày hôm nay
             $selectedDate = request('date', date('Y-m-d'));
             $formattedDate = date('d/m/Y', strtotime($selectedDate));
+            $currentDate = date('Y-m-d');
         @endphp
 
-        <h3>{{ $formattedDate }}</h3>
+        <center>
+            <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
+        </center>
+
+        <form method="GET" action="{{ route('booking.calendar.search') }}">
+            <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
+            <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
+            <button type="submit" class="btn btn-primary">Xem lịch</button>
+        </form>
+
+        <p class="d-flex align-items-center">
+            <span class="bg-light mx-2"
+                style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
+            Trống
+            <span class="bg-danger mx-2"
+                style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
+            Đã đặt
+            <span class="bg-secondary mx-2"
+                style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
+            Khóa
+        </p>
+
 
         @php
-            // Dữ liệu mẫu cho các sân (có thể thay bằng dữ liệu từ DB)
-            $courts = [
-                (object) ['id' => 1, 'Name' => 'Sân 1'],
-                (object) ['id' => 2, 'Name' => 'Sân 2'],
-                (object) ['id' => 3, 'Name' => 'Sân 3'],
-                (object) ['id' => 4, 'Name' => 'Sân 4'],
-                (object) ['id' => 5, 'Name' => 'Sân 5'],
-            ];
-
-            // Dữ liệu mẫu cho các đặt sân (có thể thay bằng dữ liệu từ DB)
-            $bookings = [
-                (object) ['court_id' => 1, 'start_time' => '06:00', 'end_time' => '07:30', 'date' => '2024-10-01'],
-                (object) ['court_id' => 2, 'start_time' => '08:00', 'end_time' => '09:00', 'date' => '2024-09-30'],
-                (object) ['court_id' => 3, 'start_time' => '09:30', 'end_time' => '11:00', 'date' => '2024-10-01'],
-                (object) ['court_id' => 4, 'start_time' => '11:30', 'end_time' => '13:00', 'date' => '2024-09-30'],
-                (object) ['court_id' => 5, 'start_time' => '18:00', 'end_time' => '20:00', 'date' => '2024-10-01'],
-                (object) ['court_id' => 5, 'start_time' => '21:00', 'end_time' => '22:30', 'date' => '2024-10-01'],
-            ];
         @endphp
 
         <div style="overflow-x: auto;">
@@ -52,6 +48,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- duyệt 2 vòng for qua các sân trong chi nhánh và qua các item trong bookings --}}
                     @foreach ($courts as $court)
                         <tr>
                             <td class="bg-primary text-white">{{ $court->Name }}</td>
@@ -61,10 +58,10 @@
                                     $isBooked = false;
                                     foreach ($bookings as $booking) {
                                         if (
-                                            $booking->court_id == $court->id &&
-                                            $booking->date == $selectedDate &&
-                                            $time >= (float) date('H.i', strtotime($booking->start_time)) &&
-                                            $time < (float) date('H.i', strtotime($booking->end_time))
+                                            $booking->court_id == $court->Court_id && // id trong bảng booking bằng id sân của chi nhánh
+                                            $booking->Date_booking == $selectedDate && // lấy ngày tháng năm từ url kiểm tra xem có bằng ngày trong booking không
+                                            $time >= (float) date('H.i', strtotime($booking->Start_time)) && // hàm date('H.i') sẽ trả về chuỗi như 6.3 cho dữ liệu 6:30, ...
+                                            $time < (float) date('H.i', strtotime($booking->End_time))
                                         ) {
                                             $isBooked = true;
                                             break;
@@ -72,8 +69,8 @@
                                     }
                                 @endphp
                                 <td class="{{ $isBooked ? 'bg-danger' : 'bg-light' }}" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="{{ $court->Name }}">
-                                    {{ $isBooked ? '' : 'Trống' }}
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}">
+                                    {{ $isBooked ? '' : 'x' }}
                                 </td>
                             @endfor
                         </tr>
@@ -81,8 +78,6 @@
                 </tbody>
             </table>
         </div>
-
-        <p>Lưu ý: Trắng - Trống, Đỏ - Đã đặt, Xám - Khóa</p>
     </div>
 
     <script>

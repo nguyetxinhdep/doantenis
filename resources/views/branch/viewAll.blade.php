@@ -25,21 +25,10 @@
                         <td>{{ $branch->Email }}</td>
                         <td>{{ $branch->user_name }}</td>
                         <td>
-                            <form action="#" method="get" style="display:inline;">
-                                @csrf
-                                @method('get')
-
-                                <input type="hidden" name="User_id" value = "{{ $branch->user_id }}">
-                                <input type="hidden" name="Manager_id" value = "{{ $branch->manager_id }}">
-                                <input type="hidden" name="Branch_id" value = "{{ $branch->Branch_id }}">
-                                <input type="hidden" name="Email" value = "{{ $branch->Email }}">
-
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye"></i> {{-- icon chi tiết --}}
-                                </button>
-                            </form>
-                            <form id="deleteForm{{ $branch->Branch_id }}" action="{{ route('rejectBranch') }}"
-                                method="POST" style="display:inline;">
+                            <a href="{{ route('admin.manage-branches.detail', ['id' => $branch->Branch_id]) }}"
+                                class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>
+                            <form id="deleteForm{{ $branch->Branch_id }}" action="{{ route('rejectBranch') }}" method="POST"
+                                style="display:inline;">
                                 @csrf
                                 @method('POST')
 

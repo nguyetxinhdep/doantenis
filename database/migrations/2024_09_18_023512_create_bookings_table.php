@@ -13,11 +13,13 @@ class CreateBookingsTable extends Migration
             $table->boolean('Status');
             $table->timestamps();
             $table->date('Date_booking');
-            $table->foreignId('court_id')->constrained('courts','Court_id')->onDelete('cascade');
-            $table->foreignId('time_slot_id')->constrained('time_slots','Time_slot_id')->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained('customers','Customer_id')->onDelete('cascade');
-            $table->foreignId('price_list_id')->constrained('price_list','Price_list_id')->onDelete('cascade');
-            $table->foreignId('branch_id')->constrained('branches','Branch_id')->onDelete('cascade');
+            $table->time('Start_time');
+            $table->time('End_time');
+            $table->foreignId('court_id')->constrained('courts', 'Court_id')->onDelete('cascade');
+            $table->foreignId('time_slot_id')->constrained('time_slots', 'Time_slot_id')->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained('customers', 'Customer_id')->onDelete('cascade');
+            $table->foreignId('price_list_id')->constrained('price_list', 'Price_list_id')->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained('branches', 'Branch_id')->onDelete('cascade');
         });
     }
 

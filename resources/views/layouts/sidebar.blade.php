@@ -98,7 +98,7 @@
                             <a href="#" class="nav-link">
 
                                 <p>
-                                    quản lí chi nhánh
+                                    Quản lí chi nhánh
                                     {{-- cấp 0 quản lí chi nhánh --}}
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
@@ -172,7 +172,7 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('booking.calendar') ? 'active' : '' }}"
-                                        href="{{ route('booking.calendar') }}">
+                                        href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}">
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- Lịch tổng quan --}}
@@ -237,6 +237,33 @@
                                 </li>
                             </ul>
                         </li>
+
+                        {{-- level 0 quản lí chi nhánh --}}
+                        <li class="nav-item {{ request()->routeIs('manage-branches.detail') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link">
+
+                                <p>
+                                    Quản lí chi nhánh
+                                    {{-- cấp 0 quản lí chi nhánh --}}
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            {{-- cấp 1 DS Chi Nhánh --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.viewAll') ? 'active' : '' }}"
+                                        href="{{ route('manage-branches.detail') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- DS Chi Nhánh --}}
+                                            Cập nhật thông tin Chi Nhánh
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         {{-- ----------------------------------------------------------------------------------------- --}}
                     @elseif (Auth::user()->Role == '4')
                         {{-- Branch Staff --}}

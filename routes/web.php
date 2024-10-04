@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\auth\LoginController;
+use App\Http\Controllers\booking\BookingController;
 use App\Http\Controllers\branch\BranchController;
 use App\Http\Controllers\courts\CourtsController;
 use App\Http\Controllers\custemer_type\CustomerTypeController;
@@ -71,9 +72,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/branch/register-emails-exists', [BranchController::class, 'registerBranchEmaiExists'])->name('branch.email.exists.post');
 
     // ---------------------------------------------------------------------------------------
+    // // Nhóm quản lý chi nhánh
+    // Route::prefix('manage-branches')->group(function () {
+    //     Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
+    // });
+
     // Nhóm quản lý chi nhánh
     Route::prefix('manage-branches')->group(function () {
         Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
+        // admin quản lí chi nhánh
+        Route::get('detail/{id}', [BranchController::class, 'getBranchDtl'])->name('admin.manage-branches.detail');
+        Route::post('detail/{id}/update', [BranchController::class, 'updateBranch'])->name('manage-branches.update');
+        // manager cập nhật thông tin chi nhánh
+        Route::get('branch/detail', [BranchController::class, 'managerGetBranchDtl'])->name('manage-branches.detail');
     });
 
     // Nhóm quản lý sân (courts)
@@ -84,16 +95,13 @@ Route::middleware(['auth'])->group(function () {
         // Route xem chi tiết giờ được đặt của sân
         Route::get('courts/{id}', [CourtsController::class, 'show'])->name('courts.show');
 
-        // Route xem lịch đặt sân
-        Route::get('booking-calendar', [CourtsController::class, 'bookingCalendar'])->name('booking.calendar');
-
         // route tạo sân cho chi nhánh
         Route::get('create', [CourtsController::class, 'viewCreate'])->name('manage-courts.getCreate');
         Route::post('single-create', [CourtsController::class, 'CourtCreate'])->name('single.court.create');
         Route::post('bulk-create', [CourtsController::class, 'CourtCreate'])->name('bulk.court.create');
     });
 
-    // Nhóm quản lý giá sân (courts)
+    // Nhóm quản lý bảng giá (courts)
     Route::prefix('manage-price-list')->group(function () {
         // route hiển thị danh sách bảng giá
         Route::get('/', [PriceListController::class, 'index'])->name('price_list.index');
@@ -106,7 +114,14 @@ Route::middleware(['auth'])->group(function () {
         // route hiển thị show để sửa
         Route::get('/price-list/{id}', [PriceListController::class, 'show'])->name('price_list.show');
         Route::get('/price-list/{id}/edit', [PriceListController::class, 'edit'])->name('price_list.edit');
-        Route::post('/price-list/{id}', [PriceListController::class, 'update'])->name('price_list.update');
-        Route::delete('/price-list/{id}', [PriceListController::class, 'destroy'])->name('price_list.destroy');
+        Route::post('/price-list-update/{id}', [PriceListController::class, 'update'])->name('price_list.update');
+        Route::post('/price-list/{id}', [PriceListController::class, 'destroy'])->name('price_list.destroy');
+    });
+
+    // nhóm quản lý booking
+    Route::prefix('booking')->group(function () {
+        // Route xem lịch đặt sân
+        Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
+        Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
     });
 });

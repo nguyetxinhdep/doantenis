@@ -25,11 +25,11 @@
     //     }, 5000);
     // }
 
-    //---------------- xử lý modal xóa
+    //---------------- xử lý modal xóa branch
     $(document).ready(function() {
         let formToSubmit; // Biến để lưu trữ form sẽ được submit
 
-        // Hàm hiển thị modal xác nhận xóa
+        // Hàm hiển thị modal xác nhận xóa chi nhánh
         window.showDeleteModal = function(branchId) {
             // Hiển thị modal
             $('#deleteModal').modal('show');
