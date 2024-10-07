@@ -96,10 +96,15 @@
                                 @if (count(session('all_branch')) == 1)
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
                                             thêm chi nhánh</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
+                                            nhánh</a></li>
                                 @else
+                                    {{-- Thêm dấu gạch --}}
                                     <hr>
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
                                             thêm chi nhánh</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
+                                            nhánh</a></li>
                                 @endif
                             </ul>
                         </li>

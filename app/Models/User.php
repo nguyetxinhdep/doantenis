@@ -38,12 +38,12 @@ class User extends Authenticatable
 
     public function admin()
     {
-        return $this->hasOne(Admin::class, 'user_id');
+        return $this->hasMany(Admin::class, 'user_id');
     }
 
     public function manager()
     {
-        return $this->hasOne(Manager::class, 'user_id');
+        return $this->hasMany(Manager::class, 'user_id');
     }
 
     /**

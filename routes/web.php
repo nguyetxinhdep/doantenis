@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
     // Nhóm quản lý chi nhánh
     Route::prefix('manage-branches')->group(function () {
         Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
+        Route::get('reload-branches', [BranchController::class, 'reloadBranch'])->name('manage-branches.reload');
         // admin quản lí chi nhánh
         Route::get('detail/{id}', [BranchController::class, 'getBranchDtl'])->name('admin.manage-branches.detail');
         Route::post('detail/{id}/update', [BranchController::class, 'updateBranch'])->name('manage-branches.update');

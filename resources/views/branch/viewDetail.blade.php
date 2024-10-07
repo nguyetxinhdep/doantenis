@@ -4,8 +4,15 @@
     <div class="container-fluid mt-4">
         {{-- @dd($data) --}}
         <div class="d-flex pb-3">
-            <form id="branch-form" class="w-50"
-                action="{{ route('manage-branches.update', session('branch_active')->Branch_id) }}" method="post"
+            @php
+                if (session()->has('branch_active')) {
+                    $branch_id = session('branch_active')->Branch_id;
+                } else {
+                    $branch_id = request()->id;
+                }
+            @endphp
+
+            <form id="branch-form" class="w-50" action="{{ route('manage-branches.update', $branch_id) }}" method="post"
                 enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
