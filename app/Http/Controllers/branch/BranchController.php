@@ -617,6 +617,9 @@ class BranchController extends Controller
 
             DB::commit();
 
+            // gọi hàm cập nhật lại danh sách chi nhánh
+            $this->reloadBranch();
+
             return redirect()->back()->with('success', "Cập nhật thành công");
 
             //code...
