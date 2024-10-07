@@ -9,6 +9,7 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -410,7 +411,11 @@ class BranchController extends Controller
     public function setBranchActive($branch_id)
     {
         // Lưu ID chi nhánh vào session
-        $branch = Branch::find($branch_id);
+        $branch = Branch::join('managers', 'branches.manager_id', '=', 'managers.Manager_id')
+            ->join('users', 'managers.user_id', '=', 'users.User_id')
+            ->where('branches.Branch_id', $branch_id)
+            ->select('branches.*', 'users.User_id as User_id')
+            ->first();
 
         session(['branch_active' => $branch]);
         // Trả về phản hồi
@@ -471,13 +476,57 @@ class BranchController extends Controller
         ]);
     }
 
-    public function updateBranch(Request $request)
+    public function reloadBranch()
     {
-        $userIdManager = session('branch_active')->User_id;
-        // dd($userIdManager);
-        $branch_id = session('branch_active')->Branch_id;
+        if (Auth::user()->Role == '3') {
+            // Lấy chi nhánh đầu tiên mà người dùng có quyền
+            $branches  = User::join('managers', function (JoinClause $join) {
+                $join->on('users.User_id', '=', 'managers.user_id');
+            })
+                ->join('branches', function (JoinClause $join) {
+                    $join->on('managers.Manager_id', '=', 'branches.manager_id');
+                })
+                ->where('users.User_id', (Auth::user()->User_id))
+                ->where('branches.Status', 3)
+                ->select(
+                    'branches.*',
+                    'users.User_id as User_id'
+                ) // Chọn các cột cần thiết
+                ->get();
 
-        $userManager = User::find($userIdManager);
+            if ($branches) {
+                // Lưu ID chi nhánh vào session
+                session(['branch_active' => $branches->first()]);
+                session(['all_branch' => $branches]);
+
+                // Trả về phản hồi đăng nhập thành công
+                return redirect()->back()->with('success', 'Cập nhật danh sách chi nhánh thành công');
+            }
+
+            return redirect()->back()->with('success', 'Cập nhật danh sách chi nhánh thành công');
+        }
+    }
+
+    public function updateBranch(Request $request, $id) //biến id gửi trên url
+    {
+        if (session()->has('branch_active')) {
+            $userIdManager = session('branch_active')->User_id;
+            // dd(session('branch_active'));
+            // dd($userIdManager);
+            $branch_id = session('branch_active')->Branch_id;
+
+            $userManager = User::find($userIdManager);
+        } else {
+            $branch_id = $id;
+
+            $userManager = Branch::join('managers', 'branches.manager_id', '=', 'managers.Manager_id')
+                ->join('users', 'managers.user_id', '=', 'users.User_id')
+                ->where('branches.Branch_id', $branch_id)
+                ->select('users.*', 'users.User_id as User_id')
+                ->first();
+
+            $userIdManager = $userManager->User_id;
+        }
 
         $this->validate(
             $request,
