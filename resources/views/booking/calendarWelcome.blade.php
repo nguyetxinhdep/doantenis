@@ -38,7 +38,8 @@
                         <th class="text-center bg-info">Thời gian</th>
                         @for ($time = 5.5; $time <= 23; $time += 0.5)
                             <th class="text-center bg-info">
-                                {{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }}</th>
+                                {{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }} -
+                                {{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}</th>
                         @endfor
                     </tr>
                 </thead>
@@ -65,6 +66,7 @@
                                     data-bs-placement="top" title="{{ $court->Name }}"
                                     @if (!$isBooked) data-court-id="{{ $court->Court_id }}" 
                                     data-time-start="{{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }}" 
+                                    data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
                                     style="cursor: pointer;" @endif>
                                     {{ $isBooked ? '' : 'x' }}
                                 </td>
@@ -95,7 +97,9 @@
         $(document).on('click', 'td.bg-light[data-court-id], td.bg-success[data-court-id]', function() {
             var courtId = $(this).data('court-id'); // Lấy ID sân
             var timeStart = $(this).data('time-start'); // Lấy thời gian bắt đầu
-            var key = courtId + '-' + timeStart; // Tạo key duy nhất cho ô
+            var timeEnd = $(this).data('time-end'); // Lấy thời gian kết thúc
+            var key = courtId + '-' + timeStart + '-' + timeEnd; // Tạo key duy nhất cho ô
+            // console.log(courtId, timeStart, timeEnd);
 
             // Kiểm tra xem key này có trong mảng selectedCells hay không
             var index = selectedCells.indexOf(key);
@@ -110,6 +114,7 @@
         });
 
         // Xử lý sự kiện click trên nút Đặt sân
+        // Xử lý sự kiện click trên nút Đặt sân
         $('#reserve-button').on('click', function() {
             if (selectedCells.length === 0) {
                 alert('Vui lòng chọn ít nhất một khung giờ trước khi đặt!');
@@ -119,13 +124,24 @@
             // Thực hiện hành động đặt sân
             var date = '{{ $selectedDate }}'; // Lấy ngày đã chọn
 
+            // Tạo mảng chứa thông tin về sân và giờ đặt
+            var reservations = selectedCells.map(function(cell) {
+                var parts = cell.split('-'); // Tách key thành courtId và timeStart và timeEnd
+                return {
+                    courtId: parts[0],
+                    timeStart: parts[1],
+                    timeEnd: parts[2] // Lấy thời gian kết thúc từ ô đã chọn
+                };
+            });
+            // console.log(reservations);
+
             // Hiển thị thông báo đặt sân
             if (confirm('Bạn có chắc chắn muốn đặt các khung giờ đã chọn?')) {
                 $.ajax({
                     url: '{{ route('booking.reserve') }}', // Đường dẫn đến route đặt sân
                     method: 'POST',
                     data: {
-                        selectedCells: selectedCells, // Gửi mảng các ô đã chọn
+                        selectedCells: reservations, // Gửi mảng thông tin đặt sân
                         date: date,
                         _token: '{{ csrf_token() }}' // CSRF token
                     },
