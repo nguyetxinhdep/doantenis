@@ -69,7 +69,6 @@ class BookingController extends Controller
         // Lặp qua các ô đã chọn từ client
         foreach ($request->selectedCells as $cell) {
             $courtId = $cell['courtId'];
-            var_dump(date('H:i', strtotime($cell['timeStart'])));
             $timeStart = \Carbon\Carbon::createFromFormat('H:i', $cell['timeStart']); // Chuyển đổi thời gian bắt đầu
             $timeEnd = \Carbon\Carbon::createFromFormat('H:i', $cell['timeEnd']); // Chuyển đổi thời gian kết thúc
 
@@ -99,7 +98,7 @@ class BookingController extends Controller
             $mergedEnd = $times[0]['timeEnd'];
             // Lặp qua từng khoảng thời gian
             foreach ($times as $key => $time) {
-                if ($key > 0 && $time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
+                if ($time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
                     // Nếu thời gian tiếp theo liên tục với thời gian trước đó
                     $mergedEnd = max($mergedEnd, $time['timeEnd']);
                 } else {
