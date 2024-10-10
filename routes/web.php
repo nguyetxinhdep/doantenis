@@ -27,7 +27,7 @@ Route::get('/', function () {
 
 // Route xem lịch đặt sân trang welcome
 Route::get('welcome-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('welcome.booking.calendar');
-Route::get('dat-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('booking.reserve');
+Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 
 // search sân tenis
 // routes/web.php
