@@ -368,19 +368,9 @@ class BranchController extends Controller
             $Email = $req->input('Email');
 
             $user = User::find($userid);
-            // Cập nhật role user là -1 -> chờ ký hợp đồng
-            if ($user->Role == '-1') {
-                $user->Role = '3';
-                $user->save();
-
-                Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
-                    $email->subject('Cấp tài khoản');
-                    $email->to($Email);
-                });
-            }
-
             $branch = Branch::find($branchid);
-            if ($branch->Status == -1) {
+
+            if ($branch->Status == -1 && $user->Role == '3') {
                 $branch->Status = 3;
                 $branch->save();
 
@@ -389,6 +379,24 @@ class BranchController extends Controller
                     $email->to($Email);
                 });
             }
+
+
+            if ($user->Role == '-1') { // Cập nhật role user là -1 -> chờ ký hợp đồng
+                $user->Role = '3';
+                $user->save();
+
+                Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
+                    $email->subject('Cấp tài khoản');
+                    $email->to($Email);
+                });
+
+                // cập nhật role chi nhánh sau khi gửi mail
+                $branch->Status = 3;
+                $branch->save();
+            }
+
+
+
 
             // Nếu mọi thứ đều thành công, commit giao dịch
             DB::commit();
