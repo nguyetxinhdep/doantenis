@@ -40,8 +40,8 @@ return [
             'host' => 'smtp.gmail.com',
             'port' => 587,
             'encryption' => 'tls',
-            'username' => 'trongnhat0902@gmail.com',
-            'password' => 'waajvvlcaylupndm',
+            'username' => 'nguyenthithunguyet.12092002@gmail.com',
+            'password' => 'gwwffzwiaqpzjvmj',
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
@@ -108,7 +108,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'trongnhat0902@gmail.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'nguyenthithunguyet.12092002@gmail.com'),
         'name' => env('MAIL_FROM_NAME', 'Quản Lý Sân Tenis'),
     ],
 
