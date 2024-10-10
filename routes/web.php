@@ -24,6 +24,11 @@ use App\Http\Controllers\price_list\PriceListController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route xem lịch đặt sân trang welcome
+Route::get('welcome-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('welcome.booking.calendar');
+Route::get('dat-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('booking.reserve');
+
 // search sân tenis
 // routes/web.php
 Route::get('/search', [BranchController::class, 'search'])->name('search');
@@ -121,7 +126,7 @@ Route::middleware(['auth'])->group(function () {
 
     // nhóm quản lý booking
     Route::prefix('booking')->group(function () {
-        // Route xem lịch đặt sân
+        // Route xem lịch đặt sân trong trong manager-role 3
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
     });

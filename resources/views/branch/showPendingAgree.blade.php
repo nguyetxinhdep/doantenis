@@ -25,7 +25,8 @@
                         <td>{{ $branch->Email }}</td>
                         <td>{{ $branch->user_name }}</td>
                         <td>
-                            <form action="{{ route('agree.success') }}" method="POST" id="form-agree" style="display:inline;">
+                            <form action="{{ route('agree.success') }}" method="POST" id="form-agree-{{ $branch->Branch_id }}"
+                                style="display:inline;">
                                 @csrf
                                 @method('POST')
 
@@ -63,7 +64,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#form-agree').on('submit', function(event) {
+            $('form[id^="form-agree-"]').on('submit', function(event) {
                 event.preventDefault(); // Ngăn chặn việc gửi form mặc định
 
                 var formData = $(this).serialize(); // Lấy dữ liệu từ form

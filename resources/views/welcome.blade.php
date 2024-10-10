@@ -1,90 +1,7 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@extends('layouts.customer.customerApp')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Sân Tenis nè</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-    {{-- link file styles.css --}}
-    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-</head>
-
-<body class="gradient-background">
-    <nav class="navbar navbar-expand-md shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <b class="text-white">Website Tenis</b>
-            </a>
-            {{-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button> --}}
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Left Side Of Navbar -->
-
-                <!-- Right Side Of Navbar -->
-                <ul class="navbar-nav ms-auto">
-                    <!-- Authentication Links -->
-                    @guest
-                        @if (Route::has('login'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">
-                                    <b class="text-white" style="font-size: 17px">Login</b>
-                                </a>
-                            </li>
-                        @endif
-
-                        @if (Route::has('register'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">
-                                    <b class="text-white" style="font-size: 17px">Branch Register</b>
-                                </a>
-                            </li>
-                        @endif
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('home') }}">
-                                <b class="text-white" style="font-size: 17px"> Trang Quản Lý</b>
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                <b class="text-white" style="font-size: 17px"> {{ Auth::user()->Name }}</b>
-
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                    onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="get" class="d-none">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                    @endguest
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+@section('content')
     <div class="container-fluid d-flex align-items-center" style="height: calc(100vh - 60px)">
-
         <div class="container ">
             <div class="row">
                 <!-- Left content area -->
@@ -115,9 +32,8 @@
         </div>
     </div>
 
-    <!-- Modal hiển thị sân -->
-    <div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel"
-        aria-hidden="true">
+    <!-- Modal hiển thị sân trang welcome -->
+    <div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Thêm lớp modal-lg -->
             <div class="modal-content">
                 <div class="modal-header">
@@ -143,7 +59,7 @@
                             allowfullscreen="" loading="lazy"></iframe>
                     </div>
                     <div class="">
-                        <a href="#" class="btn btn-primary">Đặt sân ngay</a>
+                        <a href="" id="modal-url-branch" class="btn btn-primary">Đặt sân ngay</a>
                     </div>
                 </div>
             </div>
@@ -172,6 +88,8 @@
                                 $('#suggestions-list').append(
                                     '<li class="list-group-item suggestion-item" style="cursor: pointer;" ' +
                                     'data-name="' + suggestion.Name + '" ' +
+                                    'data-branchid="' + suggestion.Branch_id +
+                                    '" ' +
                                     'data-address="' + suggestion.Location + '" ' +
                                     'data-image="' + suggestion.Image + '" ' +
                                     'data-cover-image="' + suggestion.Cover_image +
@@ -201,6 +119,9 @@
                 var image = $(this).data('image');
                 var coverImage = $(this).data('cover-image'); // Lấy ảnh bìa
                 var mapUrl = $(this).data('map-url');
+                var url_branch = $(this).data('branchid');
+                var fullUrl = 'welcome-booking-calendar/?branch_id=' +
+                    url_branch; // Nối chuỗi với url_branch
 
                 // Cập nhật thông tin cho modal
                 $('#modal-image').attr('src', image);
@@ -208,13 +129,11 @@
                 $('#modal-name').text(name);
                 $('#modal-address').text(address);
                 $('#modal-map').attr('src', mapUrl); // Cập nhật src của iframe
+                $('#modal-url-branch').attr('href', fullUrl); // Cập nhật link href của thẻ a
 
                 // Hiển thị modal
                 $('#suggestionModal').modal('show');
             });
         });
     </script>
-
-</body>
-
-</html>
+@endsection
