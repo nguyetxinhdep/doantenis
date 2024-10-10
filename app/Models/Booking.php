@@ -12,13 +12,15 @@ class Booking extends Model
     protected $primaryKey = 'Booking_id';
 
     protected $fillable = [
-        'Status', 
-        'Date_booking', 
-        'court_id', 
-        'time_slot_id', 
-        'customer_id', 
-        'price_list_id', 
-        'branch_id'
+        'Status',
+        'Date_booking',
+        'court_id',
+        'time_slot_id',
+        'customer_id',
+        'price_list_id',
+        'branch_id',
+        'Start_time',
+        'End_time'
     ];
 
     public function court()
