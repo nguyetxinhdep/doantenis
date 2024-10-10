@@ -88,53 +88,45 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
-        // Biến để lưu ô được chọn
-        var selectedCell = null;
+        // Mảng chứa các ô đã chọn
+        var selectedCells = [];
 
-        $(document).on('click', 'td.bg-light[data-court-id]', function() {
-            // Nếu có ô đã chọn trước đó
-            if (selectedCell) {
-                // Nếu ô hiện tại đã được chọn trước đó, xóa lớp 'bg-success' và trả về màu ban đầu
-                if (selectedCell === this) {
-                    $(selectedCell).removeClass('bg-success');
-                    $(selectedCell).addClass('bg-light');
-                    selectedCell = null; // Đặt lại ô đã chọn
-                    return; // Thoát ra
-                } else {
-                    // Nếu chọn ô khác, xóa lớp 'bg-success' của ô đã chọn
-                    $(selectedCell).removeClass('bg-success');
-                    $(selectedCell).addClass('bg-light');
-                }
+        // Xử lý sự kiện click trên ô thời gian
+        $(document).on('click', 'td.bg-light[data-court-id], td.bg-success[data-court-id]', function() {
+            var courtId = $(this).data('court-id'); // Lấy ID sân
+            var timeStart = $(this).data('time-start'); // Lấy thời gian bắt đầu
+            var key = courtId + '-' + timeStart; // Tạo key duy nhất cho ô
+
+            // Kiểm tra xem key này có trong mảng selectedCells hay không
+            var index = selectedCells.indexOf(key);
+
+            if (index === -1) { // Nếu key chưa có trong mảng
+                selectedCells.push(key); // Thêm key vào mảng
+                $(this).removeClass('bg-light').addClass('bg-success'); // Đổi màu nền sang màu đã chọn
+            } else { // Nếu key đã có trong mảng
+                selectedCells.splice(index, 1); // Xóa key khỏi mảng
+                $(this).removeClass('bg-success').addClass('bg-light'); // Đổi lại màu nền ban đầu
             }
-
-            // Đặt ô hiện tại là ô đã chọn
-            selectedCell = this;
-            $(selectedCell).removeClass('bg-light');
-            $(selectedCell).addClass('bg-success'); // Thêm lớp màu xanh lá
         });
 
         // Xử lý sự kiện click trên nút Đặt sân
         $('#reserve-button').on('click', function() {
-            if (!selectedCell) {
-                alert('Vui lòng chọn một sân trước khi đặt!');
+            if (selectedCells.length === 0) {
+                alert('Vui lòng chọn ít nhất một khung giờ trước khi đặt!');
                 return;
             }
 
-            var courtId = $(selectedCell).data('court-id');
-            var timeStart = $(selectedCell).data('time-start');
-            var date = '{{ $selectedDate }}'; // Ngày đã chọn
+            // Thực hiện hành động đặt sân
+            var date = '{{ $selectedDate }}'; // Lấy ngày đã chọn
 
             // Hiển thị thông báo đặt sân
-            if (confirm('Bạn có chắc chắn muốn đặt sân ' + courtId + ' vào lúc ' + timeStart + ' ngày ' + date +
-                    '?')) {
-                // Thực hiện hành động đặt sân, ví dụ gửi yêu cầu đến máy chủ
+            if (confirm('Bạn có chắc chắn muốn đặt các khung giờ đã chọn?')) {
                 $.ajax({
                     url: '{{ route('booking.reserve') }}', // Đường dẫn đến route đặt sân
                     method: 'POST',
                     data: {
-                        court_id: courtId,
+                        selectedCells: selectedCells, // Gửi mảng các ô đã chọn
                         date: date,
-                        time_start: timeStart,
                         _token: '{{ csrf_token() }}' // CSRF token
                     },
                     success: function(response) {
