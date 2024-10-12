@@ -1,0 +1,74 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-10">
+            <div class="card">
+                {{-- <div class="card-header">{{ __('Đăng Ký Chi Nhánh') }}</div> --}}
+
+                <div class="card-body">
+                    <form action="{{ route('user.register.store') }}" method="post">
+                        @csrf
+
+                        <div class="row mb-3">
+                            <label for="Name" class="col-md-4 col-form-label text-md-end">Họ Tên</label>
+                            <div class="col-md-6">
+                                <input id="Name" type="text"
+                                    class="form-control @error('Name') is-invalid @enderror" name="Name" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Số điện thoại</label>
+                            <div class="col-md-6">
+                                <input id="Phone" type="text"
+                                    class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="Email" class="col-md-4 col-form-label text-md-end">Email</label>
+                            <div class="col-md-6">
+                                <input id="Email" type="email"
+                                    class="form-control @error('Email') is-invalid @enderror" name="Email" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="Password" class="col-md-4 col-form-label text-md-end">Mật khẩu</label>
+                            <div class="col-md-6">
+                                <input id="Password" type="password"
+                                    class="form-control @error('Password') is-invalid @enderror" name="Password" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="Password_confirmation" class="col-md-4 col-form-label text-md-end">Xác nhận mật
+                                khẩu</label>
+                            <div class="col-md-6">
+                                <input id="Password_confirmation" type="password"
+                                    class="form-control @error('Password_confirmation') is-invalid @enderror"
+                                    name="Password_confirmation" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Đăng Ký') }}
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    {{ __('Reset') }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {{-- <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
+                            Nếu bạn muốn dùng 1 gmail để quản lý nhiều chi nhánh thì vui lòng
+                            đăng nhập để đăng ký chi nhánh khác!</span>
+                    </div> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

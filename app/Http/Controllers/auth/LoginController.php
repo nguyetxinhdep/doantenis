@@ -4,6 +4,7 @@ namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
@@ -60,9 +61,16 @@ class LoginController extends Controller
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công');
                 }
             }
+            // Kiểm tra thêm điều kiện Role
+            if (Auth::user()->Role == '5') {
+                $customer = Customer::where('user_id', (Auth::user()->User_id))->first();
+                session(['customer_id' => $customer->Customer_id]);
+                // Nếu role khác 0 thì cho phép vào trang admin
+                return redirect()->route('welcome')->with('success', 'Đăng nhập thành công');
+            }
 
             // Kiểm tra thêm điều kiện Role
-            if (Auth::user()->Role != '0') {
+            if (Auth::user()->Role != '0' && Auth::user()->Role != '-1') {
                 // Nếu role khác 0 thì cho phép vào trang admin
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công');
             }

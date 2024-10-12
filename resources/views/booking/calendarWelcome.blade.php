@@ -7,14 +7,17 @@
             $selectedDate = request('date', date('Y-m-d'));
             $formattedDate = date('d/m/Y', strtotime($selectedDate));
             $currentDate = date('Y-m-d');
+            $branch_id = request('branch_id');
+            // dd( $branch_id);
         @endphp
 
         <center>
             <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
 
-            <form method="GET" action="{{ route('booking.calendar.search') }}">
+            <form method="GET" action="{{ route('customer.calendar.search') }}">
                 <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
                 <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
+                <input type="hidden" name="branch_id" value="{{ $branch_id }}">
                 <button type="submit" class="btn btn-primary">Xem lịch</button>
             </form>
         </center>
@@ -26,6 +29,9 @@
             <span class="bg-danger mx-2"
                 style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
             Đã đặt
+            <span class="bg-warning mx-2"
+                style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
+            Sân của bạn
             <span class="bg-secondary mx-2"
                 style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
             Khóa
@@ -50,6 +56,7 @@
                             @for ($time = 5.5; $time <= 23; $time += 0.5)
                                 @php
                                     $isBooked = false;
+                                    $ofcustomer = false; //kiểm tra phải của khách hàng thì in vàng
                                     foreach ($bookings as $booking) {
                                         if (
                                             $booking->court_id == $court->Court_id &&
@@ -58,12 +65,15 @@
                                             $time < (float) date('H.i', strtotime($booking->End_time))
                                         ) {
                                             $isBooked = true;
+                                            if ($booking->customer_id == session('customer_id')) {
+                                                $ofcustomer = true;
+                                            }
                                             break;
                                         }
                                     }
                                 @endphp
-                                <td class="{{ $isBooked ? 'bg-danger' : 'bg-light' }}" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="{{ $court->Name }}"
+                                <td class="{{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}"
                                     @if (!$isBooked) data-court-id="{{ $court->Court_id }}" 
                                     data-time-start="{{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }}" 
                                     data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
