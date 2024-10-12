@@ -8,6 +8,7 @@ use App\Http\Controllers\courts\CourtsController;
 use App\Http\Controllers\custemer_type\CustomerTypeController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\price_list\PriceListController;
+use App\Http\Controllers\user\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,11 +24,13 @@ use App\Http\Controllers\price_list\PriceListController;
 //trang khách hàng vào thấy
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 // Route xem lịch đặt sân trang welcome
 Route::get('welcome-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('welcome.booking.calendar');
-Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
+// khách hàng tìm lịch
+Route::get('cus-calendar-search', [BookingController::class, 'customerSearchCalendar'])->name('customer.calendar.search');
+// Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 
 // search sân tenis
 // routes/web.php
@@ -37,6 +40,8 @@ Route::middleware('guest')->group(function () { //chưa đăng nhập mới vào
     Route::get('admin/login', [LoginController::class, 'index'])->name('login'); //đặt tên route là login cho thuận tiện
     Route::post('admin/login/store', [LoginController::class, 'store'])->name('login.store');
     Route::get('/branch/register', [BranchController::class, 'showForm'])->name('register');
+    Route::get('/user/register', [UserController::class, 'showForm'])->name('user.register');
+    Route::post('/user/register-store', [UserController::class, 'registerStore'])->name('user.register.store');
 });
 
 //đăng ký chi nhánh
@@ -130,4 +135,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
     });
+
+    // đặt sân
+    Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 });
