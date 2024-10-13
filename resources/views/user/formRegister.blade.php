@@ -7,7 +7,7 @@
                 {{-- <div class="card-header">{{ __('Đăng Ký Chi Nhánh') }}</div> --}}
 
                 <div class="card-body">
-                    <form action="{{ route('user.register.store') }}" method="post">
+                    <form id="user-form" action="{{ route('user.register.store') }}" method="post">
                         @csrf
 
                         <div class="row mb-3">
@@ -71,4 +71,46 @@
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#user-form').on('submit', function(event) {
+                event.preventDefault(); // Ngăn chặn việc gửi form mặc định
+
+                var formData = $(this).serialize(); // Lấy dữ liệu từ form
+
+                // Hiển thị overlay và spinner khi gửi yêu cầu AJAX
+                $('#overlay-spinner').removeClass('d-none');
+
+                $.ajax({
+                    url: '{{ route('user.register.store') }}',
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // Ẩn overlay và spinner sau khi nhận phản hồi
+                        $('#overlay-spinner').addClass('d-none');
+
+                        showAlert('success', response.message);
+                        // Reset form sau khi thành công
+                        $('#user-form')[0].reset();
+
+                    },
+                    error: function(xhr) {
+                        $('#overlay-spinner').addClass('d-none');
+                        if (xhr.status === 422) { //dữ liệu không hợp lệ
+                            // Hiển thị lỗi xác thực
+                            var errors = xhr.responseJSON.errors;
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] +
+                                    '<br>'; // Lấy thông điệp lỗi đầu tiên
+                            });
+                            showAlert('danger', errorMessage); // Hiển thị thông báo lỗi
+                        } else {
+                            showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

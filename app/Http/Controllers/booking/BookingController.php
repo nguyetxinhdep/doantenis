@@ -83,6 +83,8 @@ class BookingController extends Controller
             'date' => 'required|date', // date phải là một ngày hợp lệ
         ]);
 
+        $paymentOption = $request->input('paymentOption'); // Nhận hình thức thanh toán
+        // Log::debug($paymentOption);
         $timestamp = strtotime($request->date); // Chuyển đổi ngày thành timestamp
 
         if (date('N', $timestamp) >= 1 && date('N', $timestamp) <= 5) {
@@ -205,24 +207,40 @@ class BookingController extends Controller
             ];
         }
 
-        // Lưu các booking vào cơ sở dữ liệu
-        foreach ($bookings as $booking) {
-            Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
+        $total = 0;
+
+        // Bắt đầu transaction
+        DB::beginTransaction();
+        try {
+            // Lưu các booking vào cơ sở dữ liệu
+            foreach ($bookings as $booking) {
+                Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
+                $price_list = PriceList::where('Price_list_id', $booking['price_list_id'])->first();
+                // Tính tổng tiền
+                $total += $this->calculatePrice($price_list->Price, $booking['Start_time'], $booking['End_time']);
+            }
+
+            // Commit transaction nếu mọi thứ thành công
+            DB::commit();
+            Log::debug($total);
+
+            // Trả về phản hồi cho client
+            return response()->json(['success' => true, 'total' => $total]);
+        } catch (\Exception $e) {
+            // Rollback transaction nếu có lỗi
+            DB::rollBack();
+            Log::error('Error occurred while reserving: ' . $e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Đặt sân thất bại.'], 500);
         }
-
-        Log::debug($bookings);
-
-        // Trả về phản hồi cho client
-        return response()->json(['success' => true]);
     }
 
 
 
     //  phương thức để tính tiền
-    private function calculatePrice($courtId, $startTime, $endTime)
+    private function calculatePrice($pricePerHour, $startTime, $endTime)
     {
         // Logic tính tiền dựa trên sân, thời gian bắt đầu và kết thúc
-        $pricePerHour = 100000; // Giá một giờ (giả sử)
         $start = strtotime($startTime);
         $end = strtotime($endTime);
         $duration = ($end - $start) / 3600; // Tính thời gian đặt bằng giờ

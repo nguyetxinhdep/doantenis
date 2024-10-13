@@ -8,6 +8,7 @@ use App\Http\Controllers\courts\CourtsController;
 use App\Http\Controllers\custemer_type\CustomerTypeController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\price_list\PriceListController;
+use App\Http\Controllers\thanhtoan\PaymentController;
 use App\Http\Controllers\user\UserController;
 
 /*
@@ -59,6 +60,11 @@ Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass']);
 
 //đăng nhập rồi mới vào những route bên dưới được
 Route::middleware(['auth'])->group(function () {
+    // thanh toán
+    // Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
+    Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
+    Route::post('/momo_paymentQR', [PaymentController::class, 'paymomo']);
+    // -------------------
     Route::get('admin/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/home', [MainController::class, 'index'])->name('home');
