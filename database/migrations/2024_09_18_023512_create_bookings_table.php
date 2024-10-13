@@ -20,9 +20,6 @@ class CreateBookingsTable extends Migration
             $table->foreignId('customer_id')->constrained('customers', 'Customer_id')->onDelete('cascade');
             $table->foreignId('price_list_id')->constrained('price_list', 'Price_list_id')->onDelete('cascade');
             $table->foreignId('branch_id')->constrained('branches', 'Branch_id')->onDelete('cascade');
-            $table->float('total')->nullable();
-            $table->float('collected')->nullable();
-            $table->float('remaining')->nullable();
         });
     }
 

@@ -21,9 +21,6 @@ class Booking extends Model
         'branch_id',
         'Start_time',
         'End_time',
-        'total',
-        'collected',
-        'remaining',
     ];
 
     public function court()

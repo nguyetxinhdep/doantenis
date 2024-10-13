@@ -87,13 +87,13 @@
             </table>
         </div>
         <!-- Lựa chọn hình thức thanh toán -->
-        <div class="text-center mt-3">
+        {{-- <div class="text-center mt-3">
             <label for="payment-option">Chọn hình thức thanh toán:</label>
             <select id="payment-option" class="form-control" style="width: 200px; margin: 0 auto;">
                 <option value="deposit">Đặt cọc</option>
                 <option value="full">Thanh toán toàn bộ</option>
             </select>
-        </div>
+        </div> --}}
 
         <!-- Nút đặt sân -->
         <div class="text-center mt-3">
@@ -139,7 +139,7 @@
             }
 
             // Lấy thông tin về hình thức thanh toán
-            var paymentOption = $('#payment-option').val();
+            // var paymentOption = $('#payment-option').val();
 
             var date = '{{ $selectedDate }}'; // Lấy ngày đã chọn
 
@@ -160,7 +160,7 @@
                     data: {
                         selectedCells: reservations, // Gửi mảng thông tin đặt sân
                         date: date,
-                        paymentOption: paymentOption, // Gửi thông tin về hình thức thanh toán
+                        // paymentOption: paymentOption, // Gửi thông tin về hình thức thanh toán
                         _token: '{{ csrf_token() }}' // CSRF token
                     },
                     success: function(response) {

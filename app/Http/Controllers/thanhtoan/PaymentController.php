@@ -150,8 +150,8 @@ class PaymentController extends Controller
         $orderInfo = "Thanh toán qua ATM MoMo";
         $amount = "10000";
         $orderId = time() . "";
-        $redirectUrl = "http://127.0.0.1:8000/admin";
-        $ipnUrl = "http://127.0.0.1:8000/admin";
+        $redirectUrl = "http://127.0.0.1:8000/";
+        $ipnUrl = "http://api.course-selling.id.vn/api/order/payment-notification";
         $extraData = "";
         // $partnerCode = $_POST["partnerCode"];
         // $accessKey = $_POST["accessKey"];
@@ -206,7 +206,7 @@ class PaymentController extends Controller
         return json_decode($config, true);
     }
 
-    public function payMomo(Request $request)
+    public function payMomo(Request $req)
     {
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
         $array = $this->config();
@@ -215,7 +215,13 @@ class PaymentController extends Controller
         $accessKey = $array["accessKey"];
         $secretKey = $array["secretKey"];
         $orderInfo = "Thanh toán qua MoMo";
-        $amount = $request->price; //giá tiền
+
+        $amount = $req->input('total'); //giá tiền--------------------
+        // Kiểm tra nếu nút 'datcoc' được nhấn
+        if ($req->has('datcoc')) {
+            $amount = $amount / 2; // Chia đôi số tiền
+        }
+
         $orderId = time() . "";
         // $extraData = "merchantName=MoMo Partner";
         $extraData = "";
@@ -223,7 +229,12 @@ class PaymentController extends Controller
         $requestId = time() . "";
         $requestType = "captureWallet";
         // $redirectUrl =  route('momo.return');
-        $redirectUrl =  "http://127.0.0.1:8000/admin";
+        $redirectUrl =  route('xulythanhtoanthanhcong', [
+            'Payment_id' => $req->Payment_id,
+            'Booking_id' => $req->Booking_id,
+            'pay' =>  $amount
+        ]); //route chuyển tới khi thanh toán thành công-------------
+
         $ipnUrl = "http://api.course-selling.id.vn/api/order/payment-notification";
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
         $signature = hash_hmac("sha256", $rawHash, $secretKey);

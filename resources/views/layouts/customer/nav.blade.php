@@ -11,7 +11,16 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
-
+                @auth
+                    @if (Auth()->user()->Role == '5')
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="text-white nav-link {{ request()->routeIs('booking.history') ? 'fw-bold text-info' : '' }}"
+                                    aria-current="page" href="{{ route('booking.history') }}">Lịch sử đặt sân</a>
+                            </li>
+                        </ul>
+                    @endif
+                @endauth
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ms-auto">
                     <!-- Authentication Links -->
