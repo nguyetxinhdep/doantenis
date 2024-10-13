@@ -12,7 +12,7 @@ class CreatePaymentsTable extends Migration
             $table->id('Payment_id');
             $table->double('Amount');
             $table->string('Payment_method', 10);
-            $table->dateTime('Payment_date');
+            $table->dateTime('Payment_date')->nullable();
             $table->double('Debt')->nullable();
             $table->double('Paid');
             $table->boolean('Status');

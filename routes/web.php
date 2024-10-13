@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
     // Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
     Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
     Route::post('/momo_paymentQR', [PaymentController::class, 'paymomo']);
+    Route::get('/xulythanhtoanthanhcong/{Payment_id}/{Booking_id}/{pay}', [BookingController::class, 'xuLyThanhToanTC'])->name('xulythanhtoanthanhcong');
+
     // -------------------
     Route::get('admin/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -140,6 +142,10 @@ Route::middleware(['auth'])->group(function () {
         // Route xem lịch đặt sân trong trong manager-role 3
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
+        // lịch sử đặt sân customer
+        Route::get('booking-history', [BookingController::class, 'bookingHistory'])->name('booking.history');
+        // cần thanh toán
+        // Route::get('need-pay', [BookingController::class, 'needPay'])->name('need.pay');
     });
 
     // đặt sân

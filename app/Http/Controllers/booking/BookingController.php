@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\PriceList;
 use App\Models\TimeSlot;
 use Carbon\Carbon;
@@ -70,7 +71,99 @@ class BookingController extends Controller
 
             return view('booking.calendarWelcome', compact('courts', 'bookings', 'title'));
         } else {
-            dd(123);
+            return abort(404);
+        }
+    }
+
+    public function bookingHistory(Request $req)
+    {
+        $title = "Lịch sử đặt sân";
+
+        $history = Booking::join('branches', 'bookings.branch_id', '=', 'branches.Branch_id')
+            ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+            ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
+            ->where("bookings.customer_id", session('customer_id'))
+            // ->where("bookings.Status", 2)
+            ->select(
+                'bookings.*',
+                'branches.name as branch_name',
+                'courts.name as court_name',
+                'payments.Debt as Debt',
+                'payments.Payment_id as Payment_id',
+            )
+            ->orderBy('bookings.created_at', 'desc')
+            ->get();
+
+        return view('booking.bookingHistory', compact('history', 'title'));
+    }
+
+    // public function needPay(Request $req)
+    // {
+    //     $title = "Cần thanh toán";
+
+    //     $history = Booking::join('branches', 'bookings.branch_id', '=', 'branches.Branch_id')
+    //         ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+    //         ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
+    //         ->where("bookings.customer_id", session('customer_id'))
+    //         ->where("bookings.Status", 2)
+    //         ->select(
+    //             'bookings.*',
+    //             'branches.name as branch_name',
+    //             'courts.name as court_name',
+    //             'payments.Debt as Debt',
+    //             'payments.Payment_id as Payment_id',
+    //         )
+    //         ->orderBy('bookings.created_at', 'desc')
+    //         ->get();
+
+    //     return view('booking.needPay', compact('history', 'title'));
+    // }
+
+    public function xuLyThanhToanTC(Request $req, $Payment_id, $Booking_id, $pay)
+    {
+        DB::beginTransaction(); // Bắt đầu transaction
+
+        try {
+            $payment = Payment::where('Payment_id', $Payment_id)->first();
+
+            if (!$payment) {
+                // Nếu không tìm thấy payment, ném ra ngoại lệ
+                throw new \Exception('Payment not found');
+            }
+
+            // Tính toán số tiền còn nợ
+            $debt = $payment->Amount - ($payment->Paid + $pay);
+            $status = ($debt == 0 ? 1 : 0); //trạng thái, 0 chưa thanh toán đủ, 1 thanh toán đủ
+            // Cập nhật bản ghi thanh toán
+            $payment->update([
+                'Payment_method' => 'Bank',
+                'Debt' => $debt, // tiền còn nợ
+                'Paid' => $payment->Paid + $pay, // Số tiền đã thanh toán
+                'Status' => $status, // Trạng thái thanh toán
+                'Payment_date' => now(),
+            ]);
+
+            //----------------------bảng booking
+            $booking = Booking::where('Booking_id', $Booking_id)->first();
+
+            if (!$booking) {
+                // Nếu không tìm thấy booking, ném ra ngoại lệ
+                throw new \Exception('Booking not found');
+            }
+
+            // Cập nhật trạng thái booking
+            $booking->update([
+                'Status' => $status, // Trạng thái thanh toán
+            ]);
+
+            DB::commit(); // Cam kết transaction nếu mọi thứ thành công
+
+            return redirect()->route('booking.history')->with('success', 'Thanh toán thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction nếu có lỗi
+            Log::error('Payment processing error: ' . $e->getMessage());
+
+            return redirect()->route('booking.history')->with('error', 'Có lỗi xảy ra trong quá trình thanh toán: ' . $e->getMessage());
         }
     }
 
@@ -166,7 +259,7 @@ class BookingController extends Controller
                         'Date_booking' => $request->date,
                         'Start_time' => $mergedStart->format('H:i'),
                         'End_time' => $mergedEnd->format('H:i'),
-                        'Status' => 0,
+                        'Status' => 2,
                         'time_slot_id' => $timeslot_id,
                         'customer_id' => $customerID,
                         'price_list_id' => $pricelist->Price_list_id,
@@ -199,7 +292,7 @@ class BookingController extends Controller
                 'Date_booking' => $request->date,
                 'Start_time' => $mergedStart->format('H:i'),
                 'End_time' => $mergedEnd->format('H:i'),
-                'Status' => 0,
+                'Status' => 2,
                 'time_slot_id' => $timeslot_id,
                 'customer_id' => $customerID,
                 'price_list_id' => $pricelist->Price_list_id,
@@ -214,10 +307,20 @@ class BookingController extends Controller
         try {
             // Lưu các booking vào cơ sở dữ liệu
             foreach ($bookings as $booking) {
-                Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
+                $bookingcreate = Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
                 $price_list = PriceList::where('Price_list_id', $booking['price_list_id'])->first();
                 // Tính tổng tiền
                 $total += $this->calculatePrice($price_list->Price, $booking['Start_time'], $booking['End_time']);
+
+                Payment::create([
+                    'Amount' => $total,
+                    'Payment_method' => 'Bank',
+                    'Debt' => $total,
+                    'Paid' => 0,
+                    'Status' => 0,
+                    'branch_id' => $booking['branch_id'],
+                    'booking_id' => $bookingcreate->Booking_id
+                ]);
             }
 
             // Commit transaction nếu mọi thứ thành công
