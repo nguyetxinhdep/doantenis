@@ -26,6 +26,9 @@ class UserController extends Controller
             'Phone' => 'required|digits_between:10,11',
             'Email' => 'required|string|email|max:255|unique:users',
             'Password' => 'required|string|confirmed',
+        ], [
+            'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            'Password.confirmed' => 'Mật khẩu xác nhận không khớp',
         ]);
 
         // Sử dụng transaction để đảm bảo rollback nếu có lỗi xảy ra
@@ -51,7 +54,7 @@ class UserController extends Controller
             DB::commit();
 
             // Đăng ký thành công, chuyển hướng hoặc trả về thông báo
-            return redirect()->back()->with('success', 'Đăng ký tài khoản thành công.');
+            return response()->json(['message' => 'Đăng ký tài khoản thành công',], 201);
         } catch (\Exception $e) {
             // Nếu có lỗi, rollback transaction
             DB::rollBack();

@@ -86,6 +86,14 @@
                 </tbody>
             </table>
         </div>
+        <!-- Lựa chọn hình thức thanh toán -->
+        <div class="text-center mt-3">
+            <label for="payment-option">Chọn hình thức thanh toán:</label>
+            <select id="payment-option" class="form-control" style="width: 200px; margin: 0 auto;">
+                <option value="deposit">Đặt cọc</option>
+                <option value="full">Thanh toán toàn bộ</option>
+            </select>
+        </div>
 
         <!-- Nút đặt sân -->
         <div class="text-center mt-3">
@@ -124,35 +132,35 @@
         });
 
         // Xử lý sự kiện click trên nút Đặt sân
-        // Xử lý sự kiện click trên nút Đặt sân
         $('#reserve-button').on('click', function() {
             if (selectedCells.length === 0) {
                 alert('Vui lòng chọn ít nhất một khung giờ trước khi đặt!');
                 return;
             }
 
-            // Thực hiện hành động đặt sân
+            // Lấy thông tin về hình thức thanh toán
+            var paymentOption = $('#payment-option').val();
+
             var date = '{{ $selectedDate }}'; // Lấy ngày đã chọn
 
             // Tạo mảng chứa thông tin về sân và giờ đặt
             var reservations = selectedCells.map(function(cell) {
-                var parts = cell.split('-'); // Tách key thành courtId và timeStart và timeEnd
+                var parts = cell.split('-');
                 return {
                     courtId: parts[0],
                     timeStart: parts[1],
-                    timeEnd: parts[2] // Lấy thời gian kết thúc từ ô đã chọn
+                    timeEnd: parts[2]
                 };
             });
-            // console.log(reservations);
 
-            // Hiển thị thông báo đặt sân
             if (confirm('Bạn có chắc chắn muốn đặt các khung giờ đã chọn?')) {
                 $.ajax({
-                    url: '{{ route('booking.reserve') }}', // Đường dẫn đến route đặt sân
+                    url: '{{ route('booking.reserve') }}',
                     method: 'POST',
                     data: {
                         selectedCells: reservations, // Gửi mảng thông tin đặt sân
                         date: date,
+                        paymentOption: paymentOption, // Gửi thông tin về hình thức thanh toán
                         _token: '{{ csrf_token() }}' // CSRF token
                     },
                     success: function(response) {
