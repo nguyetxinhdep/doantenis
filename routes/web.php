@@ -150,4 +150,12 @@ Route::middleware(['auth'])->group(function () {
         // quản lý và nhân viên đặt sân
         Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'reserve'])->name('manager.booking.reserve');
     });
+
+    // nhóm quản lý thanh toán
+    Route::prefix('payment')->group(function () {
+        // Route xem
+        Route::get('manage', [PaymentController::class, 'index'])->name('manager.payment');
+        Route::post('payment-court', [PaymentController::class, 'paymentCourt'])->name('manager.paymentCourt');
+        Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt');
+    });
 });

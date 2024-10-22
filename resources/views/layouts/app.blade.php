@@ -49,7 +49,7 @@
 
     {{-- chỗ hiển thị thông báo lỗi --}}
     <!-- Thông báo sẽ được chèn vào đây -->
-    <div id="alert-container"></div>
+    <div id="alert-container" style="z-index: 1060"></div>
 
     {{-- include script aler ở đầu khi load cho khỏi bị mất --}}
     @include('layouts.alert')

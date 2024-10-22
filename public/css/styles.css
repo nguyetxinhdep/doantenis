@@ -83,4 +83,5 @@
     pointer-events: none;
     /* Ngăn người dùng tương tác */
     opacity: 0.6;
+    border-radius: 0 !important;
 }
