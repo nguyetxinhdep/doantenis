@@ -3,10 +3,123 @@
 namespace App\Http\Controllers\thanhtoan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    public function index(Request $req)
+    {
+        $title = "Quản lý thanh toán";
+
+        $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
+            ->join('users', 'users.User_id', '=', 'customers.user_id')
+            ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+            ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
+            ->select(
+                'bookings.*',
+                'users.Name as user_name',
+                'users.Phone as user_phone',
+                'courts.name as court_name',
+                'payments.Debt as Debt',
+                'payments.Payment_id as Payment_id',
+            )
+            ->orderBy('bookings.created_at', 'desc')
+            ->get();
+
+        return view('thanhtoan.index', compact('history', 'title'));
+    }
+
+    public function paymentCourt(Request $req)
+    {
+        // Bắt đầu transaction
+        DB::beginTransaction();
+
+        try {
+            // Lấy thông tin từ request
+            $booking_id = $req->input('Booking_id');
+            $payment_id = $req->input('Payment_id');
+            $so_tien_thanh_toan = (float) $req->input('paymentAmount');
+
+            // Tìm payment record theo payment_id
+            $payment = Payment::find($payment_id);
+
+            if (!$payment) {
+                // Trả về thông báo lỗi nếu không tìm thấy payment record
+                return redirect()->back()->with('danger', 'Không tìm thấy thông tin thanh toán.');
+            }
+
+            // Tính toán lại số tiền còn nợ và số tiền đã trả
+            $newDebt = $payment->Debt - $so_tien_thanh_toan;
+            $newPaid = $payment->Paid + $so_tien_thanh_toan; // Số tiền đã trả
+
+            // Cập nhật lại số tiền nợ và số tiền đã trả trong bảng payments
+            $payment->Debt = max(0, $newDebt); // Debt không thể nhỏ hơn 0
+            $payment->Paid = $newPaid; // Cập nhật số tiền đã trả
+            if ($newDebt <= 0) {
+                $payment->Status = 1; //hết nợ
+            }
+            $payment->save();
+
+            $booking = Booking::find($booking_id);
+
+            if ($newDebt <= 0) { // Nếu số tiền đã trả hết, cập nhật trạng thái đã trả đủ
+                if ($booking) {
+                    $booking->status = 1; // Cập nhật trạng thái đã thanh toán đủ
+                    $booking->save();
+                }
+            } else {
+                if ($booking) {
+                    $booking->status = 0; // Cập nhật trạng thái chưa thu đủ
+                    $booking->save();
+                }
+            }
+
+            // Nếu tất cả đều thành công, commit transaction
+            DB::commit();
+
+            // Trả về thông báo thành công
+            return redirect()->back()->with('success', 'Thanh toán thành công!');
+        } catch (\Exception $e) {
+            // Nếu có lỗi, rollback tất cả thay đổi
+            DB::rollBack();
+
+            return redirect()->back()->with('danger', 'Có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.');
+        }
+    }
+
+    public function cancelCourt(Request $req)
+    {
+        // Bắt đầu transaction
+        DB::beginTransaction();
+
+        try {
+            // Lấy thông tin từ request
+            $booking_id = $req->input('Booking_id');
+
+            $booking = Booking::find($booking_id);
+
+            if ($booking) {
+                $booking->status = 3; // Cập nhật trạng thái chưa thu đủ
+                $booking->save();
+            }
+
+            // Nếu tất cả đều thành công, commit transaction
+            DB::commit();
+
+            // Trả về thông báo thành công
+            return redirect()->back()->with('success', 'Hủy sân thành công!');
+        } catch (\Exception $e) {
+            // Nếu có lỗi, rollback tất cả thay đổi
+            DB::rollBack();
+
+            return redirect()->back()->with('danger', 'Có lỗi xảy ra trong quá trình Hủy sân. Vui lòng thử lại.');
+        }
+    }
+
+    // --------------
     public function vnpay_payment(Request $request)
     {
         $code_card = rand(00, 9999); //randum mã đơn hàng để test

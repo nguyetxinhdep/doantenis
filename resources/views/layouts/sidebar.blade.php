@@ -261,7 +261,16 @@
                                 </li>
                             </ul>
                         </li>
+                        {{-- level 0 Quản lý thanh toán --}}
+                        <li class="nav-item {{ request()->routeIs('manager.payment  ') ? 'menu-open' : '' }}">
+                            <a href="{{ route('manager.payment') }}" class="nav-link">
+                                <p>
+                                    Quản lý thanh toán
+                                    {{-- cấp 0 quản lý sân --}}
 
+                                </p>
+                            </a>
+                        </li>
                         {{-- ----------------------------------------------------------------------------------------- --}}
                     @elseif (Auth::user()->Role == '4')
                         {{-- Branch Staff --}}
