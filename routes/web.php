@@ -144,10 +144,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
         // lịch sử đặt sân customer
         Route::get('booking-history', [BookingController::class, 'bookingHistory'])->name('booking.history');
-        // cần thanh toán
-        // Route::get('need-pay', [BookingController::class, 'needPay'])->name('need.pay');
-    });
+        // khách hàng đặt sân
+        Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 
-    // đặt sân
-    Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
+        // quản lý và nhân viên đặt sân
+        Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'reserve'])->name('manager.booking.reserve');
+    });
 });

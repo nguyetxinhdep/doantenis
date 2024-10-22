@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PriceList;
 use App\Models\TimeSlot;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -124,41 +125,49 @@ class BookingController extends Controller
         DB::beginTransaction(); // Bắt đầu transaction
 
         try {
-            $payment = Payment::where('Payment_id', $Payment_id)->first();
+            // kiểm tra kết quả thanh toán từ momo
+            $resultCode = $req->input('resultCode');
 
-            if (!$payment) {
-                // Nếu không tìm thấy payment, ném ra ngoại lệ
-                throw new \Exception('Payment not found');
+            // nếu thanh toán thành công
+            if ($resultCode == 0) {
+                $payment = Payment::where('Payment_id', $Payment_id)->first();
+
+                if (!$payment) {
+                    // Nếu không tìm thấy payment, ném ra ngoại lệ
+                    throw new \Exception('Payment not found');
+                }
+
+                // Tính toán số tiền còn nợ
+                $debt = $payment->Amount - ($payment->Paid + $pay);
+                $status = ($debt == 0 ? 1 : 0); //trạng thái, 0 chưa thanh toán đủ, 1 thanh toán đủ
+                // Cập nhật bản ghi thanh toán
+                $payment->update([
+                    'Payment_method' => 'Bank',
+                    'Debt' => $debt, // tiền còn nợ
+                    'Paid' => $payment->Paid + $pay, // Số tiền đã thanh toán
+                    'Status' => $status, // Trạng thái thanh toán
+                    'Payment_date' => now(),
+                ]);
+
+                //----------------------bảng booking
+                $booking = Booking::where('Booking_id', $Booking_id)->first();
+
+                if (!$booking) {
+                    // Nếu không tìm thấy booking, ném ra ngoại lệ
+                    throw new \Exception('Booking not found');
+                }
+
+                // Cập nhật trạng thái booking
+                $booking->update([
+                    'Status' => $status, // Trạng thái thanh toán
+                ]);
+
+                DB::commit(); // Cam kết transaction nếu mọi thứ thành công
+
+                return redirect()->route('booking.history')->with('success', 'Thanh toán thành công.');
+            } else {
+                return redirect()->route('booking.history');
             }
-
-            // Tính toán số tiền còn nợ
-            $debt = $payment->Amount - ($payment->Paid + $pay);
-            $status = ($debt == 0 ? 1 : 0); //trạng thái, 0 chưa thanh toán đủ, 1 thanh toán đủ
-            // Cập nhật bản ghi thanh toán
-            $payment->update([
-                'Payment_method' => 'Bank',
-                'Debt' => $debt, // tiền còn nợ
-                'Paid' => $payment->Paid + $pay, // Số tiền đã thanh toán
-                'Status' => $status, // Trạng thái thanh toán
-                'Payment_date' => now(),
-            ]);
-
-            //----------------------bảng booking
-            $booking = Booking::where('Booking_id', $Booking_id)->first();
-
-            if (!$booking) {
-                // Nếu không tìm thấy booking, ném ra ngoại lệ
-                throw new \Exception('Booking not found');
-            }
-
-            // Cập nhật trạng thái booking
-            $booking->update([
-                'Status' => $status, // Trạng thái thanh toán
-            ]);
-
-            DB::commit(); // Cam kết transaction nếu mọi thứ thành công
-
-            return redirect()->route('booking.history')->with('success', 'Thanh toán thành công.');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction nếu có lỗi
             Log::error('Payment processing error: ' . $e->getMessage());
@@ -175,85 +184,155 @@ class BookingController extends Controller
             'selectedCells' => 'required', // selectedCells phải là một mảng
             'date' => 'required|date', // date phải là một ngày hợp lệ
         ]);
+        // Bắt đầu transaction
+        DB::beginTransaction();
+        try {
+            $paymentOption = $request->input('paymentOption'); // Nhận hình thức thanh toán
+            // Log::debug($paymentOption);
+            $timestamp = strtotime($request->date); // Chuyển đổi ngày thành timestamp
 
-        $paymentOption = $request->input('paymentOption'); // Nhận hình thức thanh toán
-        // Log::debug($paymentOption);
-        $timestamp = strtotime($request->date); // Chuyển đổi ngày thành timestamp
-
-        if (date('N', $timestamp) >= 1 && date('N', $timestamp) <= 5) {
-            $time_slot_status = 1; // Ngày từ thứ Hai đến thứ Sáu
-        } else {
-            $time_slot_status = 2; // Ngày thứ Bảy hoặc Chủ nhật
-        }
-
-        $reservations = []; // Mảng để lưu trữ thông tin đặt sân tạm thời
-        // Log::debug($request->selectedCells);
-        // Lặp qua các ô đã chọn từ client
-        foreach ($request->selectedCells as $cell) {
-            $courtId = $cell['courtId'];
-            $timeStart = \Carbon\Carbon::createFromFormat('H:i', $cell['timeStart']); // Chuyển đổi thời gian bắt đầu
-            $timeEnd = \Carbon\Carbon::createFromFormat('H:i', $cell['timeEnd']); // Chuyển đổi thời gian kết thúc
-
-            // Kiểm tra xem đã có đặt sân cho sân này hay chưa
-            if (!isset($reservations[$courtId])) {
-                $reservations[$courtId] = []; // Nếu chưa, khởi tạo một mảng trống cho sân này
+            if (date('N', $timestamp) >= 1 && date('N', $timestamp) <= 5) {
+                $time_slot_status = 1; // Ngày từ thứ Hai đến thứ Sáu
+            } else {
+                $time_slot_status = 2; // Ngày thứ Bảy hoặc Chủ nhật
             }
 
-            // Thêm thông tin thời gian vào mảng đặt sân
-            $reservations[$courtId][] = [
-                'timeStart' => $timeStart,
-                'timeEnd' => $timeEnd,
-            ];
-        }
+            $reservations = []; // Mảng để lưu trữ thông tin đặt sân tạm thời
+            // Log::debug($request->selectedCells);
+            // Lặp qua các ô đã chọn từ client
+            foreach ($request->selectedCells as $cell) {
+                $courtId = $cell['courtId'];
+                $timeStart = \Carbon\Carbon::createFromFormat('H:i', $cell['timeStart']); // Chuyển đổi thời gian bắt đầu
+                $timeEnd = \Carbon\Carbon::createFromFormat('H:i', $cell['timeEnd']); // Chuyển đổi thời gian kết thúc
 
-        // -----
-        $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
-        $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+                // Kiểm tra xem đã có đặt sân cho sân này hay chưa
+                if (!isset($reservations[$courtId])) {
+                    $reservations[$courtId] = []; // Nếu chưa, khởi tạo một mảng trống cho sân này
+                }
 
-        $bookings = []; // Mảng chứa thông tin booking đã gộp
-        // Log::debug($reservations);
-        // Lặp qua từng sân
-        foreach ($reservations as $courtId => $times) {
-            // Sắp xếp các thời gian theo thời gian bắt đầu
-            usort($times, function ($a, $b) {
-                return $a['timeStart']->timestamp <=> $b['timeStart']->timestamp;
-            });
+                // Thêm thông tin thời gian vào mảng đặt sân
+                $reservations[$courtId][] = [
+                    'timeStart' => $timeStart,
+                    'timeEnd' => $timeEnd,
+                ];
+            }
 
-            // Khởi tạo thời gian bắt đầu và kết thúc gộp
-            $mergedStart = $times[0]['timeStart'];
-            $mergedEnd = $times[0]['timeEnd'];
+            // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+            if (Auth()->user()->Role == 5) { //là khách hàng
+                $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
+                $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+            } else { // là chủ sân hoặc nhân viên
+                $ten_kh = $request->input('name');
+                $sdt_kh = $request->input('phone');
+                $tien_da_tra = floatval($request->input('amount')); //tiền đã trả
 
-            // láy id chi nhánh
-            $branchID = Court::where('Court_id', $courtId)->first()->branch_id;
+                $user_new = User::create([
+                    'Name' => $ten_kh,
+                    'Phone' => $sdt_kh,
+                    'Role' => '5',
+                ]);
 
-            // lấy tất cả khung giờ theo id chi nhánh
-            $timeslots = TimeSlot::where('branch_id', $branchID)->where('Status', $time_slot_status)->get();
+                $kh_new = Customer::create([
+                    'user_id' => $user_new->User_id,
+                    'customer_type_id' => 1,
+                ]);
 
-            // Lặp qua từng khoảng thời gian
-            foreach ($times as $key => $time) {
-                if ($time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
-                    // Nếu thời gian tiếp theo liên tục với thời gian trước đó
-                    $mergedEnd = max($mergedEnd, $time['timeEnd']);
-                } else {
-                    // ---thao tác để ra timeslot mong muốn
-                    // Lặp qua từng khung giờ để kiểm tra
-                    foreach ($timeslots as $slot) {
-                        // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
-                        $startTime = Carbon::createFromFormat('H:i:s', $slot->start_time); // assuming it's stored in 'H:i:s' format
-                        $endTime = Carbon::createFromFormat('H:i:s', $slot->end_time);
+                $customerID = $kh_new->Customer_id;
+                $customer_type_id = $kh_new->customer_type_id;
+            }
 
-                        // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
-                        if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
-                            $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
-                            break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
+
+            $bookings = []; // Mảng chứa thông tin booking đã gộp
+            // Log::debug($reservations);
+            // Lặp qua từng sân
+            foreach ($reservations as $courtId => $times) {
+                // Sắp xếp các thời gian theo thời gian bắt đầu
+                usort($times, function ($a, $b) {
+                    return $a['timeStart']->timestamp <=> $b['timeStart']->timestamp;
+                });
+
+                // Khởi tạo thời gian bắt đầu và kết thúc gộp
+                $mergedStart = $times[0]['timeStart'];
+                $mergedEnd = $times[0]['timeEnd'];
+
+                // láy id chi nhánh
+                $branchID = Court::where('Court_id', $courtId)->first()->branch_id;
+
+                // lấy tất cả khung giờ theo id chi nhánh
+                $timeslots = TimeSlot::where('branch_id', $branchID)
+                    ->where('Status', $time_slot_status)
+                    ->orderBy('Start_time', 'asc') // Sắp xếp theo Start_time tăng dần
+                    ->get();
+
+                // Lặp qua từng khoảng thời gian
+                foreach ($times as $key => $time) {
+                    if ($time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
+                        // Nếu thời gian tiếp theo liên tục với thời gian trước đó
+                        $mergedEnd = max($mergedEnd, $time['timeEnd']);
+                    } else {
+                        // ---thao tác để ra timeslot mong muốn
+                        // Lặp qua từng khung giờ để kiểm tra
+                        foreach ($timeslots as $slot) {
+                            // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
+                            $startTime = Carbon::createFromFormat('H:i:s', $slot->start_time); // assuming it's stored in 'H:i:s' format
+                            $endTime = Carbon::createFromFormat('H:i:s', $slot->end_time);
+
+                            // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
+                            if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
+                                $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
+                                break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
+                            }
                         }
-                    }
 
+                        // lấy ra bảng giá phù hợp
+                        $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
+
+
+                        // Nếu không liên tục, lưu thông tin booking và khởi tạo thời gian mới
+                        $bookings[] = [
+                            'court_id' => $courtId,
+                            'Date_booking' => $request->date,
+                            'Start_time' => $mergedStart->format('H:i'),
+                            'End_time' => $mergedEnd->format('H:i'),
+                            'Status' => 2,
+                            'time_slot_id' => $timeslot_id,
+                            'customer_id' => $customerID,
+                            'price_list_id' => $pricelist->Price_list_id,
+                            'branch_id' => $branchID
+                        ];
+                        $mergedStart = $time['timeStart'];
+                        $mergedEnd = $time['timeEnd'];
+                    }
+                }
+                // -----------end foreach
+
+                // tạo mảng lưu giá trị có slot để xử lý nếu đặt ở 2 khung giờ khác nhau với giá khác nhau
+                $arraytimeslot = [];
+
+                foreach ($timeslots as $slot) {
+                    $arraytimeslot[] = $slot;
+
+                    // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
+                    $startTime = Carbon::createFromFormat('H:i:s', $slot->Start_time); // assuming it's stored in 'H:i:s' format
+                    $endTime = Carbon::createFromFormat('H:i:s', $slot->End_time);
+
+                    // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
+                    // Log các giá trị debug
+                    // Log::debug('merstart:', ['merstart' => $mergedStart]);
+                    // Log::debug('merend', ['merend' => $mergedEnd]);
+                    // Log::debug('start:', ['start' => $startTime]);
+                    // Log::debug('end', ['end' => $endTime]);
+                    if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
+                        $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
+                        break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
+                    }
+                }
+
+                if (isset($timeslot_id)) {
                     // lấy ra bảng giá phù hợp
                     $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
 
-
-                    // Nếu không liên tục, lưu thông tin booking và khởi tạo thời gian mới
+                    // Thêm booking cuối cùng vào mảng
                     $bookings[] = [
                         'court_id' => $courtId,
                         'Date_booking' => $request->date,
@@ -265,62 +344,82 @@ class BookingController extends Controller
                         'price_list_id' => $pricelist->Price_list_id,
                         'branch_id' => $branchID
                     ];
-                    $mergedStart = $time['timeStart'];
-                    $mergedEnd = $time['timeEnd'];
+                } else {
+                    // nếu giờ đặt nằm ở 2 khung giờ thì tách ra 2 booking
+                    for ($i = 0; $i < count($arraytimeslot); $i++) {
+                        $slottemp = $arraytimeslot[$i];
+                        if (
+                            $mergedStart->greaterThanOrEqualTo($slottemp->Start_time)
+                            && $mergedEnd->greaterThan($slottemp->End_time)
+                            && $mergedEnd->lessThan($arraytimeslot[$i + 1]->End_time)
+                        ) {
+                            // lấy ra bảng giá phù hợp
+                            $pricelist1 = PriceList::where('time_slot_id', $arraytimeslot[$i]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
+                            $pricelist2 = PriceList::where('time_slot_id', $arraytimeslot[$i + 1]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
+                            $bookings[] = [
+                                'court_id' => $courtId,
+                                'Date_booking' => $request->date,
+                                'Start_time' => $mergedStart->format('H:i'),
+                                'End_time' => $arraytimeslot[$i]->End_time,
+                                'Status' => 2,
+                                'time_slot_id' => $arraytimeslot[$i]->Time_slot_id,
+                                'customer_id' => $customerID,
+                                'price_list_id' => $pricelist1->Price_list_id,
+                                'branch_id' => $branchID
+                            ];
+
+                            $bookings[] = [
+                                'court_id' => $courtId,
+                                'Date_booking' => $request->date,
+                                'Start_time' => $arraytimeslot[$i]->End_time,
+                                'End_time' => $mergedEnd->format('H:i'),
+                                'Status' => 2,
+                                'time_slot_id' => $arraytimeslot[$i + 1]->Time_slot_id,
+                                'customer_id' => $customerID,
+                                'price_list_id' => $pricelist2->Price_list_id,
+                                'branch_id' => $branchID
+                            ];
+                        }
+                    }
                 }
             }
-            // -----------end foreach
 
-            foreach ($timeslots as $slot) {
-                // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
-                $startTime = Carbon::createFromFormat('H:i:s', $slot->Start_time); // assuming it's stored in 'H:i:s' format
-                $endTime = Carbon::createFromFormat('H:i:s', $slot->End_time);
-
-                // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
-                if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
-                    $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
-                    break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
-                }
-            }
-
-            // lấy ra bảng giá phù hợp
-            $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
-
-            // Thêm booking cuối cùng vào mảng
-            $bookings[] = [
-                'court_id' => $courtId,
-                'Date_booking' => $request->date,
-                'Start_time' => $mergedStart->format('H:i'),
-                'End_time' => $mergedEnd->format('H:i'),
-                'Status' => 2,
-                'time_slot_id' => $timeslot_id,
-                'customer_id' => $customerID,
-                'price_list_id' => $pricelist->Price_list_id,
-                'branch_id' => $branchID
-            ];
-        }
-
-        $total = 0;
-
-        // Bắt đầu transaction
-        DB::beginTransaction();
-        try {
+            // -------------------
             // Lưu các booking vào cơ sở dữ liệu
             foreach ($bookings as $booking) {
                 $bookingcreate = Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
                 $price_list = PriceList::where('Price_list_id', $booking['price_list_id'])->first();
                 // Tính tổng tiền
-                $total += $this->calculatePrice($price_list->Price, $booking['Start_time'], $booking['End_time']);
+                $total = $this->calculatePrice($price_list->Price, $booking['Start_time'], $booking['End_time']);
 
-                Payment::create([
-                    'Amount' => $total,
-                    'Payment_method' => 'Bank',
-                    'Debt' => $total,
-                    'Paid' => 0,
-                    'Status' => 0,
-                    'branch_id' => $booking['branch_id'],
-                    'booking_id' => $bookingcreate->Booking_id
-                ]);
+                // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+                if (Auth()->user()->Role == 5) { //là khách hàng
+                    Payment::create([
+                        'Amount' => $total,
+                        'Payment_method' => 'Bank',
+                        'Debt' => $total, //còn nợ
+                        'Paid' => 0,
+                        'Status' => 0,
+                        'branch_id' => $booking['branch_id'],
+                        'booking_id' => $bookingcreate->Booking_id
+                    ]);
+                } else { // là chủ sân hoặc nhân viên
+                    $con_no = $total - $tien_da_tra;
+                    if ($con_no == 0) { // trả đủ rồi
+                        $status = 1;
+                    } else {
+                        $status = 0;
+                    }
+                    Payment::create([
+                        'Amount' => $total,
+                        'Payment_method' => 'Bank',
+                        'Debt' => $con_no,
+                        'Paid' => $tien_da_tra,
+                        'Status' => $status,
+                        'branch_id' => $booking['branch_id'],
+                        'booking_id' => $bookingcreate->Booking_id
+                    ]);
+                }
             }
 
             // Commit transaction nếu mọi thứ thành công
