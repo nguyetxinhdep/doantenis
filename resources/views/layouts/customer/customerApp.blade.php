@@ -26,6 +26,15 @@
 </head>
 
 <body class="gradient-background">
+    <!-- Overlay and Spinner -->
+    {{-- làm mờ và tạo máy quay spinner trong khi chờ phản hồi --}}
+    <div id="overlay-spinner" class=d-none>
+        <div class="overlay"></div>
+        <div class="spinner-border" style="color: #44bf44" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     @include('layouts.customer.nav')
 
     @yield('content')

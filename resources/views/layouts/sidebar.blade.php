@@ -117,19 +117,6 @@
                                     </a>
                                 </li>
                             </ul>
-                            {{-- cấp 1 Another action --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- Another action --}}
-                                            Another action
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
                         {{-- --------------------------------------------------------------------------------------------------- --}}
                     @elseif (Auth::user()->Role == '2')
@@ -138,6 +125,43 @@
                         {{-- ------------------------------------------------------------------------------------------------ --}}
                     @elseif (Auth::user()->Role == '3')
                         {{-- Branch Manager  --}}
+
+                        {{-- level 0 quản lí chi nhánh --}}
+                        <li
+                            class="nav-item {{ request()->routeIs('manage-branches.detail') || request()->routeIs('manage-branches.create-staff') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link">
+
+                                <p>
+                                    Quản lí chi nhánh
+                                    {{-- cấp 0 quản lí chi nhánh --}}
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            {{-- cấp 1 DS Chi Nhánh --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.detail') ? 'active' : '' }}"
+                                        href="{{ route('manage-branches.detail') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- DS Chi Nhánh --}}
+                                            Cập nhật thông tin Chi Nhánh
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.create-staff') ? 'active' : '' }}"
+                                        href="{{ route('manage-branches.detail') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- Tạo nhân viên chi nhánh --}}
+                                            Tạo nhân viên chi nhánh
+                                        </p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
                         {{-- level 0 Quản lý sân --}}
                         <li
@@ -231,32 +255,6 @@
                                         <p>
                                             {{-- Thêm bảng giá --}}
                                             Thêm bảng giá
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        {{-- level 0 quản lí chi nhánh --}}
-                        <li class="nav-item {{ request()->routeIs('manage-branches.detail') ? 'menu-open' : '' }}">
-                            <a href="#" class="nav-link">
-
-                                <p>
-                                    Quản lí chi nhánh
-                                    {{-- cấp 0 quản lí chi nhánh --}}
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            {{-- cấp 1 DS Chi Nhánh --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('manage-branches.viewAll') ? 'active' : '' }}"
-                                        href="{{ route('manage-branches.detail') }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- DS Chi Nhánh --}}
-                                            Cập nhật thông tin Chi Nhánh
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>

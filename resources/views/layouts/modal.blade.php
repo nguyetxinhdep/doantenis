@@ -30,12 +30,12 @@
         let formToSubmit; // Biến để lưu trữ form sẽ được submit
 
         // Hàm hiển thị modal xác nhận xóa chi nhánh
-        window.showDeleteModal = function(branchId) {
+        window.showDeleteModal = function(id) {
             // Hiển thị modal
             $('#deleteModal').modal('show');
 
             // Lưu trữ form tương ứng vào biến formToSubmit
-            formToSubmit = $('#deleteForm' + branchId);
+            formToSubmit = $('#deleteForm' + id);
         }
 
         // Khi người dùng nhấn nút "Xóa" trong modal

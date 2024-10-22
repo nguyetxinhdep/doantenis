@@ -8,13 +8,15 @@
             $formattedDate = date('d/m/Y', strtotime($selectedDate));
             $currentDate = date('Y-m-d');
             $branch_id = request('branch_id');
-            // dd( $branch_id);
+            // Lấy thời gian hiện tại
+            $currentTime = date('H:i', strtotime('+7 hours'));
         @endphp
 
         <center>
             <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
 
             <form method="GET" action="{{ route('customer.calendar.search') }}">
+                @csrf
                 <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
                 <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
                 <input type="hidden" name="branch_id" value="{{ $branch_id }}">
@@ -45,7 +47,8 @@
                         @for ($time = 5.5; $time <= 23; $time += 0.5)
                             <th class="text-center bg-info">
                                 {{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }} -
-                                {{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}</th>
+                                {{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}
+                            </th>
                         @endfor
                     </tr>
                 </thead>
@@ -56,7 +59,14 @@
                             @for ($time = 5.5; $time <= 23; $time += 0.5)
                                 @php
                                     $isBooked = false;
-                                    $ofcustomer = false; //kiểm tra phải của khách hàng thì in vàng
+                                    $ofcustomer = false;
+                                    $timeStart = sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60);
+                                    // So sánh thời gian để xác định sân nào không thể đặt
+                                    $isTimeExpired =
+                                        strtotime($selectedDate) < strtotime($currentDate) ||
+                                        ($selectedDate == $currentDate &&
+                                            strtotime($timeStart) <= strtotime($currentTime) + 30 * 60);
+
                                     foreach ($bookings as $booking) {
                                         if (
                                             $booking->court_id == $court->Court_id &&
@@ -72,30 +82,33 @@
                                         }
                                     }
                                 @endphp
-                                <td class="{{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
+                                <td class="{{ $isTimeExpired ? 'position-relative' : '' }} {{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}"
+                                    @if (!$isBooked && !$isTimeExpired) data-court-id="{{ $court->Court_id }}" 
+                                    data-time-start="{{ $timeStart }}" 
+                                    data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
+                                    style="cursor: pointer;" @endif>
+                                    {{ $isBooked || $isTimeExpired ? '' : 'x' }}
+                                    @if ($isTimeExpired)
+                                        <div class="overlay"></div>
+                                    @endif
+                                </td>
+                                {{-- <td class="{{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}"
                                     @if (!$isBooked) data-court-id="{{ $court->Court_id }}" 
-                                    data-time-start="{{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }}" 
+                                    data-time-start="{{ $timeStart }}" 
                                     data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
                                     style="cursor: pointer;" @endif>
                                     {{ $isBooked ? '' : 'x' }}
-                                </td>
+
+                                </td> --}}
                             @endfor
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <!-- Lựa chọn hình thức thanh toán -->
-        {{-- <div class="text-center mt-3">
-            <label for="payment-option">Chọn hình thức thanh toán:</label>
-            <select id="payment-option" class="form-control" style="width: 200px; margin: 0 auto;">
-                <option value="deposit">Đặt cọc</option>
-                <option value="full">Thanh toán toàn bộ</option>
-            </select>
-        </div> --}}
 
-        <!-- Nút đặt sân -->
         <div class="text-center mt-3">
             <button id="reserve-button" class="btn btn-success">Đặt sân</button>
         </div>
@@ -168,7 +181,7 @@
                         location.reload(); // Tải lại trang để cập nhật lịch
                     },
                     error: function(xhr) {
-                        alert('Đặt sân không thành công. Vui lòng thử lại.');
+                        alert('Đặt sân không thành công. Vui lòng đăng nhập và thử lại.');
                     }
                 });
             }

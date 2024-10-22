@@ -135,5 +135,57 @@
                 $('#suggestionModal').modal('show');
             });
         });
+
+        $('#search-form').on('submit', function(event) {
+            event.preventDefault(); // Ngăn chặn việc gửi form mặc định
+
+            var formData = $(this).serialize(); // Lấy dữ liệu từ form
+
+            // Hiển thị overlay và spinner khi gửi yêu cầu AJAX
+            $('#overlay-spinner').removeClass('d-none');
+
+            $.ajax({
+                url: '{{ route('search') }}',
+                method: 'get',
+                data: formData,
+                success: function(response) {
+                    // Ẩn overlay và spinner sau khi nhận phản hồi
+                    $('#overlay-spinner').addClass('d-none');
+
+                    $('#suggestions-list').empty().show();
+                    $.each(data, function(index, suggestion) {
+                        $('#suggestions-list').append(
+                            '<li class="list-group-item suggestion-item" style="cursor: pointer;" ' +
+                            'data-name="' + suggestion.Name + '" ' +
+                            'data-branchid="' + suggestion.Branch_id +
+                            '" ' +
+                            'data-address="' + suggestion.Location + '" ' +
+                            'data-image="' + suggestion.Image + '" ' +
+                            'data-cover-image="' + suggestion.Cover_image +
+                            '" ' +
+                            'data-map-url="' + suggestion.link_map.split(
+                                '"')[1] + '">' +
+                            '<strong>' + suggestion.Name + '</strong><br>' +
+                            '<small>' + suggestion.Location + '</small>' +
+                            '</li>');
+                    });
+                },
+                error: function(xhr) {
+                    $('#overlay-spinner').addClass('d-none');
+                    if (xhr.status === 422) { //dữ liệu không hợp lệ
+                        // Hiển thị lỗi xác thực
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = '';
+                        $.each(errors, function(key, value) {
+                            errorMessage += value[0] +
+                                '<br>'; // Lấy thông điệp lỗi đầu tiên
+                        });
+                        showAlert('danger', errorMessage); // Hiển thị thông báo lỗi
+                    } else {
+                        showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!');
+                    }
+                }
+            });
+        });
     </script>
 @endsection
