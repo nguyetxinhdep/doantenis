@@ -128,7 +128,13 @@
 
                         {{-- level 0 quản lí chi nhánh --}}
                         <li
-                            class="nav-item {{ request()->routeIs('manage-branches.detail') || request()->routeIs('manage-branches.create-staff') ? 'menu-open' : '' }}">
+                            class="nav-item {{ request()->routeIs('manage-branches.detail') ||
+                            request()->routeIs('manage-branches.create-staff') ||
+                            request()->routeIs('manage-branches.createStaff') ||
+                            request()->routeIs('manage-branches.viewStaff') ||
+                            request()->routeIs('manage-branches.editStaff')
+                                ? 'menu-open'
+                                : '' }}">
                             <a href="#" class="nav-link">
 
                                 <p>
@@ -151,8 +157,20 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('manage-branches.create-staff') ? 'active' : '' }}"
-                                        href="{{ route('manage-branches.detail') }}">
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.viewStaff') || request()->routeIs('manage-branches.editStaff')
+                                        ? 'active'
+                                        : '' }}"
+                                        href="{{ route('manage-branches.viewStaff') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- Tạo nhân viên chi nhánh --}}
+                                            Danh sách nhân viên
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.createStaff') ? 'active' : '' }}"
+                                        href="{{ route('manage-branches.createStaff') }}">
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- Tạo nhân viên chi nhánh --}}
@@ -262,8 +280,9 @@
                             </ul>
                         </li>
                         {{-- level 0 Quản lý thanh toán --}}
-                        <li class="nav-item {{ request()->routeIs('manager.payment  ') ? 'menu-open' : '' }}">
-                            <a href="{{ route('manager.payment') }}" class="nav-link">
+                        <li class="nav-item">
+                            <a href="{{ route('manager.payment') }}"
+                                class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
                                 <p>
                                     Quản lý thanh toán
                                     {{-- cấp 0 quản lý sân --}}
@@ -274,7 +293,88 @@
                         {{-- ----------------------------------------------------------------------------------------- --}}
                     @elseif (Auth::user()->Role == '4')
                         {{-- Branch Staff --}}
+                        {{-- level 0 Quản lý sân --}}
+                        <li
+                            class="nav-item {{ request()->routeIs('manage-courts.getCreate') ||
+                            request()->routeIs('courts.index') ||
+                            request()->routeIs('booking.calendar') ||
+                            request()->routeIs('courts.show')
+                                ? 'menu-open'
+                                : '' }}">
+                            <a href="#" class="nav-link">
+                                <p>
+                                    Quản lý sân
+                                    {{-- cấp 0 quản lý sân --}}
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            {{-- cấp 1 DS sân --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('courts.index') || request()->routeIs('courts.show') ? 'active' : '' }}"
+                                        href="{{ route('courts.index') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- DS sân --}}
+                                            DS sân
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
+                            </ul>
+                            {{-- cấp 1 Lịch tổng quan --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('booking.calendar') ? 'active' : '' }}"
+                                        href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- Lịch tổng quan --}}
+                                            Lịch tổng quan
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
+                            </ul>
 
+                        </li>
+
+                        {{-- level 0 Quản lý Bảng giá --}}
+                        <li
+                            class="nav-item {{ request()->routeIs('price_list.create') || request()->routeIs('price_list.index') ? 'menu-open' : '' }}">
+                            <a href="#" class="nav-link">
+                                <p>
+                                    Quản lý Bảng giá
+                                    {{-- cấp 0 quản lý Bảng giá --}}
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            {{-- cấp 1 DS Bảng giá --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('price_list.index') ? 'active' : '' }}"
+                                        href="{{ route('price_list.index') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- DS bảng giá --}}
+                                            DS bảng giá
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {{-- level 0 Quản lý thanh toán --}}
+                        <li class="nav-item">
+                            <a href="{{ route('manager.payment') }}"
+                                class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
+                                <p>
+                                    Quản lý thanh toán
+                                    {{-- cấp 0 quản lý sân --}}
+
+                                </p>
+                            </a>
+                        </li>
                         {{-- ------------------------------------------------------------------------------------------- --}}
                     @endif
 

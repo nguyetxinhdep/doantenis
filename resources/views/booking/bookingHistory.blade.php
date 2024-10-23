@@ -52,7 +52,7 @@
                                 @endswitch
                             </td>
                             <td>
-                                @if ($booking->Debt != 0)
+                                @if ($booking->Debt != 0 && $booking->Status != 3)
                                     <!-- Chỉ hiển thị nút thanh toán nếu cần thanh toán -->
                                     <form action="/momo_paymentQR" method="POST">
                                         @csrf

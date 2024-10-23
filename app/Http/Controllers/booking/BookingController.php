@@ -401,14 +401,14 @@ class BookingController extends Controller
                         'Paid' => 0,
                         'Status' => 0,
                         'branch_id' => $booking['branch_id'],
-                        'booking_id' => $bookingcreate->Booking_id
+                        'booking_id' => $bookingcreate->Booking_id - 1
                     ]);
                 } else { // là chủ sân hoặc nhân viên
                     $con_no = $total - $tien_da_tra;
                     if ($con_no == 0) { // trả đủ rồi
                         $status = 1;
                     } else {
-                        $status = 0;
+                        $status = 0; //chưa trả đủ
                     }
                     Payment::create([
                         'Amount' => $total,
@@ -417,14 +417,14 @@ class BookingController extends Controller
                         'Paid' => $tien_da_tra,
                         'Status' => $status,
                         'branch_id' => $booking['branch_id'],
-                        'booking_id' => $bookingcreate->Booking_id
+                        'booking_id' => $bookingcreate->Booking_id - 1
                     ]);
                 }
             }
 
             // Commit transaction nếu mọi thứ thành công
             DB::commit();
-            Log::debug($total);
+            // Log::debug($total);
 
             // Trả về phản hồi cho client
             return response()->json(['success' => true, 'total' => $total]);

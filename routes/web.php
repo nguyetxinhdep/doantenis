@@ -8,6 +8,8 @@ use App\Http\Controllers\courts\CourtsController;
 use App\Http\Controllers\custemer_type\CustomerTypeController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\price_list\PriceListController;
+use App\Http\Controllers\profile\ProfileController;
+use App\Http\Controllers\staff\StaffController;
 use App\Http\Controllers\thanhtoan\PaymentController;
 use App\Http\Controllers\user\UserController;
 
@@ -104,6 +106,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('detail/{id}/update', [BranchController::class, 'updateBranch'])->name('manage-branches.update');
         // manager cập nhật thông tin chi nhánh
         Route::get('branch/detail', [BranchController::class, 'managerGetBranchDtl'])->name('manage-branches.detail');
+
+        // ------------staff-----------
+        // view tạo nhân viên cho chi nhánh
+        Route::get('create-staff', [StaffController::class, 'createStaff'])->name('manage-branches.createStaff');
+        Route::post('store-staff', [StaffController::class, 'storeStaff'])->name('manage-branches.storeStaff');
+        Route::get('view-staff', [StaffController::class, 'viewStaff'])->name('manage-branches.viewStaff');
+        Route::get('view-editStaff/{id}', [StaffController::class, 'editStaff'])->name('manage-branches.editStaff');
+        Route::post('updateStaff/{id}', [StaffController::class, 'updateStaff'])->name('manage-branches.updateStaff');
+        Route::post('destroyStaff', [StaffController::class, 'destroyStaff'])->name('manage-branches.destroy');
     });
 
     // Nhóm quản lý sân (courts)
@@ -154,8 +165,14 @@ Route::middleware(['auth'])->group(function () {
     // nhóm quản lý thanh toán
     Route::prefix('payment')->group(function () {
         // Route xem
-        Route::get('manage', [PaymentController::class, 'index'])->name('manager.payment');
-        Route::post('payment-court', [PaymentController::class, 'paymentCourt'])->name('manager.paymentCourt');
-        Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt');
+        Route::get('manage', [PaymentController::class, 'index'])->name('manager.payment'); //hiển thị
+        Route::post('payment-court', [PaymentController::class, 'paymentCourt'])->name('manager.paymentCourt'); //thanh toán sân
+        Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt'); //hủy sân
+        Route::get('searchBookings', [PaymentController::class, 'index'])->name('manager.searchBookings'); //hiển thị
     });
+
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profile/update/{id}', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::get('profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
+    Route::post('profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });

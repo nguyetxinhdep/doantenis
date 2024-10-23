@@ -7,8 +7,9 @@
                 <!-- Left content area -->
                 <div class="col-md-6 d-flex align-items-center justify-content-center text-white background-bong-tenis">
                     <div class="text-center">
-                        <h1>Welcome to Tennis Court Booking</h1>
-                        <p>Book your court now and enjoy the game!</p>
+                        <h3>Chào mừng đến với hệ thống Đặt Sân Tennis</h3>
+                        <p>Hãy đặt sân ngay bây giờ và tận hưởng!</p>
+
 
                         <div class="position-relative">
                             <form class="d-flex" id="search-form">

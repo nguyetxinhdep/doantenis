@@ -1,116 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row justify-content-center mt-3">
-        <div class="col-md-10">
-            <div class="card">
-                {{-- <div class="card-header">{{ __('Đăng Ký Chi Nhánh') }}</div> --}}
-
-                <div class="card-body">
-                    <form id="user-form" action="{{ route('user.register.store') }}" method="post">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="Name" class="col-md-4 col-form-label text-md-end">Họ Tên</label>
-                            <div class="col-md-6">
-                                <input id="Name" type="text"
-                                    class="form-control @error('Name') is-invalid @enderror" name="Name" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Số điện thoại</label>
-                            <div class="col-md-6">
-                                <input id="Phone" type="text"
-                                    class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="Email" class="col-md-4 col-form-label text-md-end">Email</label>
-                            <div class="col-md-6">
-                                <input id="Email" type="email"
-                                    class="form-control @error('Email') is-invalid @enderror" name="Email" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="Password" class="col-md-4 col-form-label text-md-end">Mật khẩu</label>
-                            <div class="col-md-6">
-                                <input id="Password" type="password"
-                                    class="form-control @error('Password') is-invalid @enderror" name="Password" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="Password_confirmation" class="col-md-4 col-form-label text-md-end">Xác nhận mật
-                                khẩu</label>
-                            <div class="col-md-6">
-                                <input id="Password_confirmation" type="password"
-                                    class="form-control @error('Password_confirmation') is-invalid @enderror"
-                                    name="Password_confirmation" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Đăng Ký') }}
-                                </button>
-                                <button type="reset" class="btn btn-secondary">
-                                    {{ __('Reset') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    {{-- <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
-                            Nếu bạn muốn dùng 1 gmail để quản lý nhiều chi nhánh thì vui lòng
-                            đăng nhập để đăng ký chi nhánh khác!</span>
-                    </div> --}}
-                </div>
+    <div class="container my-3">
+        <form action="{{ route('manage-branches.storeStaff') }}" method="POST">
+            @csrf
+            <!-- Chọn chi nhánh -->
+            <div class="form-group">
+                <label for="branch">Chi Nhánh</label>
+                <select name="branch_id" id="branch" class="form-control">
+                    @foreach ($branches as $branch)
+                        <option {{ session('branch_active')->Branch_id == $branch->Branch_id ? 'selected' : '' }}
+                            value="{{ $branch->Branch_id }}">{{ $branch->Name }}</option>
+                    @endforeach
+                </select>
             </div>
-        </div>
+
+            <!-- Nhập tên nhân viên -->
+            <div class="form-group">
+                <label for="name">Tên Nhân Viên</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Nhập tên nhân viên"
+                    required>
+            </div>
+
+            <!-- Nhập email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email" required>
+            </div>
+
+            <!-- Nhập số điện thoại -->
+            <div class="form-group">
+                <label for="phone">Số Điện Thoại</label>
+                <input type="text" name="phone" id="phone" class="form-control" placeholder="Nhập số điện thoại"
+                    required>
+            </div>
+
+            <!-- Nhập chức vụ -->
+            <div class="form-group">
+                <label for="address">Địa chỉ</label>
+                <input type="text" name="address" id="address" class="form-control" placeholder="Nhập địa chỉ"
+                    required>
+            </div>
+
+            <!-- Nút submit -->
+            <button type="submit" class="btn btn-primary">Thêm Nhân Viên</button>
+        </form>
     </div>
-    <script>
-        $(document).ready(function() {
-            $('#user-form').on('submit', function(event) {
-                event.preventDefault(); // Ngăn chặn việc gửi form mặc định
-
-                var formData = $(this).serialize(); // Lấy dữ liệu từ form
-
-                // Hiển thị overlay và spinner khi gửi yêu cầu AJAX
-                $('#overlay-spinner').removeClass('d-none');
-
-                $.ajax({
-                    url: '{{ route('user.register.store') }}',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        // Ẩn overlay và spinner sau khi nhận phản hồi
-                        $('#overlay-spinner').addClass('d-none');
-
-                        showAlert('success', response.message);
-                        // Reset form sau khi thành công
-                        $('#user-form')[0].reset();
-
-                    },
-                    error: function(xhr) {
-                        $('#overlay-spinner').addClass('d-none');
-                        if (xhr.status === 422) { //dữ liệu không hợp lệ
-                            // Hiển thị lỗi xác thực
-                            var errors = xhr.responseJSON.errors;
-                            var errorMessage = '';
-                            $.each(errors, function(key, value) {
-                                errorMessage += value[0] +
-                                    '<br>'; // Lấy thông điệp lỗi đầu tiên
-                            });
-                            showAlert('danger', errorMessage); // Hiển thị thông báo lỗi
-                        } else {
-                            showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!');
-                        }
-                    }
-                });
-            });
-        });
-    </script>
 @endsection

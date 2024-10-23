@@ -34,6 +34,18 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+    {{-- include script aler ở đầu khi load cho khỏi bị mất --}}
+    @include('layouts.alert')
+
+    @if ($message = session('success'))
+        <script>
+            showAlert('success', {!! json_encode($message) !!});
+        </script>
+    @elseif($message = session('danger'))
+        <script>
+            showAlert('danger', {!! json_encode($message) !!});
+        </script>
+    @endif
 
     @include('layouts.customer.nav')
 
