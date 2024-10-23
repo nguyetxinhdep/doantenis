@@ -8,6 +8,7 @@ use App\Http\Controllers\courts\CourtsController;
 use App\Http\Controllers\custemer_type\CustomerTypeController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\price_list\PriceListController;
+use App\Http\Controllers\profile\ProfileController;
 use App\Http\Controllers\staff\StaffController;
 use App\Http\Controllers\thanhtoan\PaymentController;
 use App\Http\Controllers\user\UserController;
@@ -169,4 +170,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt'); //hủy sân
         Route::get('searchBookings', [PaymentController::class, 'index'])->name('manager.searchBookings'); //hiển thị
     });
+
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profile/update/{id}', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::get('profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
+    Route::post('profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });
