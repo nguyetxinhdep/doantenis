@@ -401,7 +401,7 @@ class BookingController extends Controller
                         'Paid' => 0,
                         'Status' => 0,
                         'branch_id' => $booking['branch_id'],
-                        'booking_id' => $bookingcreate->Booking_id - 1
+                        'booking_id' => $bookingcreate->Booking_id
                     ]);
                 } else { // là chủ sân hoặc nhân viên
                     $con_no = $total - $tien_da_tra;
@@ -417,7 +417,7 @@ class BookingController extends Controller
                         'Paid' => $tien_da_tra,
                         'Status' => $status,
                         'branch_id' => $booking['branch_id'],
-                        'booking_id' => $bookingcreate->Booking_id - 1
+                        'booking_id' => $bookingcreate->Booking_id
                     ]);
                 }
             }
