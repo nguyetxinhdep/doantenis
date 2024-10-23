@@ -20,7 +20,7 @@
             <tbody>
                 @if ($history->isEmpty())
                     <tr>
-                        <td colspan="6" class="text-center">Chưa có lịch sử đặt sân nào.</td>
+                        <td colspan="10" class="text-center">Chưa có lịch sử đặt sân nào.</td>
                     </tr>
                 @else
                     @foreach ($history as $booking)
@@ -57,10 +57,8 @@
                             </td>
 
                             <td>
-                                @if ($booking->Debt != 0)
-                                    <!-- Chỉ hiển thị nút thanh toán nếu cần thanh toán -->
-
-                                    <!-- Nút mở modal -->
+                                @if ($booking->Debt != 0 && $booking->Status != 3)
+                                    <!-- Nút mở modal thanh toán -->
                                     <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
                                         data-target="#paymentModal-{{ $booking->Booking_id }}">
                                         Thanh toán
@@ -72,8 +70,8 @@
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="paymentModalLabel">Nhập số tiền thanh
-                                                        toán</h5>
+                                                    <h5 class="modal-title" id="paymentModalLabel">Nhập số tiền thanh toán
+                                                    </h5>
                                                     <button type="button" class="close" data-dismiss="modal"
                                                         aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
@@ -107,12 +105,12 @@
                                         </div>
                                     </div>
 
-
                                     <!-- Nút Hủy -->
                                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                         data-target="#deleteModal-{{ $booking->Booking_id }}">
                                         Hủy
                                     </button>
+
                                     <!-- Modal xác nhận hủy sân -->
                                     <div class="modal fade" id="deleteModal-{{ $booking->Booking_id }}" tabindex="-1"
                                         role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -126,57 +124,31 @@
                                                     </button>
                                                 </div>
                                                 <form id="deleteForm{{ $booking->Booking_id }}"
-                                                    action="{{ route('manager.cancelCourt') }}" method="POST"
-                                                    style="display:inline;">
+                                                    action="{{ route('manager.cancelCourt') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="Payment_id"
+                                                        value="{{ $booking->Payment_id }}">
+                                                    <input type="hidden" name="Booking_id"
+                                                        value="{{ $booking->Booking_id }}">
+
                                                     <div class="modal-body">
                                                         Bạn có chắc chắn muốn hủy đặt sân cho sân này không?
-                                                        @csrf
-                                                        @method('POST')
-
-                                                        <input type="hidden" name="Payment_id"
-                                                            value="{{ $booking->Payment_id }}">
-                                                        <input type="hidden" name="Booking_id"
-                                                            value="{{ $booking->Booking_id }}">
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Đóng</button>
-                                                            <button type="submit" class="btn btn-danger">Xác Nhận
-                                                                Hủy</button>
-                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Đóng</button>
+                                                        <button type="submit" class="btn btn-danger">Xác Nhận Hủy</button>
+                                                    </div>
                                                 </form>
                                             </div>
                                         </div>
                                     </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
+            </tbody>
+        </table>
     </div>
-    @endif
-    </td>
-    </tr>
-    @endforeach
-    @endif
-    </tbody>
-    </table>
-
-    </div>
-    <script>
-        // function submitPaymentForm(bookingId, minAmount) {
-        //     const paymentAmountInput = document.getElementById('paymentAmount-' + bookingId);
-        //     const paymentAmount = parseFloat(paymentAmountInput.value);
-
-        //     if (paymentAmount < minAmount) {
-        //         // showAlert('danger', 'Số tiền thanh toán phải lớn hơn hoặc bằng 1/2 số tiền nợ.');
-        //         return;
-        //     }
-
-        //     // Tạo input chứa số tiền đã nhập và thêm vào form
-        //     const form = document.getElementById('form-agree-' + bookingId);
-        //     const input = document.createElement('input');
-        //     input.type = 'hidden';
-        //     input.name = 'amount'; // Tên của field số tiền đã thanh toán
-        //     input.value = paymentAmount;
-        //     form.appendChild(input);
-
-        //     // Submit form
-        //     form.submit();
-        // }
-    </script>
 @endsection
