@@ -9,7 +9,9 @@
                     <th>Khung giờ</th>
                     <th>Vãng lai</th>
                     <th>Cố định</th>
-                    <th>Hành động</th>
+                    @if (Auth()->user()->Role == '3')
+                        <th>Hành động</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -56,21 +58,23 @@
                                 @endphp
                                 {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
-                            <td>
-                                @php
-                                    $item = $items->first();
-                                @endphp
-                                <a href="{{ route('price_list.edit', $item->time_slot_id) }}"
-                                    class="btn btn-warning btn-sm">Sửa</a>
+                            @if (Auth()->user()->Role == '3')
+                                <td>
+                                    @php
+                                        $item = $items->first();
+                                    @endphp
+                                    <a href="{{ route('price_list.edit', $item->time_slot_id) }}"
+                                        class="btn btn-warning btn-sm">Sửa</a>
 
-                                <form action="{{ route('price_list.destroy', $item->time_slot_id) }}" method="POST"
-                                    style="display: inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
-                                </form>
-                            </td>
+                                    <form action="{{ route('price_list.destroy', $item->time_slot_id) }}" method="POST"
+                                        style="display: inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @endif
                 @endforeach
@@ -98,21 +102,23 @@
                                 @endphp
                                 {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
-                            <td>
-                                @php
-                                    $item = $items->first();
-                                @endphp
-                                <a href="{{ route('price_list.edit', $item->time_slot_id) }}"
-                                    class="btn btn-warning btn-sm">Sửa</a>
+                            @if (Auth()->user()->Role == '3')
+                                <td>
+                                    @php
+                                        $item = $items->first();
+                                    @endphp
+                                    <a href="{{ route('price_list.edit', $item->time_slot_id) }}"
+                                        class="btn btn-warning btn-sm">Sửa</a>
 
-                                <form action="{{ route('price_list.destroy', $item->time_slot_id) }}" method="POST"
-                                    style="display: inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
-                                </form>
-                            </td>
+                                    <form action="{{ route('price_list.destroy', $item->time_slot_id) }}" method="POST"
+                                        style="display: inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @endif
                 @endforeach

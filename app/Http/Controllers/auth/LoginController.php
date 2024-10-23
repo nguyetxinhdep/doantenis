@@ -61,7 +61,34 @@ class LoginController extends Controller
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công');
                 }
             }
-            // Kiểm tra thêm điều kiện Role
+
+            if (Auth::user()->Role == '4') { //role 4 là  nhân viên chi nhánh
+                // Lấy chi nhánh đầu tiên mà người dùng có quyền
+                $branches  = User::join('staff', function (JoinClause $join) {
+                    $join->on('users.User_id', '=', 'staff.user_id');
+                })
+                    ->join('branches', function (JoinClause $join) {
+                        $join->on('staff.branch_id', '=', 'branches.Branch_id');
+                    })
+                    ->where('users.User_id', (Auth::user()->User_id))
+                    ->where('branches.Status', 3)
+                    ->select(
+                        'branches.*',
+                        'users.User_id as User_id'
+                    ) // Chọn các cột cần thiết
+                    ->first();
+
+                if ($branches) {
+                    // Lưu ID chi nhánh vào session
+                    session(['branch_active' => $branches]);
+                    // session(['all_branch' => $branches]);
+
+                    // Trả về phản hồi đăng nhập thành công
+                    return redirect()->route('home')->with('success', 'Đăng nhập thành công');
+                }
+            }
+
+            // Kiểm tra thêm điều kiện Role 5 là khách hàng
             if (Auth::user()->Role == '5') {
                 $customer = Customer::where('user_id', (Auth::user()->User_id))->first();
                 session(['customer_id' => $customer->Customer_id]);

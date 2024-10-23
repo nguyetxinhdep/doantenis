@@ -8,7 +8,7 @@
                 <tr>
                     <th>Tên sân</th>
                     <th>Tình trạng</th>
-                    <th>Chi tiết</th>
+                    {{-- <th>Chi tiết</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -16,9 +16,9 @@
                     <tr>
                         <td>{{ $court->Name }}</td>
                         <td>{{ $court->Availability ? 'Hoạt động' : 'Đang bảo trì' }}</td>
-                        <td>
+                        {{-- <td>
                             <a href="{{ route('courts.show', $court->Court_id) }}" class="btn btn-info">Xem chi tiết</a>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             </tbody>

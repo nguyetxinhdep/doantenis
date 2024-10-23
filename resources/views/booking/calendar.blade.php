@@ -222,10 +222,10 @@
                             <label for="phone">Số điện thoại:</label>
                             <input type="tel" class="form-control" id="phone" required>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="amount">Số tiền đã trả:</label>
                             <input type="number" class="form-control" id="amount" placeholder="vd: 90000" required>
-                        </div>
+                        </div> --}}
                     </form>
                 </div>
                 <div class="modal-footer">
