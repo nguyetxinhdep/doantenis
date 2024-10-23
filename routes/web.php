@@ -154,8 +154,9 @@ Route::middleware(['auth'])->group(function () {
     // nhóm quản lý thanh toán
     Route::prefix('payment')->group(function () {
         // Route xem
-        Route::get('manage', [PaymentController::class, 'index'])->name('manager.payment');
+        Route::get('manage', [PaymentController::class, 'index'])->name('manager.payment'); //hiển thị
         Route::post('payment-court', [PaymentController::class, 'paymentCourt'])->name('manager.paymentCourt');
-        Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt');
+        Route::post('cancel-court', [PaymentController::class, 'cancelCourt'])->name('manager.cancelCourt'); //hủy sân
+        Route::get('searchBookings', [PaymentController::class, 'index'])->name('manager.searchBookings'); //hiển thị
     });
 });

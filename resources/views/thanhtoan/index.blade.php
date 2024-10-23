@@ -2,9 +2,57 @@
 
 @section('content')
     <div class="container my-3">
+        <!-- Form tìm kiếm -->
+        <form action="{{ route('manager.searchBookings') }}" method="GET" class="mb-4">
+            <div class="row">
+                <!-- Ô input tìm kiếm tên -->
+                <div class="col-md-3">
+                    <label for="name">Tên</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Nhập tên người đặt"
+                        value="{{ request('name') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm ngày tháng năm -->
+                <div class="col-md-3">
+                    <label for="date">Ngày tháng năm</label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm số điện thoại -->
+                <div class="col-md-3">
+                    <label for="phone">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" name="phone"
+                        placeholder="Nhập số điện thoại" value="{{ request('phone') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm trạng thái -->
+                <div class="col-md-3">
+                    <label for="status">Trạng thái</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">Tất cả</option>
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chưa thu đủ</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã thu đủ (OK)</option>
+                        <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Cần thanh toán để giữ sân
+                        </option>
+                        <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Đã hủy</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nút tìm kiếm -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+        </form>
+        {{-- ----------------------------------------- --}}
+
+        {{-- bảng hiển thị nội dung --}}
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Ngày Đặt</th>
                     <th>Người đặt</th>
                     <th>Số điện thoại</th>
@@ -23,8 +71,10 @@
                         <td colspan="10" class="text-center">Chưa có lịch sử đặt sân nào.</td>
                     </tr>
                 @else
+                    @php $i = 1; @endphp
                     @foreach ($history as $booking)
                         <tr>
+                            <td>{{ $i++ }}</td>
                             <td>{{ \Carbon\Carbon::parse($booking->Date_booking)->format('d/m/Y') }}</td>
                             <td>{{ $booking->user_name }}</td>
                             <td>0{{ $booking->user_phone }}</td>
@@ -117,7 +167,8 @@
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel">Xác nhận hủy đặt sân</h5>
+                                                    <h5 class="modal-title" id="deleteModalLabel">Xác nhận hủy đặt sân
+                                                    </h5>
                                                     <button type="button" class="close" data-dismiss="modal"
                                                         aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
@@ -137,7 +188,8 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-dismiss="modal">Đóng</button>
-                                                        <button type="submit" class="btn btn-danger">Xác Nhận Hủy</button>
+                                                        <button type="submit" class="btn btn-danger">Xác Nhận
+                                                            Hủy</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -150,5 +202,11 @@
                 @endif
             </tbody>
         </table>
+
+        <!-- Hiển thị các liên kết phân trang -->
+        <!-- Hiển thị phân trang -->
+        <div class="">
+            {{ $history->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 @endsection

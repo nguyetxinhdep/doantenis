@@ -14,6 +14,7 @@ class PaymentController extends Controller
     {
         $title = "Quản lý thanh toán";
 
+        // Tạo đối tượng query ban đầu
         $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
             ->join('users', 'users.User_id', '=', 'customers.user_id')
             ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
@@ -24,13 +25,38 @@ class PaymentController extends Controller
                 'users.Phone as user_phone',
                 'courts.name as court_name',
                 'payments.Debt as Debt',
-                'payments.Payment_id as Payment_id',
+                'payments.Payment_id as Payment_id'
             )
-            ->orderBy('bookings.created_at', 'desc')
-            ->get();
+            ->orderBy('bookings.created_at', 'desc');
+
+        // Tìm kiếm theo số điện thoại (loại bỏ số 0 đầu tiên)
+        if ($req->filled('phone')) {
+            $phone = ltrim($req->phone, '0');
+            $history->where('users.Phone', 'like', '%' . $phone . '%');
+        }
+
+        // Tìm kiếm theo tên
+        if ($req->filled('name')) {
+            $history->where('users.Name', 'like', '%' . $req->name . '%');
+        }
+
+        // Tìm kiếm theo ngày đặt
+        if ($req->filled('date')) {
+            $history->whereDate('bookings.Date_booking', $req->date);
+        }
+
+        // Tìm kiếm theo trạng thái
+        if ($req->filled('status')) {
+            $history->where('bookings.Status', $req->status);
+        }
+
+        // Thực hiện phân trang với 10 bản ghi trên mỗi trang
+        $history = $history->paginate(10);
 
         return view('thanhtoan.index', compact('history', 'title'));
     }
+
+
 
     public function paymentCourt(Request $req)
     {
@@ -118,6 +144,8 @@ class PaymentController extends Controller
             return redirect()->back()->with('danger', 'Có lỗi xảy ra trong quá trình Hủy sân. Vui lòng thử lại.');
         }
     }
+
+    public function searchBookings(Request $req) {}
 
     // --------------
     public function vnpay_payment(Request $request)
