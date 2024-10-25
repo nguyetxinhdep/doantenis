@@ -13,7 +13,7 @@ class CreateCustomersTable extends Migration
             $table->string('Customer_code', 20)->nullable();
             $table->timestamps();
             $table->foreignId('user_id')->constrained('users', "User_id")->onDelete('cascade');
-            $table->foreignId('customer_type_id')->constrained('customer_types', 'Customer_type_id')->onDelete('cascade');
+            // $table->foreignId('customer_type_id')->constrained('customer_types', 'Customer_type_id')->onDelete('cascade');
         });
     }
 

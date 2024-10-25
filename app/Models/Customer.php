@@ -12,9 +12,9 @@ class Customer extends Model
     protected $primaryKey = 'Customer_id';
 
     protected $fillable = [
-        'Customer_code', 
-        'user_id', 
-        'customer_type_id'
+        'Customer_code',
+        'user_id',
+        // 'customer_type_id'
     ];
 
     public function user()
@@ -22,10 +22,10 @@ class Customer extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function customerType()
-    {
-        return $this->belongsTo(CustomerType::class, 'customer_type_id');
-    }
+    // public function customerType()
+    // {
+    //     return $this->belongsTo(CustomerType::class, 'customer_type_id');
+    // }
 
     public function bookings()
     {

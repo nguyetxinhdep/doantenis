@@ -12,12 +12,12 @@ class CustomerType extends Model
     protected $primaryKey = 'Customer_type_id';
 
     protected $fillable = [
-        'Name', 
+        'Name',
         'Description'
     ];
 
-    public function customers()
-    {
-        return $this->hasMany(Customer::class, 'customer_type_id');
-    }
+    // public function customers()
+    // {
+    //     return $this->hasMany(Customer::class, 'customer_type_id');
+    // }
 }

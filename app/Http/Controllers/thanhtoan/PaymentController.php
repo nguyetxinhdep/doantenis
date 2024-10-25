@@ -10,6 +10,51 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    // public function index(Request $req)
+    // {
+    //     $title = "Quản lý thanh toán";
+
+    //     // Tạo đối tượng query ban đầu
+    //     $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
+    //         ->join('users', 'users.User_id', '=', 'customers.user_id')
+    //         ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+    //         ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
+    //         ->select(
+    //             'bookings.*',
+    //             'users.Name as user_name',
+    //             'users.Phone as user_phone',
+    //             'courts.name as court_name',
+    //             'payments.Debt as Debt',
+    //             'payments.Payment_id as Payment_id'
+    //         )
+    //         ->orderBy('bookings.created_at', 'desc');
+
+    //     // Tìm kiếm theo số điện thoại (loại bỏ số 0 đầu tiên)
+    //     if ($req->filled('phone')) {
+    //         $phone = ltrim($req->phone, '0');
+    //         $history->where('users.Phone', 'like', '%' . $phone . '%');
+    //     }
+
+    //     // Tìm kiếm theo tên
+    //     if ($req->filled('name')) {
+    //         $history->where('users.Name', 'like', '%' . $req->name . '%');
+    //     }
+
+    //     // Tìm kiếm theo ngày đặt
+    //     if ($req->filled('date')) {
+    //         $history->whereDate('bookings.Date_booking', $req->date);
+    //     }
+
+    //     // Tìm kiếm theo trạng thái
+    //     if ($req->filled('status')) {
+    //         $history->where('bookings.Status', $req->status);
+    //     }
+
+    //     // Thực hiện phân trang với 10 bản ghi trên mỗi trang
+    //     $history = $history->paginate(10);
+
+    //     return view('thanhtoan.index', compact('history', 'title'));
+    // }
     public function index(Request $req)
     {
         $title = "Quản lý thanh toán";
@@ -20,15 +65,24 @@ class PaymentController extends Controller
             ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
             ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
             ->select(
-                'bookings.*',
-                'users.Name as user_name',
-                'users.Phone as user_phone',
-                'courts.name as court_name',
-                'payments.Debt as Debt',
-                'payments.Payment_id as Payment_id'
+                'bookings.booking_code',
+                // 'bookings.Booking_id',
+                DB::raw('GROUP_CONCAT(bookings.Date_booking SEPARATOR ", ") as Date_booking'),
+                DB::raw('GROUP_CONCAT(bookings.Start_time SEPARATOR ", ") as Start_time'),
+                DB::raw('GROUP_CONCAT(bookings.End_time SEPARATOR ", ") as End_time'),
+                DB::raw('MAX(bookings.Status) as Status'),
+                DB::raw('MAX(users.Name) as user_name'),
+                DB::raw('MAX(users.Phone) as user_phone'),
+                DB::raw('GROUP_CONCAT(courts.name SEPARATOR ", ") as court_name'),
+                DB::raw('SUM(payments.Debt) as Debt'),
+                DB::raw('GROUP_CONCAT(payments.Payment_id SEPARATOR ", ") as Payment_id'),
+                DB::raw('MAX(bookings.created_at) as created_at') // Thêm trường created_at để sắp xếp
             )
-            ->orderBy('bookings.created_at', 'desc');
+            ->groupBy('bookings.booking_code', 'bookings.Date_booking') // Nhóm theo booking_code
+            ->orderBy('created_at', 'desc'); // Sắp xếp theo thời gian tạo mới nhất
 
+        // In ra câu truy vấn SQL
+        // dd($history->toSql(), $history->getBindings());
         // Tìm kiếm theo số điện thoại (loại bỏ số 0 đầu tiên)
         if ($req->filled('phone')) {
             $phone = ltrim($req->phone, '0');
@@ -37,12 +91,19 @@ class PaymentController extends Controller
 
         // Tìm kiếm theo tên
         if ($req->filled('name')) {
-            $history->where('users.Name', 'like', '%' . $req->name . '%');
+            $history->where(
+                'users.Name',
+                'like',
+                '%' . $req->name . '%'
+            );
         }
 
         // Tìm kiếm theo ngày đặt
         if ($req->filled('date')) {
-            $history->whereDate('bookings.Date_booking', $req->date);
+            $history->whereDate(
+                'bookings.Date_booking',
+                $req->date
+            );
         }
 
         // Tìm kiếm theo trạng thái
@@ -65,43 +126,57 @@ class PaymentController extends Controller
 
         try {
             // Lấy thông tin từ request
-            $booking_id = $req->input('Booking_id');
-            $payment_id = $req->input('Payment_id');
+            $payment_ids = explode(',', $req->input('Payment_id')); // Tách các Payment_id
+            // dd($payment_ids);
             $so_tien_thanh_toan = (float) $req->input('paymentAmount');
 
-            // Tìm payment record theo payment_id
-            $payment = Payment::find($payment_id);
+            foreach ($payment_ids as $payment_id) {
+                // Tìm payment record theo từng Payment_id
+                $payment = Payment::find($payment_id);
 
-            if (!$payment) {
-                // Trả về thông báo lỗi nếu không tìm thấy payment record
-                return redirect()->back()->with('danger', 'Không tìm thấy thông tin thanh toán.');
-            }
-
-            // Tính toán lại số tiền còn nợ và số tiền đã trả
-            $newDebt = $payment->Debt - $so_tien_thanh_toan;
-            $newPaid = $payment->Paid + $so_tien_thanh_toan; // Số tiền đã trả
-
-            // Cập nhật lại số tiền nợ và số tiền đã trả trong bảng payments
-            $payment->Debt = max(0, $newDebt); // Debt không thể nhỏ hơn 0
-            $payment->Paid = $newPaid; // Cập nhật số tiền đã trả
-            if ($newDebt <= 0) {
-                $payment->Status = 1; //hết nợ
-            }
-            $payment->save();
-
-            $booking = Booking::find($booking_id);
-
-            if ($newDebt <= 0) { // Nếu số tiền đã trả hết, cập nhật trạng thái đã trả đủ
-                if ($booking) {
-                    $booking->status = 1; // Cập nhật trạng thái đã thanh toán đủ
-                    $booking->save();
+                if (!$payment) {
+                    // Trả về thông báo lỗi nếu không tìm thấy payment record nào trong danh sách
+                    return redirect()->back()->with('danger', 'Không tìm thấy thông tin thanh toán');
                 }
-            } else {
-                if ($booking) {
-                    $booking->status = 0; // Cập nhật trạng thái chưa thu đủ
-                    $booking->save();
+
+                if ($req->has('halfPaymentAmount')) {
+                    // Tính toán lại số tiền còn nợ và số tiền đã trả
+                    $newDebt = $payment->Debt - ($payment->Debt) / 2;
+                    $newPaid = $payment->Paid + ($payment->Debt) / 2; // Số tiền đã trả
+                } elseif ($req->has('fullPaymentAmount')) {
+                    // Tính toán lại số tiền còn nợ và số tiền đã trả
+                    $newDebt = $payment->Debt - $payment->Debt;
+                    $newPaid = $payment->Paid + $payment->Debt; // Số tiền đã trả
+                }
+
+
+
+                // Cập nhật lại số tiền nợ và số tiền đã trả trong bảng payments
+                $payment->Debt = $newDebt; // Debt không thể nhỏ hơn 0
+                $payment->Paid = $newPaid; // Cập nhật số tiền đã trả
+
+                if ($newDebt <= 0) {
+                    $payment->Status = 1; // Đánh dấu hết nợ nếu đã thanh toán đủ
+                }
+
+                $payment->save(); // Lưu lại từng bản ghi payment
+
+                // tìm booking 
+                $booking = Booking::find($payment->booking_id);
+
+                if ($newDebt <= 0) { // Nếu số tiền đã trả hết, cập nhật trạng thái đã trả đủ
+                    if ($booking) {
+                        $booking->status = 1; // Cập nhật trạng thái đã thanh toán đủ
+                        $booking->save();
+                    }
+                } else {
+                    if ($booking) {
+                        $booking->status = 0; // Cập nhật trạng thái chưa thu đủ
+                        $booking->save();
+                    }
                 }
             }
+
 
             // Nếu tất cả đều thành công, commit transaction
             DB::commit();
@@ -122,14 +197,18 @@ class PaymentController extends Controller
         DB::beginTransaction();
 
         try {
-            // Lấy thông tin từ request
-            $booking_id = $req->input('Booking_id');
+            $payment_ids = explode(',', $req->input('listPayment_id_string')); // Tách các Payment_id
+            foreach ($payment_ids as $payment_id) {
+                // Tìm payment record theo từng Payment_id
+                $payment = Payment::find($payment_id);
 
-            $booking = Booking::find($booking_id);
+                $booking = Booking::find($payment->booking_id);
+                // dd($booking);
 
-            if ($booking) {
-                $booking->status = 3; // Cập nhật trạng thái chưa thu đủ
-                $booking->save();
+                if ($booking) {
+                    $booking->status = 3; // Cập nhật trạng thái đã hủy
+                    $booking->save();
+                }
             }
 
             // Nếu tất cả đều thành công, commit transaction

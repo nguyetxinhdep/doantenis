@@ -220,7 +220,8 @@ class BookingController extends Controller
             // -----kiểm tra ai là người tạo để lấy customerid và customer type id
             if (Auth()->user()->Role == 5) { //là khách hàng
                 $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
-                $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+                // $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+                $customer_type_id = 1;
             } else { // là chủ sân hoặc nhân viên
                 $ten_kh = $request->input('name');
                 $sdt_kh = $request->input('phone');
@@ -234,11 +235,11 @@ class BookingController extends Controller
 
                 $kh_new = Customer::create([
                     'user_id' => $user_new->User_id,
-                    'customer_type_id' => 1,
+                    // 'customer_type_id' => 1,
                 ]);
 
                 $customerID = $kh_new->Customer_id;
-                $customer_type_id = $kh_new->customer_type_id;
+                $customer_type_id = 1;
             }
 
 
@@ -269,40 +270,41 @@ class BookingController extends Controller
                     if ($time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
                         // Nếu thời gian tiếp theo liên tục với thời gian trước đó
                         $mergedEnd = max($mergedEnd, $time['timeEnd']);
-                    } else {
-                        // ---thao tác để ra timeslot mong muốn
-                        // Lặp qua từng khung giờ để kiểm tra
-                        foreach ($timeslots as $slot) {
-                            // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
-                            $startTime = Carbon::createFromFormat('H:i:s', $slot->start_time); // assuming it's stored in 'H:i:s' format
-                            $endTime = Carbon::createFromFormat('H:i:s', $slot->end_time);
-
-                            // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
-                            if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
-                                $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
-                                break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
-                            }
-                        }
-
-                        // lấy ra bảng giá phù hợp
-                        $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
-
-
-                        // Nếu không liên tục, lưu thông tin booking và khởi tạo thời gian mới
-                        $bookings[] = [
-                            'court_id' => $courtId,
-                            'Date_booking' => $request->date,
-                            'Start_time' => $mergedStart->format('H:i'),
-                            'End_time' => $mergedEnd->format('H:i'),
-                            'Status' => 2,
-                            'time_slot_id' => $timeslot_id,
-                            'customer_id' => $customerID,
-                            'price_list_id' => $pricelist->Price_list_id,
-                            'branch_id' => $branchID
-                        ];
-                        $mergedStart = $time['timeStart'];
-                        $mergedEnd = $time['timeEnd'];
                     }
+                    // else { //nếu không liên tục
+                    //     // ---thao tác để ra timeslot mong muốn
+                    //     // Lặp qua từng khung giờ để kiểm tra
+                    //     foreach ($timeslots as $slot) {
+                    //         // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
+                    //         $startTime = Carbon::createFromFormat('H:i:s', $slot->start_time); // assuming it's stored in 'H:i:s' format
+                    //         $endTime = Carbon::createFromFormat('H:i:s', $slot->end_time);
+
+                    //         // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
+                    //         if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
+                    //             $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
+                    //             break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
+                    //         }
+                    //     }
+
+                    //     // lấy ra bảng giá phù hợp
+                    //     $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
+
+
+                    //     // Nếu không liên tục, lưu thông tin booking và khởi tạo thời gian mới
+                    //     $bookings[] = [
+                    //         'court_id' => $courtId,
+                    //         'Date_booking' => $request->date,
+                    //         'Start_time' => $mergedStart->format('H:i'),
+                    //         'End_time' => $mergedEnd->format('H:i'),
+                    //         'Status' => 2,
+                    //         'time_slot_id' => $timeslot_id,
+                    //         'customer_id' => $customerID,
+                    //         'price_list_id' => $pricelist->Price_list_id,
+                    //         'branch_id' => $branchID
+                    //     ];
+                    //     $mergedStart = $time['timeStart'];
+                    //     $mergedEnd = $time['timeEnd'];
+                    // }
                 }
                 // -----------end foreach
 
@@ -331,6 +333,9 @@ class BookingController extends Controller
                 if (isset($timeslot_id)) {
                     // lấy ra bảng giá phù hợp
                     $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
+                    // lấy max booking_code để tạo bookingcode mới 
+                    $maxBookingCode = Booking::max('booking_code') ?? 0;
+                    $bookingcodeNew = $maxBookingCode + 1;
 
                     // Thêm booking cuối cùng vào mảng
                     $bookings[] = [
@@ -342,7 +347,8 @@ class BookingController extends Controller
                         'time_slot_id' => $timeslot_id,
                         'customer_id' => $customerID,
                         'price_list_id' => $pricelist->Price_list_id,
-                        'branch_id' => $branchID
+                        'branch_id' => $branchID,
+                        'booking_code' => $bookingcodeNew
                     ];
                 } else {
                     // nếu giờ đặt nằm ở 2 khung giờ thì tách ra 2 booking
@@ -353,6 +359,10 @@ class BookingController extends Controller
                             && $mergedEnd->greaterThan($slottemp->End_time)
                             && $mergedEnd->lessThan($arraytimeslot[$i + 1]->End_time)
                         ) {
+                            // lấy max booking_code để tạo bookingcode mới 
+                            $maxBookingCode = Booking::max('booking_code') ?? 0;
+                            $bookingcodeNew = $maxBookingCode + 1;
+                            // Log::debug('code:', [$bookingcodeNew]);
                             // lấy ra bảng giá phù hợp
                             $pricelist1 = PriceList::where('time_slot_id', $arraytimeslot[$i]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
                             $pricelist2 = PriceList::where('time_slot_id', $arraytimeslot[$i + 1]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
@@ -365,7 +375,8 @@ class BookingController extends Controller
                                 'time_slot_id' => $arraytimeslot[$i]->Time_slot_id,
                                 'customer_id' => $customerID,
                                 'price_list_id' => $pricelist1->Price_list_id,
-                                'branch_id' => $branchID
+                                'branch_id' => $branchID,
+                                'booking_code' => $bookingcodeNew
                             ];
 
                             $bookings[] = [
@@ -377,7 +388,8 @@ class BookingController extends Controller
                                 'time_slot_id' => $arraytimeslot[$i + 1]->Time_slot_id,
                                 'customer_id' => $customerID,
                                 'price_list_id' => $pricelist2->Price_list_id,
-                                'branch_id' => $branchID
+                                'branch_id' => $branchID,
+                                'booking_code' => $bookingcodeNew
                             ];
                         }
                     }
