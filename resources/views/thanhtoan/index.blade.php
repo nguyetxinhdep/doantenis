@@ -1,7 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $groupedBookings = [];
+
+        // Duyệt qua danh sách lịch sử đặt sân
+        foreach ($history as $booking) {
+            // Nếu mã đặt sân chưa tồn tại, khởi tạo một mảng cho nó
+            if (!isset($groupedBookings[$booking->booking_code])) {
+                $groupedBookings[$booking->booking_code] = [];
+            }
+            // Thêm booking vào nhóm của booking_code tương ứng
+            $groupedBookings[$booking->booking_code][] = $booking;
+        }
+    @endphp
+
     <div class="container my-3">
+        <!-- Form tìm kiếm -->
         <!-- Form tìm kiếm -->
         <form action="{{ route('manager.searchBookings') }}" method="GET" class="mb-4">
             <div class="row">
@@ -48,8 +63,8 @@
         </form>
         {{-- ----------------------------------------- --}}
 
-        {{-- bảng hiển thị nội dung --}}
-        <table class="table table-bordered table-striped">
+        {{-- Bảng hiển thị nội dung --}}
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>STT</th>
@@ -61,152 +76,269 @@
                     <th>Chi Nhánh</th>
                     <th>Sân</th>
                     <th>Còn nợ</th>
-                    <th>Trạng Thái</th>
-                    <th></th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                @if ($history->isEmpty())
+                @if (empty($groupedBookings))
                     <tr>
-                        <td colspan="10" class="text-center">Chưa có lịch sử đặt sân nào.</td>
+                        <td colspan="11" class="text-center">Chưa có lịch sử đặt sân nào.</td>
                     </tr>
                 @else
                     @php $i = 1; @endphp
-                    @foreach ($history as $booking)
-                        <tr>
-                            <td>{{ $i++ }}</td>
-                            <td>{{ \Carbon\Carbon::parse($booking->Date_booking)->format('d/m/Y') }}</td>
-                            <td>{{ $booking->user_name }}</td>
-                            <td>0{{ $booking->user_phone }}</td>
-                            <td>{{ $booking->Start_time }}</td>
-                            <td>{{ $booking->End_time }}</td>
-                            <td>{{ session('branch_active')->Name }}</td>
-                            <td>{{ $booking->court_name }}</td>
-                            <td>{{ number_format($booking->Debt, 0, ',', '.') }} đ</td>
-                            <td>
-                                @switch($booking->Status)
-                                    @case(0)
-                                        <span class="badge bg-warning">Chưa thu đủ</span>
-                                    @break
+                    @foreach ($groupedBookings as $bookingCode => $bookings)
+                        @php
+                            $totalBookings = count($bookings);
+                            $totalDebt = 0; // Khởi tạo biến tổng nợ
+                            $listBooking_id = []; //biến lưu danh sách booking id thi mã booking_code
+                            $listPayment_id = []; //biến lưu danh sách payment id thi mã booking_code
 
-                                    @case(1)
-                                        <span class="badge bg-success">Đã thu đủ (OK)</span>
-                                    @break
+                            // Tính tổng nợ cho các booking
+                            foreach ($bookings as $booking) {
+                                $totalDebt += $booking->Debt; // Cộng dồn nợ
+                                // Tách các Payment_id có dấu phẩy
+                                $paymentIds = explode(',', $booking->Payment_id);
+                                // Lưu các giá trị đã tách vào mảng listPayment_id
+                                foreach ($paymentIds as $id) {
+                                    $listPayment_id[] = trim($id); // trim() để loại bỏ khoảng trắng
+                                }
+                            }
 
-                                    @case(2)
-                                        <span class="badge bg-info">Cần thanh toán để giữ sân</span>
-                                    @break
+                            // Sau khi vòng lặp kết thúc, gộp các Payment_id lại thành chuỗi
+                            $listPayment_id_string = implode(',', $listPayment_id); // Không có dấu giữa các Payment_id
+                        @endphp
 
-                                    @case(3)
-                                        <span class="badge bg-danger">Đã hủy</span>
-                                    @break
+                        @foreach ($bookings as $index => $booking)
+                            <tr>
+                                @if ($index === 0)
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">{{ $i++ }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $dates = explode(',', $booking->Date_booking);
+                                            $uniqueDates = array_unique(array_map('trim', $dates)); // Lấy các ngày duy nhất
+                                            $formattedDates = array_map(function ($date) {
+                                                return \Carbon\Carbon::parse($date)->format('d/m/Y');
+                                            }, $uniqueDates);
+                                        @endphp
+                                        {!! implode('<br>', $formattedDates) !!}
+                                    </td>
+                                    <td>{{ $booking->user_name }}</td>
+                                    <td>0{{ $booking->user_phone }}</td>
+                                    <td>
+                                        @php
+                                            $startTimes = explode(',', $booking->Start_time); // Tách giờ vào
+                                            $formattedStartTimes = array_map(function ($time) {
+                                                return \Carbon\Carbon::parse(trim($time))->format('H:i'); // Định dạng giờ vào
+                                            }, $startTimes);
+                                        @endphp
+                                        {!! implode('<br>', $formattedStartTimes) !!} <!-- In ra các giờ vào, mỗi giờ trên một dòng -->
+                                    </td>
+                                    <td>
+                                        @php
+                                            $endTimes = explode(',', $booking->End_time); // Tách giờ ra
+                                            $formattedEndTimes = array_map(function ($time) {
+                                                return \Carbon\Carbon::parse(trim($time))->format('H:i'); // Định dạng giờ ra
+                                            }, $endTimes);
+                                        @endphp
+                                        {!! implode('<br>', $formattedEndTimes) !!} <!-- In ra các giờ ra, mỗi giờ trên một dòng -->
+                                    </td>
+                                    <td>{{ session('branch_active')->Name }}</td>
+                                    <td>
+                                        @php
+                                            $courtNames = explode(',', $booking->court_name); // Tách tên sân
+                                        @endphp
+                                        {!! implode('<br>', array_map('trim', $courtNames)) !!} <!-- In ra các sân, mỗi sân trên một dòng -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        {{ number_format($totalDebt, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        @switch($booking->Status)
+                                            @case(0)
+                                                <span class="badge bg-warning">Chưa thu đủ</span>
+                                            @break
 
-                                    @default
-                                        <span class="badge bg-secondary">Không xác định</span>
-                                @endswitch
-                            </td>
+                                            @case(1)
+                                                <span class="badge bg-success">Đã thu đủ (OK)</span>
+                                            @break
 
-                            <td>
-                                @if ($booking->Debt != 0 && $booking->Status != 3)
-                                    <!-- Nút mở modal thanh toán -->
-                                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-                                        data-target="#paymentModal-{{ $booking->Booking_id }}">
-                                        Thanh toán
-                                    </button>
+                                            @case(2)
+                                                <span class="badge bg-info">Cần thanh toán để giữ sân</span>
+                                            @break
 
-                                    <!-- Modal nhập số tiền -->
-                                    <div class="modal fade" id="paymentModal-{{ $booking->Booking_id }}" tabindex="-1"
-                                        role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="paymentModalLabel">Nhập số tiền thanh toán
-                                                    </h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <form action="{{ route('manager.paymentCourt') }}" method="POST"
-                                                    id="paymentForm-{{ $booking->Booking_id }}">
-                                                    @csrf
-                                                    <input type="hidden" name="Booking_id"
-                                                        value="{{ $booking->Booking_id }}">
-                                                    <input type="hidden" name="Payment_id"
-                                                        value="{{ $booking->Payment_id }}">
+                                            @case(3)
+                                                <span class="badge bg-danger">Đã hủy</span>
+                                            @break
 
-                                                    <div class="modal-body">
-                                                        <div class="form-group">
-                                                            <label for="paymentAmount">Số tiền cần thanh toán (ít nhất
-                                                                1/2 số tiền nợ: {{ $booking->Debt / 2 }} VND):</label>
-                                                            <input type="number" class="form-control" name="paymentAmount"
-                                                                id="paymentAmount-{{ $booking->Booking_id }}"
-                                                                placeholder="Nhập số tiền" min="{{ $booking->Debt / 2 }}"
-                                                                required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">Đóng</button>
-                                                        <button type="submit" class="btn btn-primary">OK</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Nút Hủy -->
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                        data-target="#deleteModal-{{ $booking->Booking_id }}">
-                                        Hủy
-                                    </button>
-
-                                    <!-- Modal xác nhận hủy sân -->
-                                    <div class="modal fade" id="deleteModal-{{ $booking->Booking_id }}" tabindex="-1"
-                                        role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel">Xác nhận hủy đặt sân
-                                                    </h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <form id="deleteForm{{ $booking->Booking_id }}"
-                                                    action="{{ route('manager.cancelCourt') }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="Payment_id"
-                                                        value="{{ $booking->Payment_id }}">
-                                                    <input type="hidden" name="Booking_id"
-                                                        value="{{ $booking->Booking_id }}">
-
-                                                    <div class="modal-body">
-                                                        Bạn có chắc chắn muốn hủy đặt sân cho sân này không?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">Đóng</button>
-                                                        <button type="submit" class="btn btn-danger">Xác Nhận
-                                                            Hủy</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                            @default
+                                                <span class="badge bg-secondary">Không xác định</span>
+                                        @endswitch
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        @if ($booking->Debt != 0 && $booking->Status != 3)
+                                            <!-- Nút mở modal thanh toán -->
+                                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                                data-target="#paymentModal-{{ $bookingCode }}">
+                                                Thanh toán
+                                            </button>
+                                            <!-- Nút hủy chỉ hiển thị một lần cho mỗi nhóm -->
+                                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                                data-target="#cancelModal-{{ $bookingCode }}">
+                                                Hủy
+                                            </button>
+                                        @else
+                                            <span class="text-muted">Không có hành động nào</span>
+                                        @endif
+                                    </td>
+                                @else
+                                    <td>
+                                        @php
+                                            $dates = explode(',', $booking->Date_booking);
+                                            $uniqueDates = array_unique(array_map('trim', $dates)); // Lấy các ngày duy nhất
+                                            $formattedDates = array_map(function ($date) {
+                                                return \Carbon\Carbon::parse($date)->format('d/m/Y');
+                                            }, $uniqueDates);
+                                        @endphp
+                                        {!! implode('<br>', $formattedDates) !!}
+                                    </td>
+                                    <td>{{ $booking->user_name }}</td>
+                                    <td>0{{ $booking->user_phone }}</td>
+                                    <td>
+                                        @php
+                                            $startTimes = explode(',', $booking->Start_time); // Tách giờ vào
+                                            $formattedStartTimes = array_map(function ($time) {
+                                                return \Carbon\Carbon::parse(trim($time))->format('H:i'); // Định dạng giờ vào
+                                            }, $startTimes);
+                                        @endphp
+                                        {!! implode('<br>', $formattedStartTimes) !!} <!-- In ra các giờ vào, mỗi giờ trên một dòng -->
+                                    </td>
+                                    <td>
+                                        @php
+                                            $endTimes = explode(',', $booking->End_time); // Tách giờ ra
+                                            $formattedEndTimes = array_map(function ($time) {
+                                                return \Carbon\Carbon::parse(trim($time))->format('H:i'); // Định dạng giờ ra
+                                            }, $endTimes);
+                                        @endphp
+                                        {!! implode('<br>', $formattedEndTimes) !!} <!-- In ra các giờ ra, mỗi giờ trên một dòng -->
+                                    </td>
+                                    <td>{{ session('branch_active')->Name }}</td>
+                                    <td>
+                                        @php
+                                            $courtNames = explode(',', $booking->court_name); // Tách tên sân
+                                        @endphp
+                                        {!! implode('<br>', array_map('trim', $courtNames)) !!} <!-- In ra các sân, mỗi sân trên một dòng -->
+                                    </td>
                                 @endif
-                            </td>
-                        </tr>
+                            </tr>
+                        @endforeach
+
+                        <!-- Modal nhập số tiền chỉ hiển thị một lần cho mỗi nhóm -->
+                        <div class="modal fade" id="paymentModal-{{ $bookingCode }}" tabindex="-1" role="dialog"
+                            aria-labelledby="paymentModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="paymentModalLabel">THANH TOÁN</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form action="{{ route('manager.paymentCourt') }}" method="POST"
+                                        id="paymentForm-{{ $bookingCode }}">
+                                        @csrf
+                                        <input type="hidden" name="Payment_id" value="{{ $listPayment_id_string }}">
+
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label>Chọn số tiền thanh toán:</label>
+
+                                                <!-- Lựa chọn thanh toán một nửa -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="halfPaymentAmount"
+                                                        id="halfPayment-{{ $bookingCode }}" value="{{ $totalDebt / 2 }}"
+                                                        onclick="selectPaymentOption('halfPayment', 'fullPayment', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
+                                                    <label class="form-check-label" for="halfPayment-{{ $bookingCode }}">
+                                                        Thanh toán 1/2 số tiền nợ:
+                                                        {{ number_format($totalDebt / 2, 0, ',', '.') }} đ
+                                                    </label>
+                                                </div>
+
+                                                <!-- Lựa chọn thanh toán đủ -->
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio"
+                                                        name="fullPaymentAmount" id="fullPayment-{{ $bookingCode }}"
+                                                        value="{{ $totalDebt }}"
+                                                        onclick="selectPaymentOption('fullPayment', 'halfPayment', {{ $totalDebt }}, '{{ $bookingCode }}')">
+                                                    <label class="form-check-label"
+                                                        for="fullPayment-{{ $bookingCode }}">
+                                                        Thanh toán đủ: {{ number_format($totalDebt, 0, ',', '.') }} đ
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-primary">Xác nhận thanh toán</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal hủy chỉ hiển thị một lần cho mỗi nhóm -->
+                        <div class="modal fade" id="cancelModal-{{ $bookingCode }}" tabindex="-1" role="dialog"
+                            aria-labelledby="cancelModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="cancelModalLabel">HỦY ĐẶT SÂN</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form action="{{ route('manager.cancelCourt') }}" method="POST"
+                                        id="cancelForm-{{ $bookingCode }}">
+                                        @csrf
+                                        <input type="hidden" name="bookingCode" value="{{ $bookingCode }}">
+                                        <input type="hidden" name="listPayment_id_string"
+                                            value="{{ $listPayment_id_string }}">
+
+                                        <div class="modal-body">
+                                            <p>Bạn có chắc chắn muốn hủy đặt sân này</p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 @endif
             </tbody>
         </table>
 
-        <!-- Hiển thị các liên kết phân trang -->
-        <!-- Hiển thị phân trang -->
+        {{-- Phân trang --}}
         <div class="">
             {{ $history->links('pagination::bootstrap-5') }}
         </div>
     </div>
+    <script>
+        function selectPaymentOption(selectedName, otherName, amount, bookingId) {
+            // Gán giá trị cho name đã chọn
+            document.getElementsByName(selectedName)[0].checked = true;
+            // Bỏ checked cho name còn lại
+            document.getElementsByName(otherName)[0].checked = false;
+
+            // Gán giá trị cho hidden input để submit khi gửi form
+            document.getElementById('paymentAmount-' + bookingId).value = amount;
+        }
+    </script>
 @endsection

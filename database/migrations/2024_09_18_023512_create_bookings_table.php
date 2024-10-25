@@ -20,6 +20,7 @@ class CreateBookingsTable extends Migration
             $table->foreignId('customer_id')->constrained('customers', 'Customer_id')->onDelete('cascade');
             $table->foreignId('price_list_id')->constrained('price_list', 'Price_list_id')->onDelete('cascade');
             $table->foreignId('branch_id')->constrained('branches', 'Branch_id')->onDelete('cascade');
+            $table->bigInteger('booking_code');
         });
     }
 

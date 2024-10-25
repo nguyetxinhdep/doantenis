@@ -47,7 +47,7 @@ class UserController extends Controller
             // Tạo một bản ghi khách hàng
             Customer::create([
                 'user_id' => $user->User_id, // Truy cập id của người dùng vừa tạo
-                'customer_type_id' => 1, // Loại khách hàng mặc định (vãng lai)
+                // 'customer_type_id' => 1, // Loại khách hàng mặc định (vãng lai)
             ]);
 
             // Nếu tất cả thành công, commit transaction

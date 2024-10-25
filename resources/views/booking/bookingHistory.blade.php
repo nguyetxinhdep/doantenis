@@ -60,7 +60,9 @@
                                         <input type="hidden" name="Payment_id" value="{{ $booking->Payment_id }}">
                                         <input type="hidden" name="Booking_id" value="{{ $booking->Booking_id }}">
                                         <button type="submit" name="thanhtoan" class="btn btn-primary">Thanh toán</button>
-                                        <button type="submit" name="datcoc" class="btn btn-warning">Đặt cọc</button>
+                                        @if ($booking->Status != 0)
+                                            <button type="submit" name="datcoc" class="btn btn-warning">Đặt cọc</button>
+                                        @endif
                                     </form>
                                 @endif
                             </td>

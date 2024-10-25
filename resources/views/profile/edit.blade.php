@@ -22,7 +22,7 @@
             <div class="form-group">
                 <label for="phone">Số điện thoại</label>
                 <input type="text" class="form-control" id="phone" name="phone"
-                    value="{{ old('phone', Auth::user()->Phone) }}" required>
+                    value="0{{ old('phone', Auth::user()->Phone) }}" required>
             </div>
 
             <div class="form-group">

@@ -45,7 +45,7 @@
                     <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline Chi Nhánh</label>
                     <div class="col-md-6">
                         <input id="Phone" type="text" class="form-control @error('Phone') is-invalid @enderror"
-                            name="Phone" value="{{ $data->Phone }}">
+                            name="Phone" value="0{{ $data->Phone }}">
                         @error('Phone')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -111,7 +111,7 @@
                     <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">SĐT Cá Nhân</label>
                     <div class="col-md-6">
                         <input id="SDTCaNhan" type="text" class="form-control @error('SDTCaNhan') is-invalid @enderror"
-                            name="user_phone" value="{{ $data->user_phone }}">
+                            name="user_phone" value="0{{ $data->user_phone }}">
                         @error('SDTCaNhan')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

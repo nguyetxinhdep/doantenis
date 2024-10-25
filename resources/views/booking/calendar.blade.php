@@ -12,16 +12,23 @@
             $currentTime = date('H:i', strtotime('+7 hours'));
         @endphp
 
+        {{-- include modal đặt sân cố định --}}
+        @include('booking.modalDatCoDinh')
+
         <center>
             <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
+            <!-- Nút Đặt lịch cố định -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fixedScheduleModal">
+                Đặt lịch cố định
+            </button>
+
+
+            <form method="GET" class="py-2" action="{{ route('booking.calendar.search') }}">
+                <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
+                <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
+                <button type="submit" class="btn btn-primary">Xem lịch</button>
+            </form>
         </center>
-
-        <form method="GET" action="{{ route('booking.calendar.search') }}">
-            <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
-            <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
-            <button type="submit" class="btn btn-primary">Xem lịch</button>
-        </form>
-
         <p class="d-flex align-items-center">
             <span class="bg-light mx-2"
                 style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
@@ -33,10 +40,7 @@
                 style="width: 20px; height: 20px; border: 1px solid black; margin-right: 5px;"></span>
             Khóa
         </p>
-
-
-        @php
-        @endphp
+        {{--  --}}
 
         <div style="overflow-x: auto;">
             <table class="table table-bordered">
