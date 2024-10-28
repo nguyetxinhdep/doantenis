@@ -17,6 +17,26 @@ class UserController extends Controller
         ]);
     }
 
+    public function searchUsers(Request $request)
+    {
+        $nameuser = $request->input('name');
+
+        // Lấy ra danh sách người dùng với số điện thoại và tên
+        $users = User::select('User_id', 'Name', 'Phone')
+            ->where('Role', '5') // Giả sử vai trò khách hàng có ID là 5
+            ->where('Name', 'LIKE', "%{$nameuser}%")
+            ->get();
+
+        // Lọc dữ liệu để chỉ lấy những bản ghi không bị trùng lặp
+        $uniqueUsers = $users->groupBy(function ($user) {
+            return $user->Name . '|' . $user->Phone; // Kết hợp tên và số điện thoại để lọc
+        })->map(function ($group) {
+            return $group->first(); // Giữ lại bản ghi đầu tiên trong mỗi nhóm
+        })->values(); // Reset keys
+
+        return response()->json($uniqueUsers); // Trả về dữ liệu đã lọc
+    }
+
 
     public function registerStore(Request $request)
     {

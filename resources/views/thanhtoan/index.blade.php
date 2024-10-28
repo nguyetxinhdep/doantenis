@@ -258,7 +258,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="halfPaymentAmount"
                                                         id="halfPayment-{{ $bookingCode }}" value="{{ $totalDebt / 2 }}"
-                                                        onclick="selectPaymentOption('halfPayment', 'fullPayment', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
+                                                        onclick="selectPaymentOption('halfPaymentAmount', 'fullPaymentAmount', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
                                                     <label class="form-check-label" for="halfPayment-{{ $bookingCode }}">
                                                         Thanh toán 1/2 số tiền nợ:
                                                         {{ number_format($totalDebt / 2, 0, ',', '.') }} đ
@@ -270,7 +270,7 @@
                                                     <input class="form-check-input" type="radio"
                                                         name="fullPaymentAmount" id="fullPayment-{{ $bookingCode }}"
                                                         value="{{ $totalDebt }}"
-                                                        onclick="selectPaymentOption('fullPayment', 'halfPayment', {{ $totalDebt }}, '{{ $bookingCode }}')">
+                                                        onclick="selectPaymentOption('fullPaymentAmount', 'halfPaymentAmount', {{ $totalDebt }}, '{{ $bookingCode }}')">
                                                     <label class="form-check-label"
                                                         for="fullPayment-{{ $bookingCode }}">
                                                         Thanh toán đủ: {{ number_format($totalDebt, 0, ',', '.') }} đ
@@ -339,6 +339,7 @@
 
             // Gán giá trị cho hidden input để submit khi gửi form
             document.getElementById('paymentAmount-' + bookingId).value = amount;
+
         }
     </script>
 @endsection
