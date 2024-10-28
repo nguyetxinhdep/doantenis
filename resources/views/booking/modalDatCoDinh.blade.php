@@ -7,6 +7,31 @@
             </div>
             <div class="modal-body">
                 <form id="fixedScheduleForm">
+                    @csrf
+                    <!-- Thêm input cho tên khách hàng và số điện thoại -->
+                    <div class="mb-3">
+                        <label class="form-label">Khách hàng:</label><br>
+                        <input type="radio" id="hasAccount" name="customerType" value="hasAccount">
+                        <label for="hasAccount">Đã có tài khoản</label><br>
+                        <input type="radio" id="noAccount" name="customerType" value="noAccount">
+                        <label for="noAccount">Chưa có tài khoản</label>
+                    </div>
+
+                    <!-- Các input sẽ hiển thị hoặc ẩn tùy thuộc vào lựa chọn của radio -->
+                    <div id="accountFields" style="display: none">
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">Tên Khách Hàng</label>
+                            <input type="text" id="customerName" class="form-control"
+                                placeholder="Nhập tên khách hàng" required>
+                            <div id="suggestions" class="list-group" style="display:none;"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label">Số Điện Thoại</label>
+                            <input type="text" id="customerPhone" class="form-control" required>
+                        </div>
+                        <input type="hidden" id="user_id">
+                    </div>
+
                     <div class="row mb-3">
                         <div class="col">
                             <label for="startDate" class="form-label">Từ ngày:</label>
@@ -44,20 +69,21 @@
                                     <div class="court-group">
                                         <div class="input-group mb-2 px-4">
                                             <select class="form-select courts">
-                                                <option value="court1">Sân 1</option>
-                                                <option value="court2">Sân 2</option>
-                                                <option value="court3">Sân 3</option>
+                                                @foreach ($courts as $court)
+                                                    <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
+                                                @endforeach
                                             </select>
                                             <button type="button" class="btn btn-secondary btn-sm addCourt">+</button>
                                         </div>
                                         <div class="timesContainer">
                                             <div class="timeGroup mb-2 px-5">
-                                                <label class="form-label">Nhập giờ cho court3</label>
+                                                <label class="form-label">Nhập giờ</label>
                                                 <div class="input-group">
                                                     <input type="time" class="form-control start-time"
                                                         required="">
                                                     <span class="input-group-text">đến</span>
-                                                    <input type="time" class="form-control end-time" required="">
+                                                    <input type="time" class="form-control end-time"
+                                                        required="">
                                                 </div>
                                             </div>
                                         </div>
@@ -112,9 +138,9 @@
                 <div class="court-group">
                     <div class="input-group mb-2 px-4">
                         <select class="form-select courts">
-                            <option value="court1">Sân 1</option>
-                            <option value="court2">Sân 2</option>
-                            <option value="court3">Sân 3</option>
+                            @foreach ($courts as $court)
+                                <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
+                            @endforeach
                         </select>
                         <button type="button" class="btn btn-secondary btn-sm addCourt">+</button>
                     </div>
@@ -161,9 +187,9 @@
             courtGroup.innerHTML = `
             <div class="input-group px-4">
                 <select class="form-select courts">
-                    <option value="court1">Sân 1</option>
-                    <option value="court2">Sân 2</option>
-                    <option value="court3">Sân 3</option>
+                    @foreach ($courts as $court)
+                        <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
+                    @endforeach
                 </select>
                 <button type="button" class="btn btn-danger btn-sm removeCourt">-</button>
             </div>
@@ -191,7 +217,7 @@
                     timeGroup.classList.add('timeGroup', 'mb-2', 'px-5');
 
                     timeGroup.innerHTML = `
-                    <label class="form-label">Nhập giờ cho ${selectedCourts.join(', ')}</label>
+                    <label class="form-label">Nhập giờ</label>
                     <div class="input-group">
                         <input type="time" class="form-control start-time" required>
                         <span class="input-group-text">đến</span>
@@ -216,7 +242,7 @@
                 timeGroup.classList.add('timeGroup', 'mb-2', 'px-5');
 
                 timeGroup.innerHTML = `
-                <label class="form-label">Nhập giờ cho ${selectedCourts.join(', ')}</label>
+                <label class="form-label">Nhập giờ</label>
                 <div class="input-group">
                     <input type="time" class="form-control start-time" required>
                     <span class="input-group-text">đến</span>
@@ -236,6 +262,9 @@
     document.getElementById('submitFixedSchedule').addEventListener('click', function() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
+        const user_Name = document.getElementById('customerName').value;
+        const user_phone = document.getElementById('customerPhone').value;
+        const user_id = document.getElementById('user_id').value;
         const schedules = [];
 
         // Lặp qua tất cả các nhóm lịch
@@ -266,13 +295,126 @@
             });
         });
 
-        // Gửi dữ liệu đi hoặc xử lý thêm theo yêu cầu
+        // Dữ liệu cần gửi
         const dataToSend = {
+            user_name: user_Name,
+            user_phone: user_phone,
+            user_id: user_id,
             startDate: startDate,
             endDate: endDate,
             schedules: schedules,
         };
 
-        console.log(dataToSend); // Hiển thị dữ liệu ra console
+        // console.log(dataToSend); // Hiển thị dữ liệu ra console
+
+        // Hiển thị overlay và spinner khi gửi yêu cầu AJAX
+        $('#overlay-spinner').removeClass('d-none');
+        // Gửi dữ liệu qua Ajax
+        $.ajax({
+            url: '{{ route('dat.co.dinh.booking.reserve') }}', // Thay bằng route phù hợp
+            type: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(dataToSend),
+            success: function(response) {
+                if (response.success) {
+                    // Chuyển hướng đến route booking.calendar
+                    window.location.href = response.redirect;
+                }
+
+                // showAlert('success', response.message);
+            },
+            error: function(error) {
+                $('#overlay-spinner').addClass('d-none');
+                $('#fixedScheduleModal').modal('hide'); // Ẩn modal
+                showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!');
+            }
+        });
+    });
+
+    // searrch user
+    $(document).ready(function() {
+        $('#customerName').on('input', function() {
+            const query = $(this).val();
+            if (query.length > 0) {
+                $.ajax({
+                    url: '{{ route('search.user') }}', // Đường dẫn đến route tìm kiếm người dùng
+                    method: 'GET',
+                    data: {
+                        name: query
+                    },
+                    success: function(data) {
+                        $('#suggestions').empty().show();
+                        data.forEach(user => {
+                            $('#suggestions').append(`
+                            <a href="#" class="list-group-item list-group-item-action user-suggestion" 
+                               data-id="${user.User_id}" 
+                               data-phone="${user.Phone}" data-name="${user.Name}">
+                                ${user.Name + '-0' + user.Phone}
+                            </a>
+                        `);
+                        });
+                    }
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+
+        $(document).on('click', '.user-suggestion', function(e) {
+            e.preventDefault();
+            const userId = $(this).data('id');
+            const userPhone = '0' + $(this).data('phone');
+            const userName = $(this).data('name');
+
+            $('#customerName').val(userName.trim());
+
+            $('#customerPhone').val(userPhone);
+            $('#user_id').val(userId);
+            $('#suggestions').hide();
+        });
+
+        $(document).on('click', function() {
+            $('#suggestions').hide();
+        });
+    });
+</script>
+
+{{-- checkbox --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const accountFields = document.getElementById('accountFields');
+        const hasAccountRadio = document.getElementById('hasAccount');
+        const noAccountRadio = document.getElementById('noAccount');
+        const inputhiddenUserID = document.getElementById('user_id');
+
+        // Hiển thị trường nhập liệu theo mặc định
+        // accountFields.style.display = 'block';
+
+        // Thêm sự kiện lắng nghe cho radio buttons
+        hasAccountRadio.addEventListener('change', function() {
+            if (this.checked) {
+                // Hiện các trường nhập liệu khi chọn đã có tài khoản
+                accountFields.style.display = 'block';
+                // inputhiddenUserID.style.display = ''; //bỏ thuộc tính display đi
+                // Xóa giá trị trong số điện thoại và đặt thành readonly
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerPhone').setAttribute('readonly', true);
+            }
+        });
+
+        noAccountRadio.addEventListener('change', function() {
+            if (this.checked) {
+                // inputhiddenUserID.style.display = 'none';
+                // Hiện các trường nhập liệu khi chọn chưa có tài khoản
+                accountFields.style.display = 'block';
+                inputhiddenUserID.value = '';
+                // Xóa giá trị trong số điện thoại và bỏ readonly
+                document.getElementById('customerPhone').removeAttribute('readonly');
+            }
+        });
     });
 </script>

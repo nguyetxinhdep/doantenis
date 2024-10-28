@@ -62,6 +62,8 @@ Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass']);
 
 //đăng nhập rồi mới vào những route bên dưới được
 Route::middleware(['auth'])->group(function () {
+    Route::get('/search-users', [UserController::class, 'searchUsers'])->name('search.user');
+
     // thanh toán
     // Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
     Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
@@ -160,6 +162,8 @@ Route::middleware(['auth'])->group(function () {
 
         // quản lý và nhân viên đặt sân
         Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'reserve'])->name('manager.booking.reserve');
+        // đặt lịch cố định
+        Route::post('dat-co-dinh-booking-calendar/', [BookingController::class, 'datCoDinh'])->name('dat.co.dinh.booking.reserve');
     });
 
     // nhóm quản lý thanh toán
