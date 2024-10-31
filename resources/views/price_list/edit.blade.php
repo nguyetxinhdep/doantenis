@@ -5,7 +5,6 @@
         <form action="{{ route('price_list.update', $priceListVangLai->time_slot_id) }}" method="POST">
             @csrf
             @method('post') <!-- Thay đổi thành PUT để phản ánh chính xác phương thức HTTP -->
-
             <!-- Ngày -->
             <div class="row mb-3">
                 <label for="status" class="col-md-4 col-form-label text-md-end">Ngày</label>
@@ -35,16 +34,6 @@
                 </div>
             </div>
 
-            <!-- Giá Vãng lai -->
-            <div class="row mb-3">
-                <label for="vang_lai_price" class="col-md-4 col-form-label text-md-end">Giá Vãng lai</label>
-                <div class="col-md-6">
-                    <input id="vang_lai_price" type="number" step="0.01"
-                        class="form-control @error('vang_lai_price') is-invalid @enderror" name="vang_lai_price"
-                        value="{{ old('vang_lai_price', $priceListVangLai->Price ?? 0) }}" required>
-                </div>
-            </div>
-
             <!-- Giá Cố định -->
             <div class="row mb-3">
                 <label for="co_dinh_price" class="col-md-4 col-form-label text-md-end">Giá Cố định</label>
@@ -55,6 +44,18 @@
                 </div>
             </div>
 
+            <!-- Giá Vãng lai -->
+            <div class="row mb-3">
+                <label for="vang_lai_price" class="col-md-4 col-form-label text-md-end">Giá Vãng lai</label>
+                <div class="col-md-6">
+                    <input id="vang_lai_price" type="number" step="0.01"
+                        class="form-control @error('vang_lai_price') is-invalid @enderror" name="vang_lai_price"
+                        value="{{ old('vang_lai_price', $priceListVangLai->Price ?? 0) }}" required>
+                </div>
+            </div>
+
+            <input type="hidden" name="priceListCoDinh" value="{{ $priceListCoDinh->Price_list_id }}">
+            <input type="hidden" name="priceListVangLai" value="{{ $priceListVangLai->Price_list_id }}">
             <!-- Nút Submit -->
             <div class="row mb-0">
                 <div class="col-md-8 offset-md-4">

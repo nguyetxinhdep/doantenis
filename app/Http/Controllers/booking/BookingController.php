@@ -4,6 +4,7 @@ namespace App\Http\Controllers\booking;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Branch;
 use App\Models\Court;
 use App\Models\Customer;
 use App\Models\Payment;
@@ -23,7 +24,8 @@ class BookingController extends Controller
         // Lấy danh sách sân và giờ đã đặt(bảng booking)
         $courts = Court::where('branch_id', session('branch_active')->Branch_id)->get();
         $bookings = Booking::where('branch_id', session('branch_active')->Branch_id)
-            ->where('Date_booking', $date)->get(); // Lấy tất cả đặt sân
+            ->where('Date_booking', $date) // Lấy tất cả đặt sân
+            ->where('Status', '!=', 3)->get();
         $title = "Lịch";
 
         return view('booking.calendar', compact('courts', 'bookings', 'title'));
@@ -38,7 +40,8 @@ class BookingController extends Controller
         // Lấy danh sách sân và giờ đã đặt(bảng booking)
         $courts = Court::where('branch_id', $branch_id)->get();
         $bookings = Booking::where('branch_id', $branch_id)
-            ->where('Date_booking', $date)->get(); // Lấy tất cả đặt sân
+            ->where('Date_booking', $date) // Lấy tất cả đặt sân
+            ->where('Status', '!=', 3)->get();
         $title = "Lịch";
 
         return view('booking.calendarWelcome', compact('courts', 'bookings', 'title'));
@@ -78,27 +81,90 @@ class BookingController extends Controller
 
     public function bookingHistory(Request $req)
     {
-        $title = "Lịch sử đặt sân";
+        $title = "Lịch sử đ";
 
-        $history = Booking::join('branches', 'bookings.branch_id', '=', 'branches.Branch_id')
+        // Tạo đối tượng query ban đầu
+        $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
+            ->join('users', 'users.User_id', '=', 'customers.user_id')
             ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+            ->join('branches', 'courts.branch_id', '=', 'branches.Branch_id') // Join bảng branches
             ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
-            ->where("bookings.customer_id", session('customer_id'))
-            // ->where("bookings.Status", 2)
+            ->where('users.User_id', Auth()->user()->User_id)
             ->select(
-                'bookings.*',
-                'branches.name as branch_name',
-                'courts.name as court_name',
-                'payments.Debt as Debt',
-                'payments.Payment_id as Payment_id',
+                'bookings.booking_code',
+                // 'bookings.Booking_id',
+                DB::raw('GROUP_CONCAT(bookings.Date_booking SEPARATOR ", ") as Date_booking'),
+                DB::raw('GROUP_CONCAT(bookings.Start_time SEPARATOR ", ") as Start_time'),
+                DB::raw('GROUP_CONCAT(bookings.End_time SEPARATOR ", ") as End_time'),
+                DB::raw('MAX(bookings.Status) as Status'),
+                DB::raw('MAX(bookings.branch_id) as branch_id'),
+                DB::raw('MAX(users.Name) as user_name'),
+                DB::raw('MAX(users.Phone) as user_phone'),
+                DB::raw('GROUP_CONCAT(courts.name SEPARATOR ", ") as court_name'),
+                DB::raw('MAX(branches.Name) as branch_address'), // Lấy địa chỉ của chi nhánh
+                DB::raw('SUM(payments.Debt) as Debt'),
+                DB::raw('GROUP_CONCAT(payments.Payment_id SEPARATOR ", ") as Payment_id'),
+                DB::raw('MAX(bookings.created_at) as created_at') // Thêm trường created_at để sắp xếp
             )
-            ->orderBy('bookings.created_at', 'desc')
+            ->groupBy('bookings.booking_code', 'bookings.Date_booking') // Nhóm theo booking_code
+            ->orderBy('created_at', 'desc'); // Sắp xếp theo thời gian tạo mới nhất
+
+
+        // lấy branch_id trong booking theo customer id
+        $bookingtemp = Booking::where('customer_id', session('customer_id'))
+            ->select('branch_id')
+            ->distinct()
             ->get();
 
-        return view('booking.bookingHistory', compact('history', 'title'));
+        // Trích xuất mảng các branch_id từ $bookingtemp
+        $branchIds = $bookingtemp->pluck('branch_id');
+
+        // Lấy danh sách các Branch tương ứng với các branch_id duy nhất
+        $branches = Branch::whereIn('Branch_id', $branchIds)->get();
+
+        // dd($branchIds);
+        // In ra câu truy vấn SQL
+        // dd($history->toSql(), $history->getBindings());
+        // Tìm kiếm theo số điện thoại (loại bỏ số 0 đầu tiên)
+        if ($req->filled('phone')) {
+            $phone = ltrim($req->phone, '0');
+            $history->where('users.Phone', 'like', '%' . $phone . '%');
+        }
+
+        // Tìm kiếm theo tên
+        if ($req->filled('name')) {
+            $history->where(
+                'users.Name',
+                'like',
+                '%' . $req->name . '%'
+            );
+        }
+
+        // Tìm kiếm theo ngày đặt
+        if ($req->filled('date')) {
+            $history->whereDate(
+                'bookings.Date_booking',
+                $req->date
+            );
+        }
+
+        // Tìm kiếm theo trạng thái
+        if ($req->filled('status')) {
+            $history->where('bookings.Status', $req->status);
+        }
+
+        // Thêm điều kiện tìm kiếm theo tên nếu có
+        if ($req->filled('branch')) {
+            $history->where('branches.Name', 'LIKE', '%' . $req->branch . '%');
+        }
+
+        // Thực hiện phân trang với 10 bản ghi trên mỗi trang
+        $history = $history->paginate(10);
+
+        return view('booking.bookingHistory', compact('history', 'title', 'branches'));
     }
 
-    public function xuLyThanhToanTC(Request $req, $Payment_id, $Booking_id, $pay)
+    public function xuLyThanhToanTC(Request $req)
     {
         DB::beginTransaction(); // Bắt đầu transaction
 
@@ -108,43 +174,60 @@ class BookingController extends Controller
 
             // nếu thanh toán thành công
             if ($resultCode == 0) {
-                $payment = Payment::where('Payment_id', $Payment_id)->first();
+                // Lấy thông tin từ request
+                $Payment_id = explode(',', $req->input('Payment_id')); // Tách các Payment_id thành mảng
 
-                if (!$payment) {
-                    // Nếu không tìm thấy payment, ném ra ngoại lệ
-                    throw new \Exception('Payment not found');
+                foreach ($Payment_id as $id) {
+                    // Tìm payment record theo từng Payment_id
+                    $payment = Payment::find($id);
+
+                    if (!$payment) {
+                        // Trả về thông báo lỗi nếu không tìm thấy payment record nào trong danh sách
+                        return redirect()->back()->with('danger', 'Không tìm thấy thông tin thanh toán');
+                    }
+
+                    if ($req->pay == 'half') {
+                        // Tính toán lại số tiền còn nợ và số tiền đã trả
+                        $newDebt = $payment->Debt - ($payment->Debt) / 2;
+                        $newPaid = $payment->Paid + ($payment->Debt) / 2; // Số tiền đã trả
+                    } elseif ($req->pay == 'full') {
+
+                        // Tính toán lại số tiền còn nợ và số tiền đã trả
+                        $newDebt = $payment->Debt - $payment->Debt;
+                        $newPaid = $payment->Paid + $payment->Debt; // Số tiền đã trả
+                    }
+
+                    // Cập nhật lại số tiền nợ và số tiền đã trả trong bảng payments
+                    $payment->Debt = $newDebt; // Debt không thể nhỏ hơn 0
+                    $payment->Paid = $newPaid; // Cập nhật số tiền đã trả
+
+                    if ($newDebt <= 0) {
+                        $payment->Status = 1; // Đánh dấu hết nợ nếu đã thanh toán đủ
+                    }
+                    // $payment->Payment_date = now();
+                    $payment->save(); // Lưu lại từng bản ghi payment
+
+
+                    // tìm booking 
+                    $booking = Booking::find($payment->booking_id);
+
+                    if ($newDebt <= 0) { // Nếu số tiền đã trả hết, cập nhật trạng thái đã trả đủ
+                        if ($booking) {
+                            $booking->Status = 1; // Cập nhật trạng thái đã thanh toán đủ
+                            $booking->save();
+                        }
+                    } else {
+                        if ($booking) {
+                            $booking->Status = 0; // Cập nhật trạng thái chưa thu đủ
+                            $booking->save();
+                        }
+                    }
                 }
 
-                // Tính toán số tiền còn nợ
-                $debt = $payment->Amount - ($payment->Paid + $pay);
-                $status = ($debt == 0 ? 1 : 0); //trạng thái, 0 chưa thanh toán đủ, 1 thanh toán đủ
-                // Cập nhật bản ghi thanh toán
-                $payment->update([
-                    'Payment_method' => 'Bank',
-                    'Debt' => $debt, // tiền còn nợ
-                    'Paid' => $payment->Paid + $pay, // Số tiền đã thanh toán
-                    'Status' => $status, // Trạng thái thanh toán
-                    'Payment_date' => now(),
-                ]);
-
-                //----------------------bảng booking
-                $booking = Booking::where('Booking_id', $Booking_id)->first();
-
-                if (!$booking) {
-                    // Nếu không tìm thấy booking, ném ra ngoại lệ
-                    throw new \Exception('Booking not found');
-                }
-
-                // Cập nhật trạng thái booking
-                $booking->update([
-                    'Status' => $status, // Trạng thái thanh toán
-                ]);
-
-                DB::commit(); // Cam kết transaction nếu mọi thứ thành công
-
+                DB::commit(); // Commit transaction
                 return redirect()->route('booking.history')->with('success', 'Thanh toán thành công.');
             } else {
-                return redirect()->route('booking.history');
+                return redirect()->route('booking.history')->with('success', 'Thanh toán thất bại.');
             }
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction nếu có lỗi
@@ -434,6 +517,7 @@ class BookingController extends Controller
                 $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
                 // $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
                 $customer_type_id = 2;
+                // Log::debug($customerID);
             } else { // là chủ sân hoặc nhân viên
                 $ten_kh = $request->input('user_name');
                 $sdt_kh = $request->input('user_phone');
@@ -591,6 +675,24 @@ class BookingController extends Controller
             // -------------------
             // Lưu các booking vào cơ sở dữ liệu
             foreach ($bookings as $booking) {
+                // Kiểm tra sự tồn tại của booking
+                $existingBooking = Booking::where('court_id', $booking['court_id'])
+                    ->where('Date_booking', $booking['Date_booking'])
+                    ->where(function ($query) use ($booking) {
+                        $query->whereBetween('Start_time', [$booking['Start_time'], $booking['End_time']])
+                            ->orWhereBetween('End_time', [$booking['Start_time'], $booking['End_time']])
+                            ->orWhere(function ($query) use ($booking) {
+                                $query->where('Start_time', '<=', $booking['Start_time'])
+                                    ->where('End_time', '>=', $booking['End_time']);
+                            });
+                    })
+                    ->first();
+
+                if ($existingBooking) {
+                    // Sân đã được đặt, thông báo cho người dùng
+                    return response()->json(['available' => false, 'message' => ' Đặt sân thất bại. Sân vào ngày ' . $booking['Date_booking'] . ' đã được người khác đặt.'], 409);
+                }
+
                 $bookingcreate = Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
                 $price_list = PriceList::where('Price_list_id', $booking['price_list_id'])->first();
                 // Tính tổng tiền
@@ -637,14 +739,21 @@ class BookingController extends Controller
             // Trả về thông tin thành công
             // Lưu trữ thông báo vào session
             session()->flash('success', 'Đặt sân cố định thành công');
-            return response()->json([
-                'success' => true,
-                'redirect' => route('booking.calendar', ['date' => $date])
-            ]);
+            if (Auth()->user()->Role == 5) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('booking.history')
+                ]);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('booking.calendar', ['date' => $date])
+                ]);
+            }
         } catch (\Exception $e) {
             // Rollback transaction nếu có lỗi
             DB::rollBack();
-            Log::debug(456);
+            // Log::debug(456);
             Log::error('Error occurred while reserving: ' . $e->getMessage());
             Log::error('Booking Error: ' . $e->getMessage(), [
                 'request' => $request->all(),

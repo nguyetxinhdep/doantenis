@@ -42,13 +42,9 @@ Route::get('/search', [BranchController::class, 'search'])->name('search');
 Route::middleware('guest')->group(function () { //chưa đăng nhập mới vào được những route này
     Route::get('admin/login', [LoginController::class, 'index'])->name('login'); //đặt tên route là login cho thuận tiện
     Route::post('admin/login/store', [LoginController::class, 'store'])->name('login.store');
-    Route::get('/branch/register', [BranchController::class, 'showForm'])->name('register');
     Route::get('/user/register', [UserController::class, 'showForm'])->name('user.register');
     Route::post('/user/register-store', [UserController::class, 'registerStore'])->name('user.register.store');
 });
-
-//đăng ký chi nhánh
-Route::post('/branch/register', [BranchController::class, 'register'])->name('branch.store');
 
 //--------------------------------------------------------------------------------------------------
 
@@ -67,8 +63,8 @@ Route::middleware(['auth'])->group(function () {
     // thanh toán
     // Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
     Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
-    Route::post('/momo_paymentQR', [PaymentController::class, 'paymomo']);
-    Route::get('/xulythanhtoanthanhcong/{Payment_id}/{Booking_id}/{pay}', [BookingController::class, 'xuLyThanhToanTC'])->name('xulythanhtoanthanhcong');
+    Route::post('/momo_paymentQR', [PaymentController::class, 'vnpay_payment']);
+    Route::get('/xulythanhtoanthanhcong/', [BookingController::class, 'xuLyThanhToanTC'])->name('xulythanhtoanthanhcong');
 
     // -------------------
     Route::get('admin/logout', [LoginController::class, 'logout'])->name('logout');
@@ -89,6 +85,9 @@ Route::middleware(['auth'])->group(function () {
     // set branch active
     Route::get('/set-branch-active/{branch_id}', [BranchController::class, 'setBranchActive'])->name('setBranchActive');
 
+    //đăng ký chi nhánh
+    Route::get('/branch/register', [BranchController::class, 'showForm'])->name('register');
+    Route::post('/branch/register', [BranchController::class, 'register'])->name('branch.store');
     // đăng kí chi nhánh với email đã tồn tại
     Route::get('/branch/register-emails-exists', [BranchController::class, 'showformEmaiExists'])->name('branch.email.exists');
     Route::post('/branch/register-emails-exists', [BranchController::class, 'registerBranchEmaiExists'])->name('branch.email.exists.post');

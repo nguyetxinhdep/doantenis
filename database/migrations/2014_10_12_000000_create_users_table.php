@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('token_change_pass', 225)->nullable();
             $table->rememberToken();
             $table->timestamps();
+            // $table->string('Email_kinh_doanh', 70)->nullable();
         });
     }
 

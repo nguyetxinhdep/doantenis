@@ -40,7 +40,7 @@
         var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert"
                                 style="top: 20px; right: 20px; z-index: 1050; opacity: 0; transform: translateY(-20px); transition: all 0.5s ease;">
                         ${icon} ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        
                      </div>`;
 
         // Thêm thông báo vào container

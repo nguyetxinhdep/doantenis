@@ -256,8 +256,8 @@
 
                                                 <!-- Lựa chọn thanh toán một nửa -->
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="halfPaymentAmount"
-                                                        id="halfPayment-{{ $bookingCode }}" value="{{ $totalDebt / 2 }}"
+                                                    <input class="form-check-input" type="radio" name="PaymentAmount"
+                                                        id="halfPayment-{{ $bookingCode }}" value="half"
                                                         onclick="selectPaymentOption('halfPaymentAmount', 'fullPaymentAmount', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
                                                     <label class="form-check-label" for="halfPayment-{{ $bookingCode }}">
                                                         Thanh toán 1/2 số tiền nợ:
@@ -267,9 +267,8 @@
 
                                                 <!-- Lựa chọn thanh toán đủ -->
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio"
-                                                        name="fullPaymentAmount" id="fullPayment-{{ $bookingCode }}"
-                                                        value="{{ $totalDebt }}"
+                                                    <input class="form-check-input" type="radio" name="PaymentAmount"
+                                                        id="fullPayment-{{ $bookingCode }}" value="full"
                                                         onclick="selectPaymentOption('fullPaymentAmount', 'halfPaymentAmount', {{ $totalDebt }}, '{{ $bookingCode }}')">
                                                     <label class="form-check-label"
                                                         for="fullPayment-{{ $bookingCode }}">

@@ -11,8 +11,8 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="Name"
-                                class="col-md-4 col-form-label text-md-end">{{ __('Tên Chi Nhánh') }}</label>
+                            <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh
+                                doanh</label>
                             <div class="col-md-6">
                                 <input id="Name" type="text"
                                     class="form-control @error('Name') is-invalid @enderror" name="Name" required>
@@ -25,7 +25,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ Chi Nhánh</label>
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh</label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
                                     class="form-control @error('Location') is-invalid @enderror" name="Location" required>
@@ -38,7 +38,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline Chi Nhánh</label>
+                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline địa điểm kinh
+                                doanh</label>
                             <div class="col-md-6">
                                 <input id="Phone" type="text"
                                     class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
@@ -53,10 +54,10 @@
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Đăng Ký') }}
+                                    Đăng ký
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    {{ __('Reset') }}
+                                    Reset
                                 </button>
                             </div>
 
@@ -93,6 +94,9 @@
                     success: function(response) {
                         // Ẩn overlay và spinner sau khi nhận phản hồi
                         $('#overlay-spinner').addClass('d-none');
+
+                        // Reset form sau khi gửi thành công
+                        $('#branch-form')[0].reset(); // Sử dụng jQuery để reset form
 
                         showAlert('success', response.message);
                     },
