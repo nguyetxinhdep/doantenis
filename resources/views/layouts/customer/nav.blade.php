@@ -18,6 +18,10 @@
                                 <a class="text-white nav-link {{ request()->routeIs('booking.history') ? 'fw-bold text-info' : '' }}"
                                     aria-current="page" href="{{ route('booking.history') }}">Lịch sử đặt sân</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="text-white nav-link {{ request()->routeIs('register') ? 'fw-bold text-info' : '' }}"
+                                    aria-current="page" href="{{ route('register') }}">Đăng ký kinh doanh</a>
+                            </li>
                         </ul>
                     @endif
                 @endauth
@@ -28,15 +32,15 @@
                         @if (Route::has('login'))
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">
-                                    <b class="text-white" style="font-size: 17px">Login</b>
+                                    <b class="text-white" style="font-size: 17px">Đăng nhập</b>
                                 </a>
                             </li>
                         @endif
 
                         @if (Route::has('register'))
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">
-                                    <b class="text-white" style="font-size: 17px">Branch Register</b>
+                                <a class="nav-link" href="{{ route('user.register') }}">
+                                    <b class="text-white" style="font-size: 17px">Đăng ký</b>
                                 </a>
                             </li>
                         @endif

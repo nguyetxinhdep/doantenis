@@ -16,7 +16,7 @@
                 enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
-                    <label for="Name" class="col-md-4 col-form-label text-md-end">{{ __('Tên Chi Nhánh') }}</label>
+                    <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh doanh</label>
                     <div class="col-md-6">
                         <input id="Name" type="text" class="form-control @error('Name') is-invalid @enderror"
                             name="Name" value="{{ $data->Name }}">
@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ Chi Nhánh</label>
+                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh</label>
                     <div class="col-md-6">
                         <input id="Location" type="text" class="form-control @error('Location') is-invalid @enderror"
                             name="Location" value="{{ $data->Location }}">
@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline Chi Nhánh</label>
+                    <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline kinh doanh</label>
                     <div class="col-md-6">
                         <input id="Phone" type="text" class="form-control @error('Phone') is-invalid @enderror"
                             name="Phone" value="0{{ $data->Phone }}">
@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Email" class="col-md-4 col-form-label text-md-end">{{ __('Email') }} Chi Nhánh</label>
+                    <label for="Email" class="col-md-4 col-form-label text-md-end">Email kinh doanh</label>
                     <div class="col-md-6">
                         <input id="Email" type="email" class="form-control @error('Email') is-invalid @enderror"
                             name="Email" value="{{ $data->Email }}">
@@ -176,7 +176,7 @@
                 <div class="w-100 d-flex">
                     <div class="w-50 pe-3">
                         <h5>Ảnh đại diện</h5>
-                        @if ($data->Cover_image)
+                        @if ($data->Image)
                             <img id="demo_Image" src="{{ $data->Image }}" class=" img-css-ggg" alt="">
                         @else
                             <h6>Chưa có dữ liệu</h6>

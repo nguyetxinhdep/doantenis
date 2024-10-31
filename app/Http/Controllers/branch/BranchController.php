@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\branch;
 
+use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Manager;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 class BranchController extends Controller
 {
@@ -55,14 +57,14 @@ class BranchController extends Controller
     public function showForm()
     {
         return view('branch.formRegister', [
-            'title' => 'Đăng ký chi nhánh'
+            'title' => 'Đăng ký kinh doanh'
         ]);
     }
 
     public function showformEmaiExists()
     {
         return view('branch.formRegisterEmailExists', [
-            'title' => 'Đăng ký chi nhánh'
+            'title' => 'Đăng ký kinh doanh'
         ]);
     }
 
@@ -75,54 +77,61 @@ class BranchController extends Controller
                 'Name' => 'required',
                 'Location' => 'required',
                 'Phone' => 'required',
-                'Email' => 'required|email|unique:users,Email',
-                'HoTen' => 'required',
-                'Address' => 'required',
-                'SDTCaNhan' => 'required',
-            ],
-            [
-                'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+                'Email' => 'required|email|',
             ]
+            // ,
+            // [
+            //     'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            // ]
         );
-        // Log::debug($request);
+        // Start a transaction
+        DB::beginTransaction();
+        try {
+            // Lấy thông tin user hiện tại
+            $user = User::where('User_id', Auth()->user()->User_id)->first();
+            $userId = $user->User_id;
+            // $user->Role = '3';
+            // $user->save();
 
-        // tạo đối tượng user
-        $user = new User();
-        $user->Name = $request->HoTen;
-        $user->Email = $request->Email;
-        $user->Phone = $request->SDTCaNhan;
-        $user->Address = $request->Address;
-        $user->Role = '0';
-        // Mã hóa mật khẩu bằng Bcrypt trước khi lưu
-        $user->password = bcrypt('123456');
-        $user->save();
-        // Lấy ID của người dùng vừa tạo
-        $userId = $user->User_id;
+            // Tạo đối tượng manager
+            $manager = new Manager();
+            $manager->Manager_code = 0;
+            $manager->user_id = $userId;
+            $manager->save();
 
-        //tạo đối tượng staff
-        $manager = new Manager();
-        $manager->Manager_code = 0;
-        $manager->user_id = $userId;
-        $manager->save();
-        // Lấy ID của người dùng vừa tạo
-        $managerID = $manager->Manager_id;
+            // Lấy ID của manager vừa tạo
+            $managerID = $manager->Manager_id;
 
+            // Tạo đối tượng branch
+            $branch = new Branch();
+            $branch->Name = $request->Name;
+            $branch->Location = $request->Location;
+            $branch->Phone = $request->Phone;
+            $branch->Email = $request->Email;
+            $branch->manager_id = $managerID;
+            $branch->Status = 0;
+            $branch->save();
 
-        // Save branch information
-        $branch = new Branch();
-        $branch->Name = $request->Name;
-        $branch->Location = $request->Location;
-        $branch->Phone = $request->Phone;
-        $branch->Email = $request->Email;
-        $branch->manager_id = $managerID; //mã manager vừa tạo vưa tạo
-        $branch->Status = 0; //mã manager của người tạo
-        $branch->save();
+            // Commit the transaction nếu không có lỗi
+            DB::commit();
 
-        // Return a JSON response
-        return response()->json([
-            'message' => 'Đăng ký thành công, Chờ duyệt',
-            'branch' => $branch,
-        ], 201); // 201 status code for successful resource creation
+            // Return a JSON response
+            return response()->json([
+                'message' => 'Đăng ký thành công, Chờ duyệt',
+                'branch' => $branch,
+            ], 201); // 201 status code for successful resource creation
+
+        } catch (\Exception $e) {
+            // Rollback the transaction nếu có lỗi xảy ra
+            DB::rollBack();
+            Log::error('Đăng ký thất bại: ' . $e->getMessage());
+
+            // Return a JSON response with error
+            return response()->json([
+                'message' => 'Đăng ký thất bại, vui lòng thử lại sau.',
+                'error' => $e->getMessage(),
+            ], 500); // 500 status code for server error
+        }
     }
 
     public function registerBranchEmaiExists(Request $request)
@@ -134,10 +143,11 @@ class BranchController extends Controller
                 'Name' => 'required',
                 'Location' => 'required',
                 'Phone' => 'required',
-            ],
-            [
-                'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
             ]
+            // ,
+            // [
+            //     'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            // ]
         );
 
         // Save branch information
@@ -147,7 +157,7 @@ class BranchController extends Controller
         $branch->Phone = $request->Phone;
         $branch->Email = $request->Email;
         $branch->manager_id = $request->manager_id; //mã manager của người tạo
-        $branch->Status = 0; //mã manager của người tạo
+        $branch->Status = 0; // chờ duyệt
         $branch->save();
 
         // Return a JSON response
@@ -166,8 +176,7 @@ class BranchController extends Controller
             ->join('users', function (JoinClause $join) {
                 $join->on('managers.user_id', '=', 'users.User_id');
             })->where(function ($query) {
-                $query->where('users.Role', '0')
-                    ->orWhere('branches.Status', '0'); // Thêm điều kiện hoặc
+                $query->where('branches.Status', '0'); // mã branch chờ duyệt
             })
             ->select(
                 'branches.*',
@@ -197,8 +206,7 @@ class BranchController extends Controller
             ->join('users', function (JoinClause $join) {
                 $join->on('managers.user_id', '=', 'users.User_id');
             })->where(function ($query) {
-                $query->where('users.Role', '-1')
-                    ->orWhere('branches.Status', '-1'); // Thêm điều kiện hoặc
+                $query->Where('branches.Status', '-1'); // chờ thỏa thuận
             })
             ->select(
                 'branches.*',
@@ -233,14 +241,26 @@ class BranchController extends Controller
             $user = User::find($userid);
 
             // kiểm tra số lượng chi nhánh đã có
-            $soluongBranch = Branch::where('manager_id', $managerid)->count();
+            $soluongBranch = Branch::where('manager_id', $managerid)->where('Status', 3)->count();
 
             if ($soluongBranch > 1) {
-                $branch = Branch::find($branchid)->delete();
-                Mail::send('branch.mailTuChoi', compact('Email', 'user', 'soluongBranch'), function ($email) use ($Email) {
-                    $email->subject('Xóa 1 chi Nhánh');
-                    $email->to($Email);
-                });
+                $branch = Branch::find($branchid);
+                if ($branch->Status == 3) {
+                    $branch->delete();
+                    Mail::send('branch.mailTuChoi', compact('Email', 'user', 'soluongBranch'), function ($email) use ($Email) {
+                        $email->subject('Xóa 1 chi Nhánh');
+                        $email->to($Email);
+                    });
+                } else {
+                    $branch->delete();
+                    Manager::find($managerid)->delete();
+                    // User::find($userid)->delete();
+                    // Gửi email
+                    Mail::send('branch.mailTuChoi', compact('Email', 'user'), function ($email) use ($Email) {
+                        $email->subject('Từ Chối Đăng Ký Chi Nhánh');
+                        $email->to($Email);
+                    });
+                }
 
                 // Commit giao dịch nếu không có lỗi
                 DB::commit();
@@ -252,14 +272,28 @@ class BranchController extends Controller
                 ], 201);
             } else {
                 // Tìm chi nhánh theo ID
-                $branch = Branch::find($branchid)->delete();
-                Manager::find($managerid)->delete();
-                User::find($userid)->delete();
-                // Gửi email
-                Mail::send('branch.mailTuChoi', compact('Email', 'user'), function ($email) use ($Email) {
-                    $email->subject('Từ Chối Đăng Ký Chi Nhánh');
-                    $email->to($Email);
-                });
+                $branch = Branch::find($branchid);
+                if ($branch->Status == 3) {
+                    $user->Role = '5';
+                    $user->save();
+                    // Xóa tất cả các phiên của người dùng này
+                    // Session::where('User_id', $userid)->delete();
+
+                    $branch->delete();
+                    Mail::send('branch.mailTuChoi', compact('Email', 'user', 'soluongBranch'), function ($email) use ($Email) {
+                        $email->subject('Xóa 1 chi Nhánh');
+                        $email->to($Email);
+                    });
+                } else {
+                    $branch->delete();
+                    Manager::find($managerid)->delete();
+                    // User::find($userid)->delete();
+                    // Gửi email
+                    Mail::send('branch.mailTuChoi', compact('Email', 'user'), function ($email) use ($Email) {
+                        $email->subject('Từ Chối Đăng Ký Chi Nhánh');
+                        $email->to($Email);
+                    });
+                }
 
                 // Commit giao dịch nếu không có lỗi
                 DB::commit();
@@ -317,11 +351,11 @@ class BranchController extends Controller
             $date = $req->input('date');
             $time = $req->input('time');
             $user = User::find($userid);
-            // Cập nhật role user là -1 -> chờ ký hợp đồng
-            if ($user->Role == '0') {
-                $user->Role = '-1';
-                $user->save();
-            }
+            // // Cập nhật role user là -1 -> chờ ký hợp đồng
+            // if ($user->Role == '0') {
+            //     $user->Role = '-1';
+            //     $user->save();
+            // }
 
             $branch = Branch::find($branchid);
             if ($branch->Status == 0) {
@@ -381,9 +415,11 @@ class BranchController extends Controller
             }
 
 
-            if ($user->Role == '-1') { // Cập nhật role user là -1 -> chờ ký hợp đồng
+            if ($user->Role == '5') { // Cập nhật role user là 5 -> khách hàng với tài khoản đăng ký kinh doanh lần đầu
                 $user->Role = '3';
                 $user->save();
+                // Xóa tất cả các phiên của người dùng này
+                // Session::where('User_id', $userid)->delete();
 
                 Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
                     $email->subject('Cấp tài khoản');
@@ -544,7 +580,7 @@ class BranchController extends Controller
                 'Cover_image' => 'file|mimes:jpg,png,pdf|max:2048',
             ],
             [
-                'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+                'Email.unique' => 'Email branches đã tồn tại', // thông báo lỗi khi email đã tồn tại
                 'Image.file' => 'Ảnh bìa không phải phải là file',
                 'Image.mimes' => 'Ảnh bìa phải có phần mở rộng là jpg,png,pdf',
                 'Cover_image.file' => 'Ảnh bìa không phải phải là file',
@@ -582,7 +618,8 @@ class BranchController extends Controller
             $branch = Branch::find($branch_id);
 
             if ($request->file('Image')) {
-                $originalName = $request->file('Image')->getClientOriginalName();
+                // $originalName = $request->file('Image')->getClientOriginalName();
+                $originalName = 'branchID_' . $branch->Branch_id . '_anhdaidien.png';
                 $urlImage = "/images/khachhang/chinhanh/$originalName";
                 if (file_exists(public_path('images/khachhang/chinhanh/') . $originalName)) {
                     unlink(public_path('images/khachhang/chinhanh/') . $originalName);
@@ -592,7 +629,8 @@ class BranchController extends Controller
             }
 
             if ($request->file('Cover_image')) {
-                $originalName = $request->file('Cover_image')->getClientOriginalName();
+                // $originalName = $request->file('Cover_image')->getClientOriginalName();
+                $originalName = 'branchID_' . $branch->Branch_id . '_anhbia.png';
                 $urlCover_image = "/images/khachhang/chinhanh/$originalName";
                 if (file_exists(public_path('images/khachhang/chinhanh/') . $originalName)) {
                     unlink(public_path('images/khachhang/chinhanh/') . $originalName);
@@ -622,6 +660,7 @@ class BranchController extends Controller
             }
 
             $branch->save();
+
 
             DB::commit();
 

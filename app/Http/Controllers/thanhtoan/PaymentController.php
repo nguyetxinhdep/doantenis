@@ -110,7 +110,7 @@ class PaymentController extends Controller
         if ($req->filled('status')) {
             $history->where('bookings.Status', $req->status);
         }
-
+        $history->where('bookings.branch_id', session('branch_active')->Branch_id);
         // Thực hiện phân trang với 10 bản ghi trên mỗi trang
         $history = $history->paginate(10);
 
@@ -139,11 +139,11 @@ class PaymentController extends Controller
                     return redirect()->back()->with('danger', 'Không tìm thấy thông tin thanh toán');
                 }
 
-                if ($req->has('halfPaymentAmount')) {
+                if ($req->input('PaymentAmount') == "half") {
                     // Tính toán lại số tiền còn nợ và số tiền đã trả
                     $newDebt = $payment->Debt - ($payment->Debt) / 2;
                     $newPaid = $payment->Paid + ($payment->Debt) / 2; // Số tiền đã trả
-                } elseif ($req->has('fullPaymentAmount')) {
+                } elseif ($req->input('PaymentAmount') == "full") {
                     // Tính toán lại số tiền còn nợ và số tiền đã trả
                     $newDebt = $payment->Debt - $payment->Debt;
                     $newPaid = $payment->Paid + $payment->Debt; // Số tiền đã trả
@@ -158,6 +158,7 @@ class PaymentController extends Controller
                 if ($newDebt <= 0) {
                     $payment->Status = 1; // Đánh dấu hết nợ nếu đã thanh toán đủ
                 }
+                $payment->Payment_date = now();
 
                 $payment->save(); // Lưu lại từng bản ghi payment
 
@@ -166,12 +167,12 @@ class PaymentController extends Controller
 
                 if ($newDebt <= 0) { // Nếu số tiền đã trả hết, cập nhật trạng thái đã trả đủ
                     if ($booking) {
-                        $booking->status = 1; // Cập nhật trạng thái đã thanh toán đủ
+                        $booking->Status = 1; // Cập nhật trạng thái đã thanh toán đủ
                         $booking->save();
                     }
                 } else {
                     if ($booking) {
-                        $booking->status = 0; // Cập nhật trạng thái chưa thu đủ
+                        $booking->Status = 0; // Cập nhật trạng thái chưa thu đủ
                         $booking->save();
                     }
                 }
@@ -232,14 +233,28 @@ class PaymentController extends Controller
         $code_card = rand(00, 9999); //randum mã đơn hàng để test
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://127.0.0.1:8000/admin";
+        // $vnp_Returnurl = route('welcome.booking.calendar');
         $vnp_TmnCode = "L7QQHQCG"; //Mã website tại VNPAY 
         $vnp_HashSecret = "O1DDKYJE367YA0UWXSWN8E822Q7TBDH2"; //Chuỗi bí mật
 
         $vnp_TxnRef = $code_card; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
         $vnp_OrderInfo = "Thanh toán đơn hàng test";
         $vnp_OrderType = "billpayment";
-        $vnp_Amount = 20000 * 100;
+        $vnp_Amount = ((float) ($request->input('total'))) * 100;
+        $kieuthanhtoan = $request->input('redirect');
+        if ($kieuthanhtoan == "half") {
+            $vnp_Amount = $vnp_Amount / 2; // Chia đôi số tiền
+        }
+        // if ($request->has('thanhtoan')) {
+        //     $kieuthanhtoan = 'full';
+        // } elseif ($request->has('datcoc')) {
+        //     $kieuthanhtoan = 'half';
+        // }
+        // $redirectUrl =  route('momo.return');
+        $vnp_Returnurl =  route('xulythanhtoanthanhcong', [
+            'Payment_id' => $request->Payment_id,
+            'pay' =>  $kieuthanhtoan
+        ]); //route chuyển tới khi thanh toán thành công-------------
         $vnp_Locale = 'vn';
         $vnp_BankCode = 'NCB';
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
@@ -337,6 +352,8 @@ class PaymentController extends Controller
         // vui lòng tham khảo thêm tại code demo
     }
 
+
+
     function execPostRequest($url, $data)
     {
         $ch = curl_init($url);
@@ -361,38 +378,51 @@ class PaymentController extends Controller
         return $result;
     }
 
+    // thanh toán qua atm momo
     public function momo_payment(Request $requests)
     {
-        $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
-        $partnerCode = 'MOMOBKUN20180529';
-        $accessKey = 'klm05TvNBzhg7h7j';
-        $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
-        $orderInfo = "Thanh toán qua ATM MoMo";
-        $amount = "10000";
-        $orderId = time() . "";
-        $redirectUrl = "http://127.0.0.1:8000/";
-        $ipnUrl = "http://api.course-selling.id.vn/api/order/payment-notification";
-        $extraData = "";
-        // $partnerCode = $_POST["partnerCode"];
-        // $accessKey = $_POST["accessKey"];
-        // $serectkey = $_POST["secretKey"];
-        // $orderId = $_POST["orderId"]; // Mã đơn hàng
-        // $orderInfo = $_POST["orderInfo"];
-        // $amount = $_POST["amount"];
-        // $ipnUrl = $_POST["ipnUrl"];
-        // $redirectUrl = $_POST["redirectUrl"];
-        // $extraData = $_POST["extraData"];
-        $requestId = time() . "";
-        $requestType = "payWithATM";
-        // $extraData = ($_POST["extraData"] ? $_POST["extraData"] : "");
-        //before sign HMAC SHA256 signature
+        $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"; // Địa chỉ API MoMo
+        $partnerCode = 'MOMOBKUN20180529'; // Mã đối tác của bạn
+        $accessKey = 'klm05TvNBzhg7h7j'; // Khóa truy cập
+        $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa'; // Khóa bí mật
+        $orderInfo = "Thanh toán qua ATM MoMo"; // Thông tin đơn hàng
+        $amount = "20000"; // Số tiền mặc định
+        $orderId = time() . ""; // Mã đơn hàng dựa trên thời gian
+
+        // Kiểm tra nếu nút 'datcoc' được nhấn
+        if ($requests->has('datcoc')) {
+            $amount = $amount / 2; // Chia đôi số tiền nếu đặt cọc
+        }
+
+        // Các thông tin cần thiết khác
+        $extraData = ""; // Dữ liệu bổ sung (nếu cần)
+        $requestId = time() . ""; // Mã yêu cầu
+        $requestType = "payWithATM"; // Loại yêu cầu thanh toán
+
+        // Xác định kiểu thanh toán
+        if ($requests->has('thanhtoan')) {
+            $kieuthanhtoan = 'full'; // Thanh toán đầy đủ
+        } elseif ($requests->has('datcoc')) {
+            $kieuthanhtoan = 'half'; // Thanh toán nửa
+        }
+
+        // Đường dẫn chuyển hướng sau khi thanh toán thành công
+        $redirectUrl = route('xulythanhtoanthanhcong', [
+            'Payment_id' => $requests->Payment_id, // Lấy Payment_id từ request
+            'pay' => $kieuthanhtoan // Kiểu thanh toán
+        ]);
+
+        $ipnUrl = "http://api.course-selling.id.vn/api/order/payment-notification"; // Đường dẫn thông báo IPN
+
+        // Tạo hash để ký
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
-        $signature = hash_hmac("sha256", $rawHash, $secretKey);
-        // dd($signature);
+        $signature = hash_hmac("sha256", $rawHash, $secretKey); // Ký HMAC SHA256
+
+        // Dữ liệu gửi đi
         $data = array(
             'partnerCode' => $partnerCode,
-            'partnerName' => "Test",
-            "storeId" => "MomoTestStore",
+            'partnerName' => "Test", // Tên đối tác
+            'storeId' => "MomoTestStore", // ID cửa hàng
             'requestId' => $requestId,
             'amount' => $amount,
             'orderId' => $orderId,
@@ -404,15 +434,18 @@ class PaymentController extends Controller
             'requestType' => $requestType,
             'signature' => $signature
         );
-        // dd(json_encode($data));
-        $result = $this->execPostRequest($endpoint, json_encode($data));
-        // dd($result);
-        $jsonResult = json_decode($result, true);  // decode json
-        //Just a example, please check more in there
-        return redirect()->to($jsonResult['payUrl']);
-        // header('Location: ' . $jsonResult['payUrl']);
 
+        // Gửi yêu cầu thanh toán
+        $result = $this->execPostRequest(
+            $endpoint,
+            json_encode($data)
+        ); // Thực hiện yêu cầu POST
+        $jsonResult = json_decode($result, true); // Giải mã JSON
+
+        // Chuyển hướng đến URL thanh toán
+        return redirect()->to($jsonResult['payUrl']);
     }
+
 
     protected function config()
     {
@@ -426,6 +459,8 @@ class PaymentController extends Controller
         return json_decode($config, true);
     }
 
+
+    // qr code momo
     public function payMomo(Request $req)
     {
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
@@ -436,7 +471,9 @@ class PaymentController extends Controller
         $secretKey = $array["secretKey"];
         $orderInfo = "Thanh toán qua MoMo";
 
-        $amount = $req->input('total'); //giá tiền--------------------
+        // $amount = $req->input('total'); //giá tiền--------------------
+        $amount = "10000"; //giá tiền--------------------
+        // $amount = 20000; //giá tiền--------------------
         // Kiểm tra nếu nút 'datcoc' được nhấn
         if ($req->has('datcoc')) {
             $amount = $amount / 2; // Chia đôi số tiền
@@ -448,11 +485,15 @@ class PaymentController extends Controller
 
         $requestId = time() . "";
         $requestType = "captureWallet";
+        if ($req->has('thanhtoan')) {
+            $kieuthanhtoan = 'full';
+        } elseif ($req->has('datcoc')) {
+            $kieuthanhtoan = 'half';
+        }
         // $redirectUrl =  route('momo.return');
         $redirectUrl =  route('xulythanhtoanthanhcong', [
             'Payment_id' => $req->Payment_id,
-            'Booking_id' => $req->Booking_id,
-            'pay' =>  $amount
+            'pay' =>  $kieuthanhtoan
         ]); //route chuyển tới khi thanh toán thành công-------------
 
         $ipnUrl = "http://api.course-selling.id.vn/api/order/payment-notification";
@@ -480,85 +521,4 @@ class PaymentController extends Controller
         // return $jsonResult;
         return redirect()->to($jsonResult['payUrl']);
     }
-
-    // Phương thức để xử lý kết quả thanh toán từ MoMo
-    // public function momoReturn(Request $request)
-    // {
-    //     http_response_code(200); //200 - Everything will be 200 Oke
-    //     $array = $this->config();
-    //     try {
-    //         $accessKey = $array["accessKey"];
-    //         $secretKey = $array["secretKey"];
-
-    //         $partnerCode = $request->input(["partnerCode"]);
-    //         $orderId = $request->input(["orderId"]);
-    //         $requestId = $request->input(["requestId"]);
-    //         $amount = $request->input(["amount"]);
-    //         $orderInfo = $request->input(["orderInfo"]);
-    //         $orderType = $request->input(["orderType"]);
-    //         $transId = $request->input(["transId"]);
-    //         $resultCode = $request->input(["resultCode"]);
-    //         $message = $request->input(["message"]);
-    //         $payType = $request->input(["payType"]);
-    //         $responseTime = $request->input(["responseTime"]);
-    //         $extraData = $request->input(["extraData"]);
-    //         $m2signature = $request->input(["signature"]); //MoMo signature
-
-    //         //Checksum
-    //         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&message=" . $message . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&orderType=" . $orderType . "&partnerCode=" . $partnerCode . "&payType=" . $payType . "&requestId=" . $requestId . "&responseTime=" . $responseTime . "&resultCode=" . $resultCode . "&transId=" . $transId;
-    //         $partnerSignature = hash_hmac("sha256", $rawHash, $secretKey);
-    //         // dd($request->input(), ['new' => $partnerSignature]);
-
-    //         if ($m2signature == $partnerSignature) {
-    //             // dd('=');
-    //             if ($resultCode == '0') {
-    //                 // Thanh toán thành công
-    //                 $data = [
-    //                     'Payment_status' => $message,
-    //                     'order_id' => $orderId,
-    //                     'amount' => $amount,
-    //                     'Payment_method' => $payType
-    //                 ];
-    //                 order::where('order_id', $orderId)->first()->update(['order_status' => 1, 'checkoutUrl' => 'done']);
-    //                 // dd(order::where('order_id', $orderId)->first());
-    //                 DB::table('logs')->insert(['log' => json_encode($data)]);
-    //             } else {
-    //                 // Thanh toán thất bại
-    //                 $data = [
-    //                     'Payment_status' => $message,
-    //                     'order_id' => $orderId,
-    //                 ];
-    //                 DB::table('logs')->insert(['log' => json_encode($data)]);
-    //             }
-    //         } else {
-    //             // Chữ ký không hợp lệ
-    //             // dd('!=');
-    //             $data = [
-    //                 'danger' => "Giao dịch này có thể bị hack, vui lòng kiểm tra chữ ký của bạn và trả lại chữ ký",
-    //                 'order_id' => $orderId,
-    //             ];
-    //             DB::table('logs')->insert(['log' => json_encode($data)]);
-    //         }
-    //     } catch (\Exception $e) {
-    //         DB::table('logs')->insert(['log' => $e->getMessage()]);
-    //     }
-
-    //     $debugger = array();
-
-    //     if ($m2signature == $partnerSignature) {
-    //         $debugger['rawData'] = $rawHash;
-    //         $debugger['momoSignature'] = $m2signature;
-    //         $debugger['partnerSignature'] = $partnerSignature;
-    //         $debugger['message'] = "Received payment result success";
-    //     } else {
-    //         $debugger['rawData'] = $rawHash;
-    //         $debugger['momoSignature'] = $m2signature;
-    //         $debugger['partnerSignature'] = $partnerSignature;
-    //         $debugger['message'] = "ERROR! Fail checksum";
-    //     }
-    //     return view('success', [
-    //         'response' => $request->input(),
-    //         'debugger' => $debugger
-    //     ]);
-    // }
 }

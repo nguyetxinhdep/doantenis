@@ -31,7 +31,6 @@ class PriceListController extends Controller
         $groupedList = $list->groupBy(function ($item) {
             return $item->Start_time . ' - ' . $item->End_time; // Nhóm theo khung giờ
         });
-
         // Trả về view danh sách sân
         return view('price_list.index', [
             'list' => $groupedList,
@@ -136,6 +135,7 @@ class PriceListController extends Controller
         // Cập nhật giá vãng lai (customer_type_id = 1)
         $priceListVangLai = PriceList::where('time_slot_id', $id)
             ->where('customer_type_id', 1)
+            ->where('Price_list_id', $request->input('priceListVangLai'))
             ->firstOrFail();
         $priceListVangLai->Price = $request->vang_lai_price;
         $priceListVangLai->save();
@@ -143,7 +143,9 @@ class PriceListController extends Controller
         // Cập nhật giá cố định (customer_type_id = 2)
         $priceListCoDinh = PriceList::where('time_slot_id', $id)
             ->where('customer_type_id', 2)
+            ->where('Price_list_id', $request->input('priceListCoDinh'))
             ->firstOrFail();
+
         $priceListCoDinh->Price = $request->co_dinh_price;
         $priceListCoDinh->save();
 

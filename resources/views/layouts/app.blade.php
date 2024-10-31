@@ -107,7 +107,7 @@
                                     {{-- Thêm dấu gạch --}}
                                     <hr>
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
-                                            thêm chi nhánh</a></li>
+                                            thêm địa điểm kinh doanh</a></li>
                                     <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
                                             nhánh</a></li>
                                 @endif
@@ -129,13 +129,13 @@
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            <a class="nav-link" href="{{ route('login') }}">Đăng nhập</a>
                         </li>
                     @endif
 
                     @if (Route::has('register'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">Branch Register</a>
+                            <a class="nav-link" href="{{ route('user.register') }}">Đăng ký</a>
                         </li>
                     @endif
                 @else

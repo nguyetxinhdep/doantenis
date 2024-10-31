@@ -12,8 +12,25 @@
             $currentTime = date('H:i', strtotime('+7 hours'));
         @endphp
 
+        {{-- include modal đặt sân cố định --}}
+        @include('booking.modalDatCoDinh')
+
         <center>
             <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
+            @auth
+                <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#fixedScheduleModal">
+                    Đặt lịch cố định
+                </button>
+            @endauth
+            @guest
+                <span style="color:yellow">
+                    Vui lòng đăng nhập để đặt sân hoặc liên hệ qua Zalo:
+                    <a href="https://zalo.me/0378344718" target="_blank" style="color: yellow; text-decoration: underline;">
+                        0378344718
+                    </a>
+                </span>
+
+            @endguest
 
             <form method="GET" action="{{ route('customer.calendar.search') }}">
                 @csrf

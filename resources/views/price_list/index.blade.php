@@ -48,13 +48,13 @@
                             <td>{{ $key }}</td>
                             <td>
                                 @php
-                                    $vanglai = $items->firstWhere('customer_type_id', 1); //true,flase
+                                    $vanglai = $items->where('customer_type_id', 1)->where('Status', 1)->first(); //true,flase
                                 @endphp
                                 {{ $vanglai ? number_format($vanglai->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
                             <td>
                                 @php
-                                    $codinh = $items->firstWhere('customer_type_id', 2); // true,false
+                                    $codinh = $items->where('customer_type_id', 2)->where('Status', 1)->first();
                                 @endphp
                                 {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
@@ -82,6 +82,7 @@
                 <!-- Hiển thị T7-CN (Status = 2) -->
                 @foreach ($list as $key => $items)
                     @php
+                        // dd($list);
                         $status1Exists = $items->contains('Status', 1);
                         $status2Exists = $items->contains('Status', 2);
                     @endphp
@@ -92,13 +93,13 @@
                             <td>{{ $key }}</td>
                             <td>
                                 @php
-                                    $vanglai = $items->firstWhere('customer_type_id', 1);
+                                    $vanglai = $items->where('customer_type_id', 1)->where('Status', 2)->first(); //true,flase
                                 @endphp
                                 {{ $vanglai ? number_format($vanglai->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
                             <td>
                                 @php
-                                    $codinh = $items->firstWhere('customer_type_id', 2);
+                                    $codinh = $items->where('customer_type_id', 2)->where('Status', 2)->first(); //true,flase
                                 @endphp
                                 {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
                             </td>
@@ -113,7 +114,7 @@
                                     <form action="{{ route('price_list.destroy', $item->time_slot_id) }}" method="POST"
                                         style="display: inline-block;">
                                         @csrf
-                                        @method('DELETE')
+                                        @method('post')
                                         <button type="submit" class="btn btn-danger btn-sm"
                                             onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
                                     </form>

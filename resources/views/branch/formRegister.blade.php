@@ -11,8 +11,7 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="Name"
-                                class="col-md-4 col-form-label text-md-end">{{ __('Tên Chi Nhánh') }}</label>
+                            <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh doanh</label>
                             <div class="col-md-6">
                                 <input id="Name" type="text" class="form-control @error('Name') is-invalid @enderror"
                                     name="Name" required>
@@ -25,7 +24,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ Chi Nhánh</label>
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh</label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
                                     class="form-control @error('Location') is-invalid @enderror" name="Location" required>
@@ -38,7 +37,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline Chi Nhánh</label>
+                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline địa điểm kinh
+                                doanh</label>
                             <div class="col-md-6">
                                 <input id="Phone" type="text"
                                     class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
@@ -51,7 +51,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Email" class="col-md-4 col-form-label text-md-end">{{ __('Email') }}</label>
+                            <label for="Email" class="col-md-4 col-form-label text-md-end">Email kinh doanh</label>
                             <div class="col-md-6">
                                 <input id="Email" type="email"
                                     class="form-control @error('Email') is-invalid @enderror" name="Email" required>
@@ -63,52 +63,13 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="HoTen" class="col-md-4 col-form-label text-md-end">Họ Tên</label>
-                            <div class="col-md-6">
-                                <input id="HoTen" type="text"
-                                    class="form-control @error('HoTen') is-invalid @enderror" name="HoTen" required>
-                                @error('HoTen')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="Address" class="col-md-4 col-form-label text-md-end">Đ/Chỉ Nhà Riêng</label>
-                            <div class="col-md-6">
-                                <input id="Address" type="text"
-                                    class="form-control @error('Address') is-invalid @enderror" name="Address" required>
-                                @error('Address')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">SĐT Cá Nhân</label>
-                            <div class="col-md-6">
-                                <input id="SDTCaNhan" type="text"
-                                    class="form-control @error('SDTCaNhan') is-invalid @enderror" name="SDTCaNhan" required>
-                                @error('SDTCaNhan')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Đăng Ký') }}
+                                    Đăng ký
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    {{ __('Reset') }}
+                                    Reset
                                 </button>
                             </div>
 
@@ -116,9 +77,8 @@
                     </form>
                     <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
                             Nếu bạn muốn dùng 1
-                            gmail để quản lý nhiều chi
-                            nhánh thì vui lòng
-                            đăng nhập để đăng ký chi nhánh khác!</span></div>
+                            gmail để quản lý nhiều địa điểm kinh doanh thì vui lòng
+                            đăng nhập vào gmail mong muốn để đăng ký địa điểm kinh doanh khác!</span></div>
                 </div>
             </div>
         </div>
