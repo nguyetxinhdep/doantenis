@@ -102,6 +102,8 @@ class BookingController extends Controller
                 DB::raw('MAX(users.Phone) as user_phone'),
                 DB::raw('GROUP_CONCAT(courts.name SEPARATOR ", ") as court_name'),
                 DB::raw('MAX(branches.Name) as branch_address'), // Lấy địa chỉ của chi nhánh
+                DB::raw('SUM(payments.Amount) as Amount'),
+                DB::raw('SUM(payments.Paid) as Paid'),
                 DB::raw('SUM(payments.Debt) as Debt'),
                 DB::raw('GROUP_CONCAT(payments.Payment_id SEPARATOR ", ") as Payment_id'),
                 DB::raw('MAX(bookings.created_at) as created_at') // Thêm trường created_at để sắp xếp
@@ -170,10 +172,11 @@ class BookingController extends Controller
 
         try {
             // kiểm tra kết quả thanh toán từ momo
-            $resultCode = $req->input('resultCode');
-
-            // nếu thanh toán thành công
-            if ($resultCode == 0) {
+            // $resultCode = $req->input('resultCode');
+            // xử lý thanh toán từ vnpay
+            $transactionStatus = $req->input('vnp_TransactionStatus');
+            //$resultCode == 0 nếu thanh toán thành công
+            if ($transactionStatus == '00') {
                 // Lấy thông tin từ request
                 $Payment_id = explode(',', $req->input('Payment_id')); // Tách các Payment_id thành mảng
 
@@ -204,7 +207,7 @@ class BookingController extends Controller
                     if ($newDebt <= 0) {
                         $payment->Status = 1; // Đánh dấu hết nợ nếu đã thanh toán đủ
                     }
-                    // $payment->Payment_date = now();
+                    $payment->Payment_date = now();
                     $payment->save(); // Lưu lại từng bản ghi payment
 
 
@@ -227,7 +230,7 @@ class BookingController extends Controller
                 DB::commit(); // Commit transaction
                 return redirect()->route('booking.history')->with('success', 'Thanh toán thành công.');
             } else {
-                return redirect()->route('booking.history')->with('success', 'Thanh toán thất bại.');
+                return redirect()->route('booking.history')->with('danger', 'Thanh toán thất bại.');
             }
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction nếu có lỗi

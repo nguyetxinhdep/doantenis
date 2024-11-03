@@ -16,13 +16,13 @@
                             <input type="hidden" name="Branch_id" value = "{{ $Branch_id }}">
                             <input type="hidden" name="Email" value = "{{ $Email }}">
                             <div class="mb-3">
-                                <label for="date" class="form-label">Chọn Ngày</label>
+                                <label for="date" class="form-label">Chọn Ngày <span style="color:red">*</span></label>
                                 <input type="date" id="date" name="date" class="form-control"
                                     value="{{ date('Y-m-d') }}" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="time" class="form-label">Chọn Giờ</label>
+                                <label for="time" class="form-label">Chọn Giờ <span style="color:red">*</span></label>
                                 <input type="time" id="time" name="time" class="form-control" required>
                             </div>
 

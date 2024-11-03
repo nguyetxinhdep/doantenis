@@ -24,10 +24,11 @@ use App\Http\Controllers\user\UserController;
 |
 */
 
-//trang khách hàng vào thấy
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+// //trang khách hàng vào thấy
+// Route::get('/', function () {
+//     return view('welcome');
+// })->name('welcome');
+Route::get('/', [BranchController::class, 'welcome'])->name('welcome');
 
 // Route xem lịch đặt sân trang welcome
 Route::get('welcome-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('welcome.booking.calendar');
@@ -62,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
 
     // thanh toán
     // Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
-    Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
+    // Route::post('/momo_payment', [PaymentController::class, 'momo_payment']);
     Route::post('/momo_paymentQR', [PaymentController::class, 'vnpay_payment']);
     Route::get('/xulythanhtoanthanhcong/', [BookingController::class, 'xuLyThanhToanTC'])->name('xulythanhtoanthanhcong');
 
@@ -116,6 +117,52 @@ Route::middleware(['auth'])->group(function () {
         Route::get('view-editStaff/{id}', [StaffController::class, 'editStaff'])->name('manage-branches.editStaff');
         Route::post('updateStaff/{id}', [StaffController::class, 'updateStaff'])->name('manage-branches.updateStaff');
         Route::post('destroyStaff', [StaffController::class, 'destroyStaff'])->name('manage-branches.destroy');
+
+        // -------------admin-----------
+        //đăng ký chi nhánh
+        Route::get('/branch/register', [BranchController::class, 'adminshowForm'])->name('admin.branch.register');
+        Route::post('/branch/register', [BranchController::class, 'adminregister'])->name('admin.branch.store');
+    });
+
+    // Nhóm quản lý tài khoản
+    Route::prefix('manage-account')->group(function () {
+        Route::get('viewAll', [UserController::class, 'viewAll'])->name('manage-account.viewAll');
+        // admin quản lí chi nhánh
+        Route::get('detail/{id}', [UserController::class, 'getaccountDtl'])->name('admin.manage-account.detail');
+        Route::post('detail/{id}/update', [UserController::class, 'updateaccount'])->name('manage-account.update');
+        // routes/web.php
+        Route::get('/manage-account/{id}/change-password', [UserController::class, 'showChangePasswordForm'])->name('manage-account.changePasswordForm');
+        Route::post('/manage-account/{id}/change-password', [UserController::class, 'changePassword'])->name('manage-account.changePassword');
+        Route::post('destroyStaff', [UserController::class, 'destroyStaff'])->name('manage-account.destroy');
+
+        // -------------admin-----------
+        //quản lý tài khoản khách hàng
+        Route::get('/khachang', [UserController::class, 'indexkhachhang'])->name('admin.account.khachang');
+        Route::get('/account/khachang/edit/{id}', [UserController::class, 'editkhachang'])->name('admin.account.edit.khachang');
+        Route::post('/account/khachang/update/{id}', [UserController::class, 'updatekhachhang'])->name('admin.account.update.khachang');
+        Route::get('/account/khachang', [UserController::class, 'createkhachhang'])->name('admin.account.create.khachang');
+        Route::post('/account/khachang/addaccount', [UserController::class, 'storekhachhang'])->name('admin.account.store.khachang');
+
+        //quản lý tài khoản nhân viên
+        Route::get('/nhanvien', [UserController::class, 'indexnhanvien'])->name('admin.account.nhanvien');
+        Route::get('/account/nhanvien/edit/{id}', [UserController::class, 'editnhanvien'])->name('admin.account.edit.nhanvien');
+        Route::post('/account/nhanvien/update/{id}', [UserController::class, 'updatenhanvien'])->name('admin.account.update.nhanvien');
+        Route::get('/account/nhanvien', [UserController::class, 'createnhanvien'])->name('admin.account.create.nhanvien');
+        Route::post('/account/nhanvien/addaccount', [UserController::class, 'storenhanvien'])->name('admin.account.store.nhanvien');
+
+        //quản lý tài khoản chủ sân
+        Route::get('/chusan', [UserController::class, 'indexchusan'])->name('admin.account.chusan');
+        Route::get('/account/chusan/edit/{id}', [UserController::class, 'editchusan'])->name('admin.account.edit.chusan');
+        Route::post('/account/chusan/update/{id}', [UserController::class, 'updatechusan'])->name('admin.account.update.chusan');
+        Route::get('/account/chusan', [UserController::class, 'createchusan'])->name('admin.account.create.chusan');
+        Route::post('/account/chusan/addaccount', [UserController::class, 'storechusan'])->name('admin.account.store.chusan');
+
+        // quản lý tài khoản subadmin
+        Route::get('/nhanvienhetong', [UserController::class, 'indexnhanvienhetong'])->name('admin.account.nhanvienhetong');
+        Route::get('/account/nhanvienhetong/edit/{id}', [UserController::class, 'editnhanvienhetong'])->name('admin.account.edit.nhanvienhetong');
+        Route::post('/account/nhanvienhetong/update/{id}', [UserController::class, 'updatenhanvienhetong'])->name('admin.account.update.nhanvienhetong');
+        Route::get('/account/nhanvienhetong', [UserController::class, 'createnhanvienhetong'])->name('admin.account.create.nhanvienhetong');
+        Route::post('/account/nhanvienhetong/addaccount', [UserController::class, 'storenhanvienhetong'])->name('admin.account.store.nhanvienhetong');
     });
 
     // Nhóm quản lý sân (courts)

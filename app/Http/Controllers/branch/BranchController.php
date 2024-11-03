@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Session;
 
 class BranchController extends Controller
 {
+    public function welcome()
+    {
+        $branches = Branch::where('Status', '3')->get();
+        return view('welcome', compact('branches'));
+    }
 
     public function search(Request $request)
     {
@@ -49,7 +54,7 @@ class BranchController extends Controller
             ) // Chọn các cột cần thiết
             ->get();
         return view('branch.viewAll', [
-            'title' => 'DS Chi nhánh',
+            'title' => 'Danh sách',
             'branches' => $branches,
         ]);
     }
@@ -57,6 +62,13 @@ class BranchController extends Controller
     public function showForm()
     {
         return view('branch.formRegister', [
+            'title' => 'Đăng ký kinh doanh'
+        ]);
+    }
+
+    public function adminshowForm()
+    {
+        return view('branch.formAdminBranchRegister', [
             'title' => 'Đăng ký kinh doanh'
         ]);
     }
@@ -129,6 +141,85 @@ class BranchController extends Controller
             // Return a JSON response with error
             return response()->json([
                 'message' => 'Đăng ký thất bại, vui lòng thử lại sau.',
+                'error' => $e->getMessage(),
+            ], 500); // 500 status code for server error
+        }
+    }
+    public function adminregister(Request $request)
+    {
+        // dd($request);
+        $this->validate(
+            $request,
+            [
+                'username' => 'required',
+                'userphone' => 'required|numeric',
+                'useremail' => 'required',
+                'Name' => 'required',
+                'Location' => 'required',
+                'Phone' => 'required|numeric',
+                'Email' => 'required|email|',
+            ]
+            // ,
+            // [
+            //     'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            // ]
+        );
+        // Start a transaction
+        DB::beginTransaction();
+        try {
+            // Lấy thông tin user hiện tại
+            $user = new User();
+            $user->Name = $request->username;
+            $user->Phone = $request->userphone;
+            $user->Email = $request->useremail;
+            $user->Role = '3';
+            $user->password = bcrypt('123456');
+            $user->save();
+
+            $userId = $user->User_id;
+            // $user->Role = '3';
+            // $user->save();
+
+            // Tạo đối tượng manager
+            $manager = new Manager();
+            $manager->Manager_code = 0;
+            $manager->user_id = $userId;
+            $manager->save();
+
+            // Lấy ID của manager vừa tạo
+            $managerID = $manager->Manager_id;
+
+            // Tạo đối tượng branch
+            $branch = new Branch();
+            $branch->Name = $request->Name;
+            $branch->Location = $request->Location;
+            $branch->Phone = $request->Phone;
+            $branch->Email = $request->Email;
+            $branch->manager_id = $managerID;
+            $branch->Status = 3;
+            $branch->save();
+
+            // Commit the transaction nếu không có lỗi
+            DB::commit();
+            $Email = $request->useremail;
+            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
+                $email->subject('Cấp tài khoản');
+                $email->to($Email);
+            });
+            // Return a JSON response
+            return response()->json([
+                'message' => 'Tạo địa điểm kinh doanh mới và tài khoản chủ sân thành công',
+                'branch' => $branch,
+            ], 201); // 201 status code for successful resource creation
+
+        } catch (\Exception $e) {
+            // Rollback the transaction nếu có lỗi xảy ra
+            DB::rollBack();
+            Log::error('Tạo địa điểm kinh doanh mới và tài khoản chủ sân thất bại: ' . $e->getMessage());
+
+            // Return a JSON response with error
+            return response()->json([
+                'message' => 'Tạo địa điểm kinh doanh mới và tài khoản chủ sân thất bại, vui lòng thử lại sau.',
                 'error' => $e->getMessage(),
             ], 500); // 500 status code for server error
         }
@@ -245,6 +336,7 @@ class BranchController extends Controller
 
             if ($soluongBranch > 1) {
                 $branch = Branch::find($branchid);
+
                 if ($branch->Status == 3) {
                     $branch->delete();
                     Mail::send('branch.mailTuChoi', compact('Email', 'user', 'soluongBranch'), function ($email) use ($Email) {
@@ -295,6 +387,8 @@ class BranchController extends Controller
                     });
                 }
 
+                // Tìm tất cả nhân viên thuộc chi nhánh này và xóa
+                $staffDeleted = Staff::where('branch_id', $branchid)->delete();
                 // Commit giao dịch nếu không có lỗi
                 DB::commit();
 
@@ -488,7 +582,7 @@ class BranchController extends Controller
             ->where('Branch_id', $branch_id)
             ->first();
         return view('branch.viewDetail', [
-            'title' => 'DS Chi nhánh',
+            'title' => 'Thông tin địa điểm',
             'data' => $branch,
         ]);
     }

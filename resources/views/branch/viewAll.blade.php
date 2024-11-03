@@ -2,11 +2,10 @@
 
 @section('content')
     <div class="container-fluid mt-4">
-        <h1>{{ $title }}</h1>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID Chi Nhánh</th>
+                    <th>STT</th>
                     <th>Tên Chi Nhánh</th>
                     <th>Địa Chỉ CN</th>
                     <th>Hotline</th>
@@ -16,31 +15,37 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $i = 0;
+                @endphp
                 @foreach ($branches as $branch)
+                    @php
+                        ++$i;
+                    @endphp
                     <tr id = "{{ $branch->Branch_id }}">
-                        <td>{{ $branch->Branch_id }}</td>
+                        <td>{{ $i }}</td>
                         <td>{{ $branch->Name }}</td>
                         <td>{{ $branch->Location }}</td>
                         <td>0{{ $branch->Phone }}</td>
                         <td>{{ $branch->Email }}</td>
                         <td>{{ $branch->user_name }}</td>
-                        <td>
+                        <td class="d-flex align-items-center">
                             <a href="{{ route('admin.manage-branches.detail', ['id' => $branch->Branch_id]) }}"
-                                class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>
+                                class="btn btn-primary btn-sm me-1"><i class="fas fa-eye"></i></a>
+
                             <form id="deleteForm{{ $branch->Branch_id }}" action="{{ route('rejectBranch') }}" method="POST"
-                                style="display:inline;">
+                                class="d-inline">
                                 @csrf
                                 @method('POST')
 
-                                <input type="hidden" name="User_id" value = "{{ $branch->user_id }}">
-                                <input type="hidden" name="Manager_id" value = "{{ $branch->manager_id }}">
-                                <input type="hidden" name="Branch_id" value = "{{ $branch->Branch_id }}">
-                                <input type="hidden" name="Email" value = "{{ $branch->Email }}">
-
+                                <input type="hidden" name="User_id" value="{{ $branch->user_id }}">
+                                <input type="hidden" name="Manager_id" value="{{ $branch->manager_id }}">
+                                <input type="hidden" name="Branch_id" value="{{ $branch->Branch_id }}">
+                                <input type="hidden" name="Email" value="{{ $branch->Email }}">
 
                                 <button type="button" class="btn btn-danger btn-sm"
                                     onclick="showDeleteModal({{ $branch->Branch_id }})">
-                                    <i class="fas fa-trash"></i>{{-- icon xóa  --}}
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </td>

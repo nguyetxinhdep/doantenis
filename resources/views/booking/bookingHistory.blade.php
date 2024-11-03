@@ -13,6 +13,7 @@
             // Thêm booking vào nhóm của booking_code tương ứng
             $groupedBookings[$booking->booking_code][] = $booking;
         }
+        // dd($groupedBookings);
     @endphp
 
     <div class="container my-3">
@@ -32,7 +33,7 @@
                     <select class="form-control" id="status" name="status">
                         <option value="">Tất cả</option>
                         <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chưa thu đủ</option>
-                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã thu đủ (OK)</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã thu đủ</option>
                         <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Cần thanh toán để giữ sân
                         </option>
                         <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Đã hủy</option>
@@ -75,6 +76,8 @@
                     <th>Giờ ra</th>
                     <th>Tên địa điểm</th>
                     <th>Sân</th>
+                    <th>Tổng tiền</th>
+                    <th>Đã trả</th>
                     <th>Còn nợ</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -91,12 +94,18 @@
                         @php
                             $totalBookings = count($bookings);
                             $totalDebt = 0; // Khởi tạo biến tổng nợ
+                            $totalamount = 0; // Khởi tạo biến tổng nợ
+                            $totalpaid = 0; // Khởi tạo biến tổng nợ
                             $listBooking_id = []; //biến lưu danh sách booking id thi mã booking_code
                             $listPayment_id = []; //biến lưu danh sách payment id thi mã booking_code
 
                             // Tính tổng nợ cho các booking
                             foreach ($bookings as $booking) {
                                 $totalDebt += $booking->Debt; // Cộng dồn nợ
+                                $totalamount += $booking->Amount; // Cộng dồn nợ
+                                $totalpaid += $booking->Paid; // Cộng dồn nợ
+                                // dd($bookings);
+                                // dd($booking->Paid, $booking->Booking_id);
                                 // Tách các Payment_id có dấu phẩy
                                 $paymentIds = explode(',', $booking->Payment_id);
                                 // Lưu các giá trị đã tách vào mảng listPayment_id
@@ -157,6 +166,12 @@
                                         {!! implode('<br>', array_map('trim', $courtNames)) !!} <!-- In ra các sân, mỗi sân trên một dòng -->
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        {{ number_format($totalamount, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        {{ number_format($totalpaid, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         {{ number_format($totalDebt, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
@@ -166,7 +181,7 @@
                                             @break
 
                                             @case(1)
-                                                <span class="badge bg-success">Đã thu đủ (OK)</span>
+                                                <span class="badge bg-success">Đã thu đủ</span>
                                             @break
 
                                             @case(2)

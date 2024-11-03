@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        .tooltip-inner {
+            text-align: left;
+        }
+    </style>
     <div class="container-fluid mt-4">
         {{-- @dd($data) --}}
         <div class="d-flex pb-3">
@@ -16,7 +21,8 @@
                 enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
-                    <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh doanh</label>
+                    <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh doanh <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Name" type="text" class="form-control @error('Name') is-invalid @enderror"
                             name="Name" value="{{ $data->Name }}">
@@ -29,7 +35,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh</label>
+                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Location" type="text" class="form-control @error('Location') is-invalid @enderror"
                             name="Location" value="{{ $data->Location }}">
@@ -42,7 +49,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline kinh doanh</label>
+                    <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline kinh doanh <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Phone" type="text" class="form-control @error('Phone') is-invalid @enderror"
                             name="Phone" value="0{{ $data->Phone }}">
@@ -55,7 +63,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Email" class="col-md-4 col-form-label text-md-end">Email kinh doanh</label>
+                    <label for="Email" class="col-md-4 col-form-label text-md-end">Email kinh doanh <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Email" type="email" class="form-control @error('Email') is-invalid @enderror"
                             name="Email" value="{{ $data->Email }}">
@@ -68,7 +77,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="HoTen" class="col-md-4 col-form-label text-md-end">Quản lý chi nhánh</label>
+                    <label for="HoTen" class="col-md-4 col-form-label text-md-end">Quản lý chi nhánh <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="HoTen" type="text" class="form-control @error('HoTen') is-invalid @enderror"
                             name="user_name" value="{{ $data->user_name }}">
@@ -81,7 +91,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="user_email" class="col-md-4 col-form-label text-md-end">Email Quản Lý</label>
+                    <label for="user_email" class="col-md-4 col-form-label text-md-end">Email Quản Lý <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="user_email" type="user_email"
                             class="form-control @error('user_email') is-invalid @enderror" name="user_email"
@@ -95,7 +106,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Address" class="col-md-4 col-form-label text-md-end">Đ/Chỉ Nhà</label>
+                    <label for="Address" class="col-md-4 col-form-label text-md-end">Đ/Chỉ Nhà </label>
                     <div class="col-md-6">
                         <input id="Address" type="text" class="form-control @error('Address') is-invalid @enderror"
                             name="user_address" value="{{ $data->user_address }}">
@@ -108,7 +119,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">SĐT Cá Nhân</label>
+                    <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">SĐT Cá Nhân <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="SDTCaNhan" type="text" class="form-control @error('SDTCaNhan') is-invalid @enderror"
                             name="user_phone" value="0{{ $data->user_phone }}">
@@ -121,7 +133,17 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="link_map" class="col-md-4 col-form-label text-md-end">Vị Trí Sân</label>
+                    <label for="link_map" class="col-md-4 col-form-label text-md-end">
+                        Vị Trí Sân <span style="color:red">*</span>
+                        <span
+                            class="ms-2 bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width: 20px; height: 20px; cursor: pointer;" data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Hướng dẫn: <br> 1. Vào Google Map nhập địa chỉ sân <br> 2. Click vào chia sẻ <br> 3. Click nhúng bản đồ <br> 4. Click sao chép HTML <br> 5. Dán vào trang web">
+                            ?
+                            {{-- thêm dấu hỏi --}}
+                        </span>
+                    </label>
                     <div class="col-md-6">
                         <input id="link_map" type="text" class="form-control @error('link_map') is-invalid @enderror"
                             name="link_map" value="{{ $data->link_map }}">
@@ -194,7 +216,7 @@
                 </div>
                 {{-- data link_map --}}
                 <div class="w-100 ps-2 mt-3">
-                    <h5>Vị trí chi nhánh</h5>
+                    <h5>Vị trí sân</h5>
                     <div id="demo_link_map" class="w-100">
                         @if ($data->link_map)
                             {!! $data->link_map !!}
@@ -217,6 +239,16 @@
         border-radius: 5px;
     }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true
+            });
+        });
+    });
+</script>
 {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>

@@ -8,19 +8,19 @@
             @method('post')
 
             <div class="form-group">
-                <label for="name">Họ tên</label>
+                <label for="name">Họ tên <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="name" name="name"
                     value="{{ old('name', Auth::user()->Name) }}" required>
             </div>
 
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email <span style="color:red">*</span></label>
                 <input type="email" class="form-control" id="email" name="email"
                     value="{{ old('email', Auth::user()->Email) }}" required>
             </div>
 
             <div class="form-group">
-                <label for="phone">Số điện thoại</label>
+                <label for="phone">Số điện thoại <span style="color:red">*</span></label>
                 <input type="text" class="form-control" id="phone" name="phone"
                     value="0{{ old('phone', Auth::user()->Phone) }}" required>
             </div>

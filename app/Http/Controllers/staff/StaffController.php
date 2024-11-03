@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
@@ -14,7 +15,8 @@ class StaffController extends Controller
     // Hiển thị form tạo nhân viên
     public function createStaff()
     {
-        $branches = Branch::all(); // Lấy danh sách các chi nhánh để hiển thị trong form
+        // dd(session('branch_active'));
+        $branches = Branch::where('manager_id', session('branch_active')->manager_id)->get(); // Lấy danh sách các chi nhánh để hiển thị trong form
         $title = "Tạo nhân viên";
         return view('staff.create', compact('branches', 'title'));
     }

@@ -12,7 +12,7 @@
                         @if (Auth()->user()->Role != 5)
                             <!-- Thêm input cho tên khách hàng và số điện thoại -->
                             <div class="mb-3">
-                                <label class="form-label"><b>Khách hàng:</b></label><br>
+                                <label class="form-label"><b>Khách hàng: <span style="color:red">*</span></b></label><br>
                                 <input type="radio" id="hasAccount" name="customerType" value="hasAccount">
                                 <label for="hasAccount">Đã có tài khoản</label><br>
                                 <input type="radio" id="noAccount" name="customerType" value="noAccount">
@@ -22,13 +22,15 @@
                             <!-- Các input sẽ hiển thị hoặc ẩn tùy thuộc vào lựa chọn của radio -->
                             <div id="accountFields" style="display: none">
                                 <div class="mb-3">
-                                    <label for="customerName" class="form-label"><b>Tên Khách Hàng</b></label>
+                                    <label for="customerName" class="form-label"><b>Tên Khách Hàng <span
+                                                style="color:red">*</span></b></label>
                                     <input type="text" id="customerName" class="form-control"
                                         placeholder="Nhập tên khách hàng" required>
                                     <div id="suggestions" class="list-group" style="display:none;"></div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="customerPhone" class="form-label"><b>Số Điện Thoại</b></label>
+                                    <label for="customerPhone" class="form-label"><b>Số Điện Thoại <span
+                                                style="color:red">*</span></b></label>
                                     <input type="text" id="customerPhone" class="form-control" required>
                                 </div>
                                 <input type="hidden" id="user_id">
@@ -37,11 +39,13 @@
                     @endauth
                     <div class="row mb-3">
                         <div class="col">
-                            <label for="startDate" class="form-label"><b>Từ ngày:</b></label>
+                            <label for="startDate" class="form-label"><b>Từ ngày: <span
+                                        style="color:red">*</span></b></label>
                             <input type="date" id="startDate" class="form-control" required>
                         </div>
                         <div class="col">
-                            <label for="endDate" class="form-label"><b>Đến ngày:</b></label>
+                            <label for="endDate" class="form-label"><b>Đến ngày: <span
+                                        style="color:red">*</span></b></label>
                             <input type="date" id="endDate" class="form-control" required>
                         </div>
                     </div>
@@ -50,7 +54,8 @@
                             style="padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="days" class="form-label small">Chọn thứ</label>
+                                    <label for="days" class="form-label small">Chọn thứ <span
+                                            style="color:red">*</span></label>
                                     <select class="form-select days">
                                         <option value="1">Thứ Hai</option>
                                         <option value="2">Thứ Ba</option>
@@ -68,7 +73,8 @@
                             </div>
                             <div class="scheduleDetails" style="">
                                 <div class="courtsContainer mb-3">
-                                    <label for="courts" class="form-label small">Chọn sân</label>
+                                    <label for="courts" class="form-label small">Chọn sân <span
+                                            style="color:red">*</span></label>
                                     <div class="court-group">
                                         <div class="input-group mb-2 px-4">
                                             <select class="form-select courts">
@@ -80,7 +86,8 @@
                                         </div>
                                         <div class="timesContainer">
                                             <div class="timeGroup mb-2 px-5">
-                                                <label class="form-label">Nhập giờ</label>
+                                                <label class="form-label">Nhập giờ <span
+                                                        style="color:red">*</span></label>
                                                 <div class="input-group">
                                                     <input type="time" class="form-control start-time"
                                                         required="">
@@ -121,8 +128,10 @@
             newScheduleGroup.innerHTML = `
         <div class="row mb-3">
             <div class="col">
-                <label for="days" class="form-label">Chọn thứ</label>
+                <label for="days" class="form-label">Chọn thứ <span
+                                    style="color:red">*</span></label>
                 <select class="form-select days">
+                    <option >--Chọn Thứ--</option>
                     <option value="1">Thứ Hai</option>
                     <option value="2">Thứ Ba</option>
                     <option value="3">Thứ Tư</option>
@@ -138,10 +147,12 @@
         </div>
         <div class="scheduleDetails" style="display: none;">
             <div class="courtsContainer mb-3">
-                <label for="courts" class="form-label">Chọn sân</label>
+                <label for="courts" class="form-label">Chọn sân <span
+                                    style="color:red">*</span></label>
                 <div class="court-group">
                     <div class="input-group mb-2 px-4">
                         <select class="form-select courts">
+                            <option >--Chọn sân--</option>
                             @foreach ($courts as $court)
                                 <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
                             @endforeach
@@ -191,6 +202,7 @@
                 courtGroup.innerHTML = `
             <div class="input-group px-4">
                 <select class="form-select courts">
+                    <option >--Chọn sân--</option>
                     @foreach ($courts as $court)
                         <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
                     @endforeach
@@ -221,7 +233,8 @@
                         timeGroup.classList.add('timeGroup', 'mb-2', 'px-5');
 
                         timeGroup.innerHTML = `
-                    <label class="form-label">Nhập giờ</label>
+                    <label class="form-label">Nhập giờ <span
+                                    style="color:red">*</span></label>
                     <div class="input-group">
                         <input type="time" class="form-control start-time" required>
                         <span class="input-group-text">đến</span>
@@ -246,7 +259,8 @@
                     timeGroup.classList.add('timeGroup', 'mb-2', 'px-5');
 
                     timeGroup.innerHTML = `
-                <label class="form-label">Nhập giờ</label>
+                <label class="form-label">Nhập giờ <span
+                                    style="color:red">*</span></label>
                 <div class="input-group">
                     <input type="time" class="form-control start-time" required>
                     <span class="input-group-text">đến</span>

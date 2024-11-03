@@ -12,7 +12,7 @@
 
                         <div class="row mb-3">
                             <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh
-                                doanh</label>
+                                doanh <span style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Name" type="text"
                                     class="form-control @error('Name') is-invalid @enderror" name="Name" required>
@@ -25,7 +25,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh</label>
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
                                     class="form-control @error('Location') is-invalid @enderror" name="Location" required>
@@ -39,7 +40,7 @@
 
                         <div class="row mb-3">
                             <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline địa điểm kinh
-                                doanh</label>
+                                doanh <span style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Phone" type="text"
                                     class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
