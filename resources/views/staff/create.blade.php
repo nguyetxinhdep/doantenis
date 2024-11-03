@@ -6,7 +6,7 @@
             @csrf
             <!-- Chọn chi nhánh -->
             <div class="form-group">
-                <label for="branch">Chi Nhánh</label>
+                <label for="branch">Địa điểm kinh doạn <span style="color:red">*</span></label>
                 <select name="branch_id" id="branch" class="form-control">
                     @foreach ($branches as $branch)
                         <option {{ session('branch_active')->Branch_id == $branch->Branch_id ? 'selected' : '' }}
@@ -17,20 +17,20 @@
 
             <!-- Nhập tên nhân viên -->
             <div class="form-group">
-                <label for="name">Tên Nhân Viên</label>
+                <label for="name">Tên Nhân Viên <span style="color:red">*</span></label>
                 <input type="text" name="name" id="name" class="form-control" placeholder="Nhập tên nhân viên"
                     required>
             </div>
 
             <!-- Nhập email -->
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email <span style="color:red">*</span></label>
                 <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email" required>
             </div>
 
             <!-- Nhập số điện thoại -->
             <div class="form-group">
-                <label for="phone">Số Điện Thoại</label>
+                <label for="phone">Số Điện Thoại <span style="color:red">*</span></label>
                 <input type="text" name="phone" id="phone" class="form-control" placeholder="Nhập số điện thoại"
                     required>
             </div>
@@ -44,6 +44,7 @@
 
             <!-- Nút submit -->
             <button type="submit" class="btn btn-primary">Thêm Nhân Viên</button>
+            <a href="javascript:history.back()" class="btn btn-secondary">Trở lại</a>
         </form>
     </div>
 @endsection

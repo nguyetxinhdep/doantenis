@@ -12,17 +12,17 @@
             @method('post')
 
             <div class="form-group">
-                <label for="current_password">Mật khẩu hiện tại</label>
+                <label for="current_password">Mật khẩu hiện tại <span style="color:red">*</span></label>
                 <input type="password" class="form-control" id="current_password" name="current_password" required>
             </div>
 
             <div class="form-group">
-                <label for="new_password">Mật khẩu mới</label>
+                <label for="new_password">Mật khẩu mới <span style="color:red">*</span></label>
                 <input type="password" class="form-control" id="new_password" name="new_password" required>
             </div>
 
             <div class="form-group">
-                <label for="new_password_confirmation">Xác nhận mật khẩu mới</label>
+                <label for="new_password_confirmation">Xác nhận mật khẩu mới <span style="color:red">*</span></label>
                 <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation"
                     required>
             </div>

@@ -45,6 +45,7 @@ class LoginController extends Controller
                         $join->on('managers.Manager_id', '=', 'branches.manager_id');
                     })
                     ->where('users.User_id', (Auth::user()->User_id))
+                    // ->where('managers.Manager_id', 'branches.manager_id')
                     ->where('branches.Status', 3)
                     ->select(
                         'branches.*',
@@ -105,10 +106,10 @@ class LoginController extends Controller
             // Nếu role bằng 0, đăng xuất người dùng
             Auth::logout();
             Log::debug('error:Quyền hạn của bạn không đủ để đăng nhập!');
-            return redirect()->back();
+            return redirect()->back()->with('danger', 'Đăng nhập thất bại');
         }
         Log::debug('error:Tài khoản hoặc mật khẩu không đúng!');
-        return redirect()->back();
+        return redirect()->back()->with('danger', 'Tài khoản hoặc mật khẩu không đúng');
     }
 
     public function logout()

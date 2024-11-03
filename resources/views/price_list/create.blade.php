@@ -6,7 +6,8 @@
             @csrf
 
             <div class="row mb-3">
-                <label for="start_time" class="col-md-4 col-form-label text-md-end">Từ giờ</label>
+                <label for="start_time" class="col-md-4 col-form-label text-md-end">Từ giờ <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <input id="start_time" type="time" class="form-control @error('start_time') is-invalid @enderror"
                         name="start_time" value="{{ old('start_time') }}" required>
@@ -14,7 +15,8 @@
             </div>
 
             <div class="row mb-3">
-                <label for="end_time" class="col-md-4 col-form-label text-md-end">Đến giờ</label>
+                <label for="end_time" class="col-md-4 col-form-label text-md-end">Đến giờ <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <input id="end_time" type="time" class="form-control @error('end_time') is-invalid @enderror"
                         name="end_time" value="{{ old('end_time') }}" required>
@@ -22,7 +24,8 @@
             </div>
 
             <div class="row mb-3">
-                <label for="status" class="col-md-4 col-form-label text-md-end">Loại ngày</label>
+                <label for="status" class="col-md-4 col-form-label text-md-end">Loại ngày <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <select id="status" name="status" class="form-select @error('status') is-invalid @enderror"
                         required>
@@ -33,7 +36,8 @@
             </div>
 
             <div class="row mb-3">
-                <label for="fixed_price" class="col-md-4 col-form-label text-md-end">Giá cố định</label>
+                <label for="fixed_price" class="col-md-4 col-form-label text-md-end">Giá cố định <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <input id="fixed_price" type="number" step="0.01"
                         class="form-control @error('fixed_price') is-invalid @enderror" name="fixed_price" required>
@@ -41,7 +45,8 @@
             </div>
 
             <div class="row mb-3">
-                <label for="walk_in_price" class="col-md-4 col-form-label text-md-end">Giá vãng lai</label>
+                <label for="walk_in_price" class="col-md-4 col-form-label text-md-end">Giá vãng lai <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <input id="walk_in_price" type="number" step="0.01"
                         class="form-control @error('walk_in_price') is-invalid @enderror" name="walk_in_price" required>

@@ -9,10 +9,50 @@
                 <div class="card-body">
                     <form id="branch-form">
                         @csrf
+                        <div class="row mb-3">
+                            <label for="username" class="col-md-4 col-form-label text-md-end">Họ tên Khách hàng <span
+                                    style="color:red">*</span></label>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                    name="username" required>
+                                @error('username')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="userphone" class="col-md-4 col-form-label text-md-end">Số điện thoại cá nhân <span
+                                    style="color:red">*</span></label>
+                            <div class="col-md-6">
+                                <input id="userphone" type="text"
+                                    class="form-control @error('userphone') is-invalid @enderror" name="userphone" required>
+                                @error('userphone')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
-                            <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh doanh <span
+                            <label for="useremail" class="col-md-4 col-form-label text-md-end">Email cá nhân <span
                                     style="color:red">*</span></label>
+                            <div class="col-md-6">
+                                <input id="useremail" type="email"
+                                    class="form-control @error('useremail') is-invalid @enderror" name="useremail" required>
+                                @error('useremail')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="Name" class="col-md-4 col-form-label text-md-end">Tên địa điểm kinh
+                                doanh <span style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Name" type="text"
                                     class="form-control @error('Name') is-invalid @enderror" name="Name" required>
@@ -78,10 +118,6 @@
 
                         </div>
                     </form>
-                    <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
-                            Nếu bạn muốn dùng 1
-                            gmail để quản lý nhiều địa điểm kinh doanh thì vui lòng
-                            đăng nhập vào gmail mong muốn để đăng ký địa điểm kinh doanh khác!</span></div>
                 </div>
             </div>
         </div>
@@ -99,7 +135,7 @@
                 $('#overlay-spinner').removeClass('d-none');
 
                 $.ajax({
-                    url: '{{ route('branch.store') }}',
+                    url: '{{ route('admin.branch.store') }}',
                     method: 'POST',
                     data: formData,
                     success: function(response) {

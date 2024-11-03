@@ -6,7 +6,8 @@
             @csrf
 
             <div class="row mb-3">
-                <label for="creationType" class="col-md-4 col-form-label text-md-end">Loại tạo sân</label>
+                <label for="creationType" class="col-md-4 col-form-label text-md-end">Loại tạo sân <span
+                        style="color:red">*</span></label>
                 <div class="col-md-6">
                     <select id="creationType" name="creationType" class="form-select">
                         <option value="single">Tạo từng sân</option>
@@ -19,7 +20,8 @@
             <div id="single-court-form">
                 <!-- Single court creation form fields -->
                 <div class="row mb-3">
-                    <label for="Name" class="col-md-4 col-form-label text-md-end">Tên sân</label>
+                    <label for="Name" class="col-md-4 col-form-label text-md-end">Tên sân <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Name" placeholder="Sân 1, 2, 3,..." type="text"
                             class="form-control @error('Name') is-invalid @enderror" name="Name">
@@ -27,7 +29,8 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Availability" class="col-md-4 col-form-label text-md-end">Tình trạng</label>
+                    <label for="Availability" class="col-md-4 col-form-label text-md-end">Tình trạng <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <select name="Availability" class="form-select">
                             <option value="1" selected>Hoạt động</option>
@@ -41,7 +44,8 @@
             <div id="bulk-court-form" style="display: none;">
                 <!-- Bulk creation fields -->
                 <div class="row mb-3">
-                    <label for="courtRange" class="col-md-4 col-form-label text-md-end">Số lượng sân</label>
+                    <label for="courtRange" class="col-md-4 col-form-label text-md-end">Số lượng sân <span
+                            style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="minCourts" type="number" class="form-control" name="minCourts" placeholder="Từ số">
                         <input id="maxCourts" type="number" class="form-control mt-2" name="maxCourts"

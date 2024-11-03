@@ -22,7 +22,7 @@ class Manager extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function branch()
+    public function branches()
     {
         return $this->hasMany(Branch::class, 'manager_id');
     }

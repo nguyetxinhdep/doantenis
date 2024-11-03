@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container py-3">
-
+        <a href="{{ route('manage-branches.createStaff') }}" class="btn btn-primary mb-3">Tạo nhân viên</a>
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@
                             <td>{{ $staff->Staff_id }}</td>
                             <td>{{ $staff->Name }}</td>
                             <td>{{ $staff->Email }}</td>
-                            <td>{{ $staff->Phone }}</td>
+                            <td>0{{ $staff->Phone }}</td>
                             <td>{{ $staff->Address }}</td>
                             <td>{{ $staff->branch_id }}</td>
                             <td>

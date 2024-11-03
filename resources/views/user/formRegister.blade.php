@@ -11,7 +11,8 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="Name" class="col-md-4 col-form-label text-md-end">Họ Tên</label>
+                            <label for="Name" class="col-md-4 col-form-label text-md-end">Họ Tên <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Name" type="text"
                                     class="form-control @error('Name') is-invalid @enderror" name="Name" required>
@@ -19,7 +20,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Số điện thoại</label>
+                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Số điện thoại <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Phone" type="text"
                                     class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
@@ -27,7 +29,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Email" class="col-md-4 col-form-label text-md-end">Email</label>
+                            <label for="Email" class="col-md-4 col-form-label text-md-end">Email <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Email" type="email"
                                     class="form-control @error('Email') is-invalid @enderror" name="Email" required>
@@ -35,7 +38,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Password" class="col-md-4 col-form-label text-md-end">Mật khẩu</label>
+                            <label for="Password" class="col-md-4 col-form-label text-md-end">Mật khẩu <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Password" type="password"
                                     class="form-control @error('Password') is-invalid @enderror" name="Password" required>
@@ -44,7 +48,7 @@
 
                         <div class="row mb-3">
                             <label for="Password_confirmation" class="col-md-4 col-form-label text-md-end">Xác nhận mật
-                                khẩu</label>
+                                khẩu <span style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Password_confirmation" type="password"
                                     class="form-control @error('Password_confirmation') is-invalid @enderror"
