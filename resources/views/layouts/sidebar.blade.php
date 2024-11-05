@@ -106,17 +106,6 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('admin.branch.register') ? 'active' : '' }}"
-                                        href="{{ route('admin.branch.register') }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- DS Chi Nhánh --}}
-                                            Thêm địa điểm
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('pending.approval') || request()->routeIs('approveBranch.selecttime')
                                         ? 'active fw-bold'
                                         : '' }}"
@@ -143,37 +132,18 @@
                             </ul>
                         </li>
 
-                        {{-- level 0 quản lí tài khoản --}}
-                        <li
-                            class="nav-item {{ request()->routeIs('manage-account.viewAll') ||
-                            request()->routeIs('admin.account.create') ||
-                            request()->routeIs('admin.manage-account.detail')
-                                ? 'menu-open'
-                                : '' }}">
-                            <a href="#" class="nav-link">
-
+                        {{-- level 0 Quản lý tài khoản --}}
+                        <li class="nav-item ">
+                            <a href="{{ route('manage-account.viewAll') }}"
+                                class="nav-link {{ request()->routeIs('manage-account.viewAll') ||
+                                request()->routeIs('admin.account.create') ||
+                                request()->routeIs('admin.manage-account.detail')
+                                    ? 'bg-light'
+                                    : '' }}">
                                 <p>
                                     Quản lý tài khoản
-                                    {{-- cấp 0 quản lí chi nhánh --}}
-                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
-                            {{-- cấp 1 DS Chi Nhánh --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('manage-account.viewAll') || request()->routeIs('admin.manage-account.detail')
-                                        ? 'active'
-                                        : '' }}"
-                                        href="{{ route('manage-account.viewAll') }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- DS Chi Nhánh --}}
-                                            Danh sách tài khoản
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
 
                         {{-- level 0 Quản lý khách hàng --}}
@@ -275,17 +245,7 @@
                                         </p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('admin.branch.register') ? 'active' : '' }}"
-                                        href="{{ route('admin.branch.register') }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- DS Chi Nhánh --}}
-                                            Thêm địa điểm
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('pending.approval') || request()->routeIs('approveBranch.selecttime')
                                         ? 'active fw-bold'
@@ -313,37 +273,18 @@
                             </ul>
                         </li>
 
-                        {{-- level 0 quản lí tài khoản --}}
-                        <li
-                            class="nav-item {{ request()->routeIs('manage-account.viewAll') ||
-                            request()->routeIs('admin.account.create') ||
-                            request()->routeIs('admin.manage-account.detail')
-                                ? 'menu-open'
-                                : '' }}">
-                            <a href="#" class="nav-link">
-
+                        {{-- level 0 Quản lý tài khoản --}}
+                        <li class="nav-item ">
+                            <a href="{{ route('manage-account.viewAll') }}"
+                                class="nav-link {{ request()->routeIs('manage-account.viewAll') ||
+                                request()->routeIs('admin.account.create') ||
+                                request()->routeIs('admin.manage-account.detail')
+                                    ? 'bg-light'
+                                    : '' }}">
                                 <p>
                                     Quản lý tài khoản
-                                    {{-- cấp 0 quản lí chi nhánh --}}
-                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
-                            {{-- cấp 1 DS Chi Nhánh --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('manage-account.viewAll') || request()->routeIs('admin.manage-account.detail')
-                                        ? 'active'
-                                        : '' }}"
-                                        href="{{ route('manage-account.viewAll') }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- DS Chi Nhánh --}}
-                                            Danh sách tài khoản
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
 
                         {{-- level 0 Quản lý khách hàng --}}

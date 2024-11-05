@@ -29,6 +29,7 @@ use App\Http\Controllers\user\UserController;
 //     return view('welcome');
 // })->name('welcome');
 Route::get('/', [BranchController::class, 'welcome'])->name('welcome');
+Route::get('/danhsachsan', [BranchController::class, 'danhsachsan'])->name('danhsachsan');
 
 // Route xem lịch đặt sân trang welcome
 Route::get('welcome-booking-calendar/', [BookingController::class, 'bookingCalendarWelcome'])->name('welcome.booking.calendar');
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Nhóm quản lý tài khoản
     Route::prefix('manage-account')->group(function () {
+        // quản lý tài khoản
         Route::get('viewAll', [UserController::class, 'viewAll'])->name('manage-account.viewAll');
         // admin quản lí chi nhánh
         Route::get('detail/{id}', [UserController::class, 'getaccountDtl'])->name('admin.manage-account.detail');

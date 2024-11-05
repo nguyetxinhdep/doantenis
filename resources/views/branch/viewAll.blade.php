@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-3">
+        <a href="{{ route('admin.branch.register') }}" class="btn btn-primary mb-3">Thêm địa điểm</a>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -33,8 +34,8 @@
                             <a href="{{ route('admin.manage-branches.detail', ['id' => $branch->Branch_id]) }}"
                                 class="btn btn-primary btn-sm me-1"><i class="fas fa-eye"></i></a>
 
-                            <form id="deleteForm{{ $branch->Branch_id }}" action="{{ route('rejectBranch') }}" method="POST"
-                                class="d-inline">
+                            <form id="deleteForm{{ $branch->Branch_id }}" action="{{ route('rejectBranch') }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 @method('POST')
 

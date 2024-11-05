@@ -473,7 +473,28 @@ class UserController extends Controller
     public function viewAll(Request $request)
     {
         // Retrieve all accounts
-        $accounts = User::whereNotNull('email')->where('email', '!=', '')->get();
+        $accounts = User::whereNotNull('email')->where('email', '!=', '');
+        if ($request->filled('phone')) {
+            $phone = ltrim($request->phone, '0');
+            $accounts->where('Phone', 'like', '%' . $phone . '%');
+        }
+
+        // Tìm kiếm theo tên
+        if ($request->filled('name')) {
+            $accounts->where('Name', 'like', '%' . $request->name . '%');
+        }
+
+        // Tìm kiếm theo email
+        if ($request->filled('email')) {
+            $accounts->where('Email', 'like', '%' . $request->email . '%');
+        }
+
+        // Tìm kiếm theo role
+        if ($request->filled('role')) {
+            $accounts->where('Role', 'like', '%' . $request->role . '%');
+        }
+        $accounts = $accounts->get();
+        // dd($accounts);
         $title = "Danh sách";
         // Return view with accounts data
         return view('user.viewAll', compact('accounts', 'title'));

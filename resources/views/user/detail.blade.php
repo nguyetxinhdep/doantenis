@@ -31,10 +31,16 @@
                 @else
                     <select name="role" id="role" class="form-control" required onchange="toggleBranchSelection()">
                         {{-- <option value="1" {{ $account->Role == '1' ? 'selected' : '' }}>Admin</option> --}}
-                        <option value="2" {{ $account->Role == '2' ? 'selected' : '' }}>SubAdmin</option>
-                        <option value="3" {{ $account->Role == '3' ? 'selected' : '' }}>Chủ sân</option>
-                        <option value="4" {{ $account->Role == '4' ? 'selected' : '' }}>Nhân viên</option>
-                        <option value="5" {{ $account->Role == '5' ? 'selected' : '' }}>Khách hàng</option>
+                        @if ($account->Role == '3')
+                            <option value="3" {{ $account->Role == '3' ? 'selected' : '' }}>Chủ sân</option>
+                        @elseif ($account->Role == '2')
+                            <option value="2" {{ $account->Role == '2' ? 'selected' : '' }}>SubAdmin</option>
+                        @elseif ($account->Role == '4')
+                            {{-- <option value="3" {{ $account->Role == '3' ? 'selected' : '' }}>Chủ sân</option> --}}
+                            <option value="4" {{ $account->Role == '4' ? 'selected' : '' }}>Nhân viên</option>
+                        @elseif ($account->Role == '5')
+                            <option value="5" {{ $account->Role == '5' ? 'selected' : '' }}>Khách hàng</option>
+                        @endif
                     </select>
                 @endif
             </div>

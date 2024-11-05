@@ -25,6 +25,12 @@
                         </ul>
                     @endif
                 @endauth
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="text-white nav-link {{ request()->routeIs('danhsachsan') ? 'fw-bold text-info' : '' }}"
+                            aria-current="page" href="{{ route('danhsachsan') }}">Danh sách sân</a>
+                    </li>
+                </ul>
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ms-auto">
                     <!-- Authentication Links -->

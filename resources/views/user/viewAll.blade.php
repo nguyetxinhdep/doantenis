@@ -2,6 +2,49 @@
 
 @section('content')
     <div class="container-fluid mt-4">
+        <form action="{{ route('manage-account.viewAll') }}" method="GET" class="mb-4">
+            <div class="row">
+                <!-- Ô input tìm kiếm tên -->
+                <div class="col-md-3">
+                    <label for="name">Tên</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Nhập tên người đặt"
+                        value="{{ request('name') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm ngày tháng năm -->
+                <div class="col-md-3">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="{{ request('email') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm số điện thoại -->
+                <div class="col-md-3">
+                    <label for="phone">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" name="phone"
+                        placeholder="Nhập số điện thoại" value="{{ request('phone') }}">
+                </div>
+
+                <!-- Ô input tìm kiếm trạng thái -->
+                <div class="col-md-3">
+                    <label for="role">Role</label>
+                    <select class="form-control" id="role" name="role">
+                        <option value="">Tất cả</option>
+                        <option value="1" {{ request('role') == '1' ? 'selected' : '' }}>Admin</option>
+                        <option value="2" {{ request('role') == '2' ? 'selected' : '' }}>Subadmin</option>
+                        <option value="3" {{ request('role') == '3' ? 'selected' : '' }}>Chủ sân</option>
+                        <option value="4" {{ request('role') == '4' ? 'selected' : '' }}>Nhân viên</option>
+                        <option value="5" {{ request('role') == '5' ? 'selected' : '' }}>Khách hàng</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nút tìm kiếm -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+        </form>
         <table class="table table-striped">
             <thead>
                 <tr>
