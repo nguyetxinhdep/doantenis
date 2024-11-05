@@ -2,10 +2,10 @@
 
 @section('content')
     <div class="container-fluid mt-4">
-        <h1>{{ $title }}</h1>
         <table class="table table-striped">
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>ID Chi Nhánh</th>
                     <th>Tên Chi Nhánh</th>
                     <th>Địa Chỉ CN</th>
@@ -16,8 +16,12 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $dem = 0;
+                @endphp
                 @foreach ($branches as $branch)
                     <tr id = "{{ $branch->Branch_id }}">
+                        <td>{{ ++$dem }}</td>
                         <td>{{ $branch->Branch_id }}</td>
                         <td>{{ $branch->Name }}</td>
                         <td>{{ $branch->Location }}</td>

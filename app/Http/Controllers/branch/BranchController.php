@@ -25,6 +25,12 @@ class BranchController extends Controller
         return view('welcome', compact('branches'));
     }
 
+    public function danhsachsan()
+    {
+        $branches = Branch::where('Status', '3')->paginate(6);
+        return view('branch.danhsachsanKhachHang', compact('branches'));
+    }
+
     public function search(Request $request)
     {
         $query = $request->input('query');
@@ -283,7 +289,7 @@ class BranchController extends Controller
 
 
         return view('branch.showPending', [
-            'title' => 'DS Chờ duyệt',
+            'title' => 'Danh sách Chờ duyệt',
             'branches' => $test,
         ]);
     }
@@ -313,7 +319,7 @@ class BranchController extends Controller
 
 
         return view('branch.showPendingAgree', [
-            'title' => 'DS Chờ thỏa thuận hợp đồng',
+            'title' => 'Danh sách Chờ thỏa thuận hợp đồng',
             'branches' => $test,
         ]);
     }
@@ -609,7 +615,7 @@ class BranchController extends Controller
             ->where('Branch_id', $branch_id)
             ->first();
         return view('branch.viewDetail', [
-            'title' => 'DS Chi nhánh',
+            'title' => 'Danh sách địa điểm',
             'data' => $branch,
         ]);
     }

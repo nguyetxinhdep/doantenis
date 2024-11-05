@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="container-fluid mt-4">
-        <h1>{{ $title }}</h1>
         <table class="table table-striped">
             <thead>
                 <tr>
