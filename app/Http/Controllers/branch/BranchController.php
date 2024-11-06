@@ -25,11 +25,20 @@ class BranchController extends Controller
         return view('welcome', compact('branches'));
     }
 
-    public function danhsachsan()
+    public function danhsachsan(Request $req)
     {
-        $branches = Branch::where('Status', '3')->paginate(6);
+        $branches = Branch::where('Status', '3');
+
+        if (isset($req->search)) {
+            $branches->where('Name', 'like', '%' . $req->search . '%');
+        }
+
+        // Lấy kết quả phân trang và gán vào biến $branches
+        $branches = $branches->get();
+
         return view('branch.danhsachsanKhachHang', compact('branches'));
     }
+
 
     public function search(Request $request)
     {
