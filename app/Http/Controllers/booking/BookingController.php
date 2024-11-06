@@ -19,6 +19,31 @@ use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
+    public function layBangGia($branch_id)
+    {
+        // Lấy danh sách sân từ cơ sở dữ liệu và nhóm theo khung giờ
+        $list = DB::table('price_list')
+            ->join('time_slots', 'price_list.time_slot_id', '=', 'time_slots.Time_slot_id')
+            ->where('time_slots.branch_id', $branch_id)
+            ->select(
+                'time_slots.Start_time',
+                'time_slots.End_time',
+                'price_list.Price',
+                'price_list.customer_type_id',
+                'price_list.Price_list_id',
+                'price_list.time_slot_id',
+                'time_slots.Status'
+            )
+            ->get();
+
+        // Nhóm các bản ghi theo khung giờ
+        $groupedList = $list->groupBy(function ($item) {
+            return $item->Start_time . ' - ' . $item->End_time; // Nhóm theo khung giờ
+        });
+
+        return $groupedList;
+    }
+
     public function bookingCalendar($date)
     {
         // Lấy danh sách sân và giờ đã đặt(bảng booking)
@@ -31,6 +56,7 @@ class BookingController extends Controller
         return view('booking.calendar', compact('courts', 'bookings', 'title'));
     }
 
+    // controller xử lý hiển thị lịch cho khách hàng xem
     public function bookingCalendarWelcome(Request $req)
     {
         // Tạo biến date với ngày hiện tại
@@ -42,9 +68,15 @@ class BookingController extends Controller
         $bookings = Booking::where('branch_id', $branch_id)
             ->where('Date_booking', $date) // Lấy tất cả đặt sân
             ->where('Status', '!=', 3)->get();
+
+        // giát tiền
+        $groupedList = $this->layBangGia($branch_id);
+        // sân
+        $branch = Branch::where('branch_id', $req->branch_id)->first();
+
         $title = "Lịch";
 
-        return view('booking.calendarWelcome', compact('courts', 'bookings', 'title'));
+        return view('booking.calendarWelcome', compact('courts', 'bookings', 'title', 'groupedList', 'branch'));
     }
 
     public function bookingCalendarSearch(Request $req)
@@ -73,7 +105,13 @@ class BookingController extends Controller
                 ->where('Date_booking', $dateSearch)->get(); // Lấy tất cả đặt sân
             $title = "Lịch";
 
-            return view('booking.calendarWelcome', compact('courts', 'bookings', 'title'));
+            // giát tiền
+            $groupedList = $this->layBangGia($req->branch_id);
+
+            // sân
+            $branch = Branch::where('branch_id', $req->branch_id)->first();
+
+            return view('booking.calendarWelcome', compact('courts', 'bookings', 'title', 'branch', 'groupedList'));
         } else {
             return abort(404);
         }
@@ -81,7 +119,7 @@ class BookingController extends Controller
 
     public function bookingHistory(Request $req)
     {
-        $title = "Lịch sử đ";
+        $title = "Lịch sử đặt sân";
 
         // Tạo đối tượng query ban đầu
         $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
@@ -248,6 +286,9 @@ class BookingController extends Controller
             'selectedCells' => 'required', // selectedCells phải là một mảng
             'date' => 'required|date', // date phải là một ngày hợp lệ
         ]);
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Bạn cần đăng nhập để đặt sân.'], 401);
+        }
         // Bắt đầu transaction
         DB::beginTransaction();
         try {

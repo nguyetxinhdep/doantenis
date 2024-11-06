@@ -18,7 +18,7 @@
         <center>
             <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
             <!-- Nút Đặt lịch cố định -->
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fixedScheduleModal">
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#fixedScheduleModal">
                 Đặt lịch cố định
             </button>
 
@@ -26,7 +26,7 @@
             <form method="GET" class="py-2" action="{{ route('booking.calendar.search') }}">
                 <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
                 <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
-                <button type="submit" class="btn btn-primary">Xem lịch</button>
+                <button type="submit" class="btn btn-primary btn-sm">Xem lịch</button>
             </form>
         </center>
         <p class="d-flex align-items-center">
@@ -42,13 +42,13 @@
         </p>
         {{--  --}}
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 70vh;">
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center bg-info">Thời gian</th>
+                        <th class="text-center bg-info" style ="position: sticky; top:0; z-index:2">Thời gian</th>
                         @for ($time = 5.5; $time <= 23; $time += 0.5)
-                            <th class="text-center bg-info">
+                            <th class="text-center bg-info" style ="position: sticky; top:0; z-index:2">
                                 {{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }} -
                                 {{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}
                             </th>
@@ -85,15 +85,15 @@
                                         }
                                     }
                                 @endphp
-                                <td class="{{ $isTimeExpired ? 'position-relative' : '' }} {{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
+                                <td class="{{ $isTimeExpired ? 'position-relative z-1' : '' }} {{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}"
                                     @if (!$isBooked && !$isTimeExpired) data-court-id="{{ $court->Court_id }}" 
                                     data-time-start="{{ $timeStart }}" 
                                     data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
                                     style="cursor: pointer;" @endif>
-                                    {{ $isBooked || $isTimeExpired ? '' : 'x' }}
+                                    {{ $isBooked || $isTimeExpired ? '' : '' }}
                                     @if ($isTimeExpired)
-                                        <div class="overlay"></div>
+                                        <div class="overlay z-1"></div>
                                     @endif
                                 </td>
                                 {{-- <td class="{{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"

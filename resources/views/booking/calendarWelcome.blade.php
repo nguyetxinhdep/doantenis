@@ -16,7 +16,8 @@
         @include('booking.modalDatCoDinh')
 
         <center>
-            <h2>Lịch đặt sân ngày {{ $formattedDate }}</h2>
+            <h2>{{ $branch->Name }}</h2>
+
             @auth
                 <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#fixedScheduleModal">
                     Đặt lịch cố định
@@ -37,7 +38,11 @@
                 <label for="selected_date" style="font-size:16px" class="mr-1">Chọn ngày:</label>
                 <input type="date" id="selected_date" name="date" value="{{ request('date', date('Y-m-d')) }}">
                 <input type="hidden" name="branch_id" value="{{ $branch_id }}">
-                <button type="submit" class="btn btn-primary">Xem lịch</button>
+                <button type="submit" class="btn btn-primary btn-sm">Xem lịch</button>
+                <!-- Nút mở modal -->
+                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#priceListModal">
+                    Xem bảng giá
+                </button>
             </form>
         </center>
 
@@ -56,13 +61,13 @@
             Khóa
         </p>
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto;overflow-y: auto; max-height: 70vh;">
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center bg-info">Thời gian</th>
+                        <th class="text-center bg-info" style ="position: sticky; top:0; z-index:2">Thời gian</th>
                         @for ($time = 5.5; $time <= 23; $time += 0.5)
-                            <th class="text-center bg-info">
+                            <th class="text-center bg-info" style ="position: sticky; top:0; z-index:2">
                                 {{ sprintf('%02d:%02d', floor($time), ($time - floor($time)) * 60) }} -
                                 {{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}
                             </th>
@@ -99,15 +104,15 @@
                                         }
                                     }
                                 @endphp
-                                <td class="{{ $isTimeExpired ? 'position-relative' : '' }} {{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
+                                <td class="{{ $isTimeExpired ? 'position-relative z-1' : '' }} {{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $court->Name }}"
                                     @if (!$isBooked && !$isTimeExpired) data-court-id="{{ $court->Court_id }}" 
                                     data-time-start="{{ $timeStart }}" 
                                     data-time-end="{{ sprintf('%02d:%02d', floor($time + 0.5), ($time + 0.5 - floor($time + 0.5)) * 60) }}"
                                     style="cursor: pointer;" @endif>
-                                    {{ $isBooked || $isTimeExpired ? '' : 'x' }}
+                                    {{ $isBooked || $isTimeExpired ? '' : '' }}
                                     @if ($isTimeExpired)
-                                        <div class="overlay"></div>
+                                        <div class="overlay z-1"></div>
                                     @endif
                                 </td>
                                 {{-- <td class="{{ $isBooked ? ($ofcustomer ? 'bg-warning' : 'bg-danger') : 'bg-light' }}"
@@ -130,6 +135,7 @@
             <button id="reserve-button" class="btn btn-success">Đặt sân</button>
         </div>
     </div>
+
 
     <script>
         // Khởi tạo tooltip của Bootstrap
@@ -198,10 +204,80 @@
                         location.reload(); // Tải lại trang để cập nhật lịch
                     },
                     error: function(xhr) {
-                        alert('Đặt sân không thành công. Vui lòng đăng nhập và thử lại.');
+                        if (xhr.status === 401) {
+                            alert('Vui lòng đăng nhập để thực hiện đặt sân.');
+                            window.location.href =
+                            '{{ route('login') }}'; // Chuyển hướng tới trang đăng nhập
+                        } else {
+                            alert('Đặt sân không thành công. Vui lòng thử lại.');
+                        }
                     }
                 });
             }
         });
     </script>
+    @php
+        $status1Rows = 0;
+        foreach ($groupedList as $items) {
+            // duyệt qua từng hàng, xem có hàng nào có cột status = 1(sân ngày thường) thì + $status1Rows
+            if ($items->contains('Status', 1)) {
+                $status1Rows++;
+            }
+        }
+    @endphp
+    <!-- Modal chi tiết bảng giá -->
+    <div class="modal fade" id="priceListModal" tabindex="-1" role="dialog" aria-labelledby="priceListModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="priceListModalLabel">Chi tiết bảng giá(/giờ)</h5>
+
+                </div>
+                <div class="modal-body">
+                    <!-- Sao chép bảng giá vào modal -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Khung giờ</th>
+                                <th>Vãng lai</th>
+                                <th>Cố định</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sao chép nội dung bảng giá ở đây -->
+                            @foreach ($groupedList as $key => $items)
+                                @if ($items->contains('Status', 1))
+                                    <tr>
+                                        <td rowspan="{{ $status1Rows }}">T2-T6</td>
+                                        <td>{{ $key }}</td>
+                                        <td>{{ $items->where('customer_type_id', 1)->where('Status', 1)->first()?->Price ?? 'Không có giá' }}
+                                            VND</td>
+                                        <td>{{ $items->where('customer_type_id', 2)->where('Status', 1)->first()?->Price ?? 'Không có giá' }}
+                                            VND</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                            @foreach ($groupedList as $key => $items)
+                                @if ($items->contains('Status', 2))
+                                    <tr>
+                                        <td>T7-CN</td>
+                                        <td>{{ $key }}</td>
+                                        <td>{{ $items->where('customer_type_id', 1)->where('Status', 2)->first()?->Price ?? 'Không có giá' }}
+                                            VND</td>
+                                        <td>{{ $items->where('customer_type_id', 2)->where('Status', 2)->first()?->Price ?? 'Không có giá' }}
+                                            VND</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
