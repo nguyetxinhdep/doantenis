@@ -31,10 +31,10 @@ class PriceListController extends Controller
         $groupedList = $list->groupBy(function ($item) {
             return $item->Start_time . ' - ' . $item->End_time; // Nhóm theo khung giờ
         });
-        // Trả về view danh sách sân
+        // Trả về view danh sách bảng giá
         return view('price_list.index', [
             'list' => $groupedList,
-            'title' => 'Danh sách Sân'
+            'title' => 'Bảng giá'
         ]);
     }
 
