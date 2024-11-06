@@ -22,14 +22,14 @@
             <div class="row">
                 <!-- Ô input tìm kiếm tên -->
                 <div class="col-md-3">
-                    <label for="name">Tên</label>
+                    <label for="name">Người đặt</label>
                     <input type="text" class="form-control" id="name" name="name" placeholder="Nhập tên người đặt"
                         value="{{ request('name') }}">
                 </div>
 
                 <!-- Ô input tìm kiếm ngày tháng năm -->
                 <div class="col-md-3">
-                    <label for="date">Ngày tháng năm</label>
+                    <label for="date">Ngày đặt</label>
                     <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
                 </div>
 
@@ -57,7 +57,8 @@
             <!-- Nút tìm kiếm -->
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+                    <a href="{{ route('manager.payment') }}" class="btn btn-warning btn-sm">Đặt lại</a>
                 </div>
             </div>
         </form>
@@ -75,6 +76,8 @@
                     <th>Giờ ra</th>
                     <th>Chi Nhánh</th>
                     <th>Sân</th>
+                    <th>Tổng tiền</th>
+                    <th>Đã trả</th>
                     <th>Còn nợ</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
@@ -91,12 +94,16 @@
                         @php
                             $totalBookings = count($bookings);
                             $totalDebt = 0; // Khởi tạo biến tổng nợ
+                            $totalAmount = 0; // Khởi tạo biến tổng nợ
+                            $totalPaid = 0; // Khởi tạo biến tổng nợ
                             $listBooking_id = []; //biến lưu danh sách booking id thi mã booking_code
                             $listPayment_id = []; //biến lưu danh sách payment id thi mã booking_code
 
                             // Tính tổng nợ cho các booking
                             foreach ($bookings as $booking) {
                                 $totalDebt += $booking->Debt; // Cộng dồn nợ
+                                $totalAmount += $booking->Amount; // Cộng dồn nợ
+                                $totalPaid += $booking->Paid; // Cộng dồn nợ
                                 // Tách các Payment_id có dấu phẩy
                                 $paymentIds = explode(',', $booking->Payment_id);
                                 // Lưu các giá trị đã tách vào mảng listPayment_id
@@ -150,6 +157,12 @@
                                             $courtNames = explode(',', $booking->court_name); // Tách tên sân
                                         @endphp
                                         {!! implode('<br>', array_map('trim', $courtNames)) !!} <!-- In ra các sân, mỗi sân trên một dòng -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        {{ number_format($totalAmount, 0, ',', '.') }} đ <!-- Hiển thị tổng tiền -->
+                                    </td>
+                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                        {{ number_format($totalPaid, 0, ',', '.') }} đ <!-- Hiển thị tổng đã trả -->
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         {{ number_format($totalDebt, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
@@ -259,7 +272,8 @@
                                                     <input class="form-check-input" type="radio" name="PaymentAmount"
                                                         id="halfPayment-{{ $bookingCode }}" value="half"
                                                         onclick="selectPaymentOption('halfPaymentAmount', 'fullPaymentAmount', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
-                                                    <label class="form-check-label" for="halfPayment-{{ $bookingCode }}">
+                                                    <label class="form-check-label"
+                                                        for="halfPayment-{{ $bookingCode }}">
                                                         Thanh toán 1/2 số tiền nợ:
                                                         {{ number_format($totalDebt / 2, 0, ',', '.') }} đ
                                                     </label>

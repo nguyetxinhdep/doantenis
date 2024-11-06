@@ -7,8 +7,8 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Tên Chi Nhánh</th>
-                    <th>Địa Chỉ CN</th>
+                    <th>Tên địa điểm</th>
+                    <th>Địa Chỉ</th>
                     <th>Hotline</th>
                     <th>Email</th>
                     <th>Người Đăng Ký</th>

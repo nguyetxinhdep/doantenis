@@ -567,10 +567,10 @@ class UserController extends Controller
                 if (!$staff) {
                     $staff = new Staff();
                     $staff->user_id = $account->User_id; // Gán user_id cho manager
-                    $staff->branch_id = $validatedData['branch_id']; //
+                    $staff->branch_id = $request->branch_id; //
                 }
 
-                $staff->branch_id = $validatedData['branch_id']; //
+                $staff->branch_id = $request->branch_id; //
                 $staff->save(); // Lưu manager vào cơ sở dữ liệu
             } elseif (in_array($validatedData['role'], ['5'])) { //hoặc "Nhân viên"
                 $cus = Customer::where('user_id', $id)->first();
@@ -617,6 +617,7 @@ class UserController extends Controller
     {
         // Retrieve all accounts
         $account = User::findOrFail($id);
+        $staff = Staff::where('user_id', $id)->first();
 
         // Lấy danh sách chi nhánh với trạng thái là 3
         $branches = Branch::where('Status', 3)
@@ -636,7 +637,7 @@ class UserController extends Controller
 
         $title = "Detail";
         // Return view with accounts data
-        return view('user.detail', compact('account', 'branches', 'title', 'manager'));
+        return view('user.detail', compact('account', 'branches', 'title', 'manager', 'staff'));
     }
 
     // Delete account

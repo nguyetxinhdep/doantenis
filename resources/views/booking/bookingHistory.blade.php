@@ -23,7 +23,7 @@
             <div class="row" style="color: white">
                 <!-- Ô input tìm kiếm ngày tháng năm -->
                 <div class="col-md-3">
-                    <label for="date">Ngày tháng năm</label>
+                    <label for="date">Ngày đặt</label>
                     <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
                 </div>
 
@@ -58,7 +58,8 @@
             <!-- Nút tìm kiếm -->
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+                    <a href="{{ route('booking.history') }}" class="btn btn-warning btn-sm">Đặt lại</a>
                 </div>
             </div>
         </form>

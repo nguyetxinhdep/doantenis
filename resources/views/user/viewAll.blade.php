@@ -41,7 +41,8 @@
             <!-- Nút tìm kiếm -->
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+                    <a href="{{ route('manage-account.viewAll') }}" class="btn btn-warning btn-sm">Đặt lại</a>
                 </div>
             </div>
         </form>
@@ -59,33 +60,39 @@
             </thead>
             <tbody>
                 @php $i = 0; @endphp
-                @foreach ($accounts as $account)
-                    @php ++$i; @endphp
-                    <tr id="{{ $account->User_id }}">
-                        <td>{{ $i }}</td>
-                        <td>{{ $account->User_id }}</td>
-                        <td>{{ $account->Name }}</td>
-                        <td>{{ $account->Email }}</td>
-                        <td>0{{ $account->Phone }}</td>
-                        <td>{{ $account->Role }}</td>
-                        <td class="d-flex align-items-center">
-                            <a href="{{ route('admin.manage-account.detail', ['id' => $account->User_id]) }}"
-                                class="btn btn-primary btn-sm me-1">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <form id="deleteForm{{ $account->User_id }}" action="{{ route('manage-account.destroy') }}"
-                                method="POST" class="d-inline">
-                                @csrf
-                                @method('POST')
-                                <input type="hidden" name="account_id" value="{{ $account->User_id }}">
-                                <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="modalxoa({{ $account->User_id }})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
+                @if ($accounts->isEmpty())
+                    <tr>
+                        <td colspan="7" style="text-align: center">Không tìm thấy tài khoản</td>
                     </tr>
-                @endforeach
+                @else
+                    @foreach ($accounts as $account)
+                        @php ++$i; @endphp
+                        <tr id="{{ $account->User_id }}">
+                            <td>{{ $i }}</td>
+                            <td>{{ $account->User_id }}</td>
+                            <td>{{ $account->Name }}</td>
+                            <td>{{ $account->Email }}</td>
+                            <td>0{{ $account->Phone }}</td>
+                            <td>{{ $account->Role }}</td>
+                            <td class="d-flex align-items-center">
+                                <a href="{{ route('admin.manage-account.detail', ['id' => $account->User_id]) }}"
+                                    class="btn btn-primary btn-sm me-1">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <form id="deleteForm{{ $account->User_id }}"
+                                    action="{{ route('manage-account.destroy') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('POST')
+                                    <input type="hidden" name="account_id" value="{{ $account->User_id }}">
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="modalxoa({{ $account->User_id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
             </tbody>
         </table>
     </div>

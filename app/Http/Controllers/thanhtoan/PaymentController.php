@@ -75,6 +75,8 @@ class PaymentController extends Controller
                 DB::raw('MAX(users.Phone) as user_phone'),
                 DB::raw('GROUP_CONCAT(courts.name SEPARATOR ", ") as court_name'),
                 DB::raw('SUM(payments.Debt) as Debt'),
+                DB::raw('SUM(payments.Paid) as Paid'),
+                DB::raw('SUM(payments.Amount) as Amount'),
                 DB::raw('GROUP_CONCAT(payments.Payment_id SEPARATOR ", ") as Payment_id'),
                 DB::raw('MAX(bookings.created_at) as created_at') // Thêm trường created_at để sắp xếp
             )
