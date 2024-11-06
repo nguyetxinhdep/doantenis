@@ -4,8 +4,6 @@
     <div class="row justify-content-center mt-3">
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header">{{ __('Đăng Ký Chi Nhánh') }}</div>
-
                 <div class="card-body">
                     <form id="branch-form">
                         @csrf
@@ -25,7 +23,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ <span
                                     style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
@@ -39,8 +37,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline địa điểm kinh
-                                doanh <span style="color:red">*</span></label>
+                            <label for="Phone" class="col-md-4 col-form-label text-md-end">Hotline địa điểm <span
+                                    style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Phone" type="text"
                                     class="form-control @error('Phone') is-invalid @enderror" name="Phone" required>
@@ -60,6 +58,8 @@
                                 <button type="reset" class="btn btn-secondary">
                                     Reset
                                 </button>
+                                <a href="javascript:history.back()" class="btn btn-success">Trở lại</a>
+
                             </div>
 
                         </div>
@@ -67,11 +67,11 @@
                         <input type="hidden" name="Email" value="{{ session('branch_active')->Email }}">
                         <input type="hidden" name="manager_id" value="{{ session('branch_active')->manager_id }}">
                     </form>
-                    <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
+                    {{-- <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
                             Nếu bạn muốn dùng 1
                             gmail để quản lý nhiều chi
                             nhánh thì vui lòng
-                            đăng nhập để đăng ký chi nhánh khác!</span></div>
+                            đăng nhập để đăng ký chi nhánh khác!</span></div> --}}
                 </div>
             </div>
         </div>

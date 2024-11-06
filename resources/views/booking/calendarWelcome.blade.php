@@ -207,7 +207,7 @@
                         if (xhr.status === 401) {
                             alert('Vui lòng đăng nhập để thực hiện đặt sân.');
                             window.location.href =
-                            '{{ route('login') }}'; // Chuyển hướng tới trang đăng nhập
+                                '{{ route('login') }}'; // Chuyển hướng tới trang đăng nhập
                         } else {
                             alert('Đặt sân không thành công. Vui lòng thử lại.');
                         }
@@ -231,7 +231,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="priceListModalLabel">Chi tiết bảng giá(/giờ)</h5>
+                    <h5 class="modal-title" id="priceListModalLabel">Chi tiết bảng giá tiền/1 giờ</h5>
 
                 </div>
                 <div class="modal-body">
@@ -246,28 +246,79 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Sao chép nội dung bảng giá ở đây -->
+                            <!-- Hiển thị T2-T6 -->
                             @foreach ($groupedList as $key => $items)
-                                @if ($items->contains('Status', 1))
+                                @php
+                                    //kiểm tra xem trong hàng đang duyệt này có tồn tại cột nào có status = 1 không -> true/false
+                                    $status1Exists = $items->contains('Status', 1);
+
+                                    //kiểm tra xem trong hàng đang duyệt này có tồn tại cột nào có status = 2 không -> true/false
+                                    $status2Exists = $items->contains('Status', 2);
+                                @endphp
+
+                                <!-- Xử lý T2-T6 (Status = 1) -->
+                                @if ($status1Exists)
                                     <tr>
-                                        <td rowspan="{{ $status1Rows }}">T2-T6</td>
+                                        {{-- nếu là vòng lặp đầu tiên thì thực hiện(laravel hỗ trợ) --}}
+                                        @if ($loop->first)
+                                            <!-- Dùng rowspan để gộp T2-T6 -->
+                                            <td rowspan="{{ $status1Rows }}">T2-T6</td>
+                                        @endif
+
+                                        {{-- key này là khung giờ do group by bên controller rồi --}}
                                         <td>{{ $key }}</td>
-                                        <td>{{ $items->where('customer_type_id', 1)->where('Status', 1)->first()?->Price ?? 'Không có giá' }}
-                                            VND</td>
-                                        <td>{{ $items->where('customer_type_id', 2)->where('Status', 1)->first()?->Price ?? 'Không có giá' }}
-                                            VND</td>
+                                        <td>
+                                            @php
+                                                $vanglai = $items
+                                                    ->where('customer_type_id', 1)
+                                                    ->where('Status', 1)
+                                                    ->first(); //true,flase
+                                            @endphp
+                                            {{ $vanglai ? number_format($vanglai->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
+                                        </td>
+                                        <td>
+                                            @php
+                                                $codinh = $items
+                                                    ->where('customer_type_id', 2)
+                                                    ->where('Status', 1)
+                                                    ->first();
+                                            @endphp
+                                            {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
+                                        </td>
                                     </tr>
                                 @endif
                             @endforeach
+
+                            <!-- Hiển thị T7-CN (Status = 2) -->
                             @foreach ($groupedList as $key => $items)
-                                @if ($items->contains('Status', 2))
+                                @php
+                                    // dd($list);
+                                    $status1Exists = $items->contains('Status', 1);
+                                    $status2Exists = $items->contains('Status', 2);
+                                @endphp
+
+                                @if ($status2Exists)
                                     <tr>
                                         <td>T7-CN</td>
                                         <td>{{ $key }}</td>
-                                        <td>{{ $items->where('customer_type_id', 1)->where('Status', 2)->first()?->Price ?? 'Không có giá' }}
-                                            VND</td>
-                                        <td>{{ $items->where('customer_type_id', 2)->where('Status', 2)->first()?->Price ?? 'Không có giá' }}
-                                            VND</td>
+                                        <td>
+                                            @php
+                                                $vanglai = $items
+                                                    ->where('customer_type_id', 1)
+                                                    ->where('Status', 2)
+                                                    ->first(); //true,flase
+                                            @endphp
+                                            {{ $vanglai ? number_format($vanglai->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
+                                        </td>
+                                        <td>
+                                            @php
+                                                $codinh = $items
+                                                    ->where('customer_type_id', 2)
+                                                    ->where('Status', 2)
+                                                    ->first(); //true,flase
+                                            @endphp
+                                            {{ $codinh ? number_format($codinh->Price, 0, ',', '.') . ' VND' : 'Không có giá' }}
+                                        </td>
                                     </tr>
                                 @endif
                             @endforeach
@@ -275,7 +326,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>

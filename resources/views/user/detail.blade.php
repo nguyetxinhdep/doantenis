@@ -73,7 +73,8 @@
                     <label for="branch">Địa điểm <span style="color:red">*</span></label>
                     <select name="branch_id" id="branch" class="form-control" required>
                         @foreach ($branches as $branch)
-                            <option value="{{ $branch->Branch_id }}">{{ $branch->Name }}
+                            <option value="{{ $branch->Branch_id }}"
+                                {{ $staff->branch_id == $branch->Branch_id ? 'selected' : '' }}>{{ $branch->Name }}
                             </option>
                         @endforeach
                     </select>

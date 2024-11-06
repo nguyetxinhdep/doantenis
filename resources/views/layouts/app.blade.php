@@ -205,7 +205,7 @@
             <div class="float-right d-none d-sm-block">
                 <b>Welcome!</b>
             </div>
-            <strong>Quản Lý Sân Tenis</strong>
+            <strong>Quản Lý Sân Tennis</strong>
         </footer>
 
 

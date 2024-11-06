@@ -41,7 +41,12 @@
                 <div class="info">
                     <a style="text-decoration: none" href="#" class="d-block">
                         @auth
-                            {{ Auth::user()->Name }}
+                            @if (Auth()->user()->Role == '4')
+                                Sân {{ session('branch_active')->Name }}<br>
+                                Tên nhân viên: {{ Auth::user()->Name }}
+                            @else
+                                Tên: {{ Auth::user()->Name }}
+                            @endif
                             {{-- <p>Your email: {{ Auth::user()->email }}</p> --}}
                             {{-- <p>Your role: {{ Auth::user()->role }}</p> --}}
                         @endauth
@@ -93,7 +98,9 @@
                             {{-- cấp 1 DS Chi Nhánh --}}
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('manage-branches.viewAll') || request()->routeIs('admin.manage-branches.detail')
+                                    <a class="nav-link {{ request()->routeIs('manage-branches.viewAll') ||
+                                    request()->routeIs('admin.branch.register') ||
+                                    request()->routeIs('admin.manage-branches.detail')
                                         ? 'active'
                                         : '' }}"
                                         href="{{ route('manage-branches.viewAll') }}">
@@ -383,6 +390,17 @@
 
                             </ul>
                         </li>
+                        {{-- level 0 Lịch tổng quan --}}
+                        <li class="nav-item">
+                            <a href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}"
+                                class="nav-link {{ request()->routeIs('booking.calendar') ? 'bg-light' : '' }}">
+                                <p>
+                                    Lịch tổng quan
+                                </p>
+                            </a>
+                        </li>
+
+                        {{-- level 0 quản lý nhân viên --}}
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('manage-branches.viewStaff') ||
                             request()->routeIs('manage-branches.editStaff') ||
@@ -402,7 +420,7 @@
                         <li
                             class="nav-item {{ request()->routeIs('manage-courts.getCreate') ||
                             request()->routeIs('courts.index') ||
-                            request()->routeIs('booking.calendar') ||
+                            // request()->routeIs('booking.calendar') ||
                             request()->routeIs('courts.show')
                                 ? 'menu-open'
                                 : '' }}">
@@ -427,20 +445,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            {{-- cấp 1 Lịch tổng quan --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('booking.calendar') ? 'active' : '' }}"
-                                        href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- Lịch tổng quan --}}
-                                            Lịch tổng quan
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
+
                             {{-- cấp 1 Tạo sân --}}
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
@@ -510,11 +515,21 @@
                         {{-- ----------------------------------------------------------------------------------------- --}}
                     @elseif (Auth::user()->Role == '4')
                         {{-- Branch Staff --}}
+                        {{-- level 0 Lịch tổng quan --}}
+                        <li class="nav-item">
+                            <a href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}"
+                                class="nav-link {{ request()->routeIs('booking.calendar') ? 'bg-light' : '' }}">
+                                <p>
+                                    Lịch tổng quan
+                                </p>
+                            </a>
+                        </li>
+
                         {{-- level 0 Quản lý sân --}}
                         <li
                             class="nav-item {{ request()->routeIs('manage-courts.getCreate') ||
                             request()->routeIs('courts.index') ||
-                            request()->routeIs('booking.calendar') ||
+                            // request()->routeIs('booking.calendar') ||
                             request()->routeIs('courts.show')
                                 ? 'menu-open'
                                 : '' }}">
@@ -539,21 +554,6 @@
                                     </a>
                                 </li>
                             </ul>
-                            {{-- cấp 1 Lịch tổng quan --}}
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('booking.calendar') ? 'active' : '' }}"
-                                        href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}">
-                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
-                                            {{-- Lịch tổng quan --}}
-                                            Lịch tổng quan
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
-
                         </li>
 
                         {{-- level 0 Quản lý Bảng giá --}}
