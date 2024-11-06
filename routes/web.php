@@ -174,6 +174,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Route xem chi tiết giờ được đặt của sân
         Route::get('courts/{id}', [CourtsController::class, 'show'])->name('courts.show');
+        // Route để hiển thị form chỉnh sửa sân
+        Route::get('courts/{id}/edit', [CourtsController::class, 'edit'])->name('courts.edit');
+
+        // Route để cập nhật thông tin sân sau khi chỉnh sửa
+        Route::put('courts/{id}', [CourtsController::class, 'update'])->name('courts.update');
+
+        // Route để xóa sân
+        Route::delete('courts/{id}', [CourtsController::class, 'destroy'])->name('courts.destroy');
 
         // route tạo sân cho chi nhánh
         Route::get('create', [CourtsController::class, 'viewCreate'])->name('manage-courts.getCreate');

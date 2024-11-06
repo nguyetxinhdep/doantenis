@@ -47,6 +47,33 @@ class CourtsController extends Controller
             'title' => 'Tạo sân cho chi nhánh'
         ]);
     }
+    public function edit($id)
+    {
+        $court = Court::findOrFail($id);
+        $title = "Sửa sân";
+        return view('courts.edit', compact('court', 'title'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'Name' => 'required|string|max:255',
+            'Availability' => 'required|boolean',
+        ]);
+
+        $court = Court::findOrFail($id);
+        $court->update($request->all());
+
+        return redirect()->route('courts.index')->with('success', 'Cập nhật sân thành công!');
+    }
+
+    public function destroy($id)
+    {
+        $court = Court::findOrFail($id);
+        $court->delete();
+
+        return redirect()->route('courts.index')->with('success', 'Xóa sân thành công!');
+    }
 
     public function CourtCreate(Request $req)
     {

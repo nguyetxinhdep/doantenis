@@ -341,12 +341,12 @@
                         {{-- level 0 quản lí chi nhánh --}}
                         <li
                             class="nav-item {{ request()->routeIs('manage-branches.detail') ||
-                            request()->routeIs('manage-branches.create-staff') ||
-                            request()->routeIs('manage-branches.createStaff') ||
+                            // request()->routeIs('manage-branches.create-staff') ||
+                            // request()->routeIs('manage-branches.createStaff') ||
                             // request()->routeIs('manage-branches.viewStaff') ||
-                            request()->routeIs('branch.email.exists') ||
-                            request()->routeIs('manage-branches.editStaff')
-                                ? 'menu-open'
+                            request()->routeIs('branch.email.exists')
+                                ? // request()->routeIs('manage-branches.editStaff')
+                                'menu-open'
                                 : '' }}">
                             <a href="#" class="nav-link">
 
