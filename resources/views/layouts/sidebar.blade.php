@@ -437,7 +437,7 @@
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- DS sân --}}
-                                            DS sân
+                                            Danh sách sân
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
@@ -478,7 +478,7 @@
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- DS bảng giá --}}
-                                            DS bảng giá
+                                            Danh sách bảng giá
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
@@ -546,7 +546,7 @@
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- DS sân --}}
-                                            DS sân
+                                            Danh sách sân
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
@@ -572,7 +572,7 @@
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- DS bảng giá --}}
-                                            DS bảng giá
+                                            Danh sách bảng giá
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
