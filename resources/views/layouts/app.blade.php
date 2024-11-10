@@ -93,15 +93,14 @@
                                 @foreach (session('all_branch') as $branch)
                                     @if ($branch->Branch_id != session('branch_active')->Branch_id)
                                         <li><a class="dropdown-item"
-                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}">Chi
-                                                Nhánh
+                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}">Địa điểm
                                                 {{ $branch->Name }}</a>
                                         </li>
                                     @endif
                                 @endforeach
                                 @if (count(session('all_branch')) == 1)
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
-                                            thêm chi nhánh</a></li>
+                                            thêm địa điểm</a></li>
                                     <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
                                             nhánh</a></li>
                                 @else
