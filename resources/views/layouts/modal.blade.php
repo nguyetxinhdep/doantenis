@@ -65,6 +65,13 @@
                         $('#' + response.branch_id).remove();
 
                         showAlert('success', response.message);
+                        // Đợi 2 giây trước khi kiểm tra điều kiện và chuyển hướng
+                        setTimeout(function() {
+                            if (response.isBranch) {
+                                // Nếu xóa địa điểm đang là địa điểm hiện tại thì logout
+                                window.location.href = "{{ route('logout') }}";
+                            }
+                        }, 2000); // 2000 ms = 2 giây
                     },
                     error: function(xhr) {
                         // Xử lý lỗi

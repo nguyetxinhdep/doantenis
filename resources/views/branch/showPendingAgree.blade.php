@@ -6,9 +6,9 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>ID địa điểm</th>
+                    <th>ID</th>
                     <th>Tên địa điểm</th>
-                    <th>Địa Chỉ </th>
+                    <th>Địa Chỉ</th>
                     <th>Hotline</th>
                     <th>Email</th>
                     <th>Người Đăng Ký</th>

@@ -86,7 +86,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                Chi Nhánh {{ session('branch_active')->Name }}
+                                Địa điểm {{ session('branch_active')->Name }}
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
