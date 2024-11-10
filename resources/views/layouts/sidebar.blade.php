@@ -55,19 +55,6 @@
             </div>
         @endauth
 
-        <!-- SidebarSearch Form -->
-        {{-- <div class="form-inline">
-            <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Search"
-                    aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-sidebar">
-                        <i class="fas fa-search fa-fw"></i>
-                    </button>
-                </div>
-            </div>
-        </div> --}}
-
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -351,14 +338,15 @@
                             // request()->routeIs('manage-branches.create-staff') ||
                             // request()->routeIs('manage-branches.createStaff') ||
                             // request()->routeIs('manage-branches.viewStaff') ||
-                            request()->routeIs('branch.email.exists')
+                            request()->routeIs('branch.email.exists') ||
+                            request()->routeIs('branch.delete.reuired')
                                 ? // request()->routeIs('manage-branches.editStaff')
                                 'menu-open'
                                 : '' }}">
                             <a href="#" class="nav-link">
 
                                 <p>
-                                    Quản lí địa điểm
+                                    Quản lý địa điểm
                                     {{-- cấp 0 quản lí chi nhánh --}}
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
@@ -387,7 +375,17 @@
                                         </p>
                                     </a>
                                 </li>
-
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('branch.delete.reuired') ? 'active' : '' }}"
+                                        href="{{ route('branch.delete.reuired') }}">
+                                        {{-- <i class="far fa-circle nav-icon"></i> --}}
+                                        <p>
+                                            {{-- DS Chi Nhánh --}}
+                                            Yêu cầu xóa địa điểm
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                        </p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         {{-- level 0 Lịch tổng quan --}}

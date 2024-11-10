@@ -93,6 +93,9 @@ Route::middleware(['auth'])->group(function () {
     // đăng kí chi nhánh với email đã tồn tại
     Route::get('/branch/register-emails-exists', [BranchController::class, 'showformEmaiExists'])->name('branch.email.exists');
     Route::post('/branch/register-emails-exists', [BranchController::class, 'registerBranchEmaiExists'])->name('branch.email.exists.post');
+    // view xóa địa điểm
+    Route::get('/branch/view/deleteRequired', [BranchController::class, 'viewDeleteRequired'])->name('branch.delete.reuired');
+    Route::post('/branch/post/deleteRequired', [BranchController::class, 'postDeleteRequired'])->name('branch.delete.reuired.post');
 
     // ---------------------------------------------------------------------------------------
     // // Nhóm quản lý chi nhánh

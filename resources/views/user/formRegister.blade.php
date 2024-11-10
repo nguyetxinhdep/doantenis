@@ -97,6 +97,10 @@
                         // Reset form sau khi thành công
                         $('#user-form')[0].reset();
 
+                        setTimeout(function() {
+                            // Nếu xóa địa điểm đang là địa điểm hiện tại thì logout
+                            window.location.href = "{{ route('login') }}";
+                        }, 2000); // 2000 ms = 2 giây
                     },
                     error: function(xhr) {
                         $('#overlay-spinner').addClass('d-none');

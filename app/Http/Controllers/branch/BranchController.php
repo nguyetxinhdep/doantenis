@@ -19,6 +19,37 @@ use Illuminate\Support\Facades\Session;
 
 class BranchController extends Controller
 {
+    public function viewDeleteRequired()
+    {
+        $branches = Branch::join('managers', 'branches.manager_id', '=', 'managers.Manager_id')
+            ->join('users', 'managers.user_id', '=', 'users.User_id')
+            ->where('managers.user_id', Auth()->user()->User_id)
+            ->where('branches.Status', 3)
+            ->select('branches.*', 'users.User_id as User_id')
+            ->get();
+
+        $title = "Yêu cầu xóa địa điểm";
+        return view('branch.viewDeleteRequired', compact('branches', 'title'));
+    }
+
+    public function postDeleteRequired(Request $req)
+    {
+        $dele = Branch::where('Branch_id', $req->Branch_id)->first();
+        $dele->delete();
+        $branch = $req->Branch_id;
+        $isBranch = false;
+
+        // nếu xóa trúng branch hienenj tại thì gửi cờ  để logout chủ sân
+        if (session('branch_active')->Branch_id == $req->Branch_id) {
+            $isBranch = true;
+        }
+        return response()->json([
+            'message' => 'Xóa thành công',
+            'branch' => $branch,
+            'isBranch' => $isBranch
+        ], 201); // 201 status code for successful resource creation
+    }
+
     public function welcome()
     {
         $branches = Branch::where('Status', '3')->get();
@@ -360,7 +391,7 @@ class BranchController extends Controller
                     });
                 } else {
                     $branch->delete();
-                    Manager::find($managerid)->delete();
+                    // Manager::find($managerid)->delete();
                     // User::find($userid)->delete();
                     // Gửi email
                     Mail::send('branch.mailTuChoi', compact('Email', 'user'), function ($email) use ($Email) {
@@ -372,17 +403,32 @@ class BranchController extends Controller
                 // Commit giao dịch nếu không có lỗi
                 DB::commit();
 
+
+                $isBranch = false;
+
+                // nếu xóa trúng branch hienenj tại thì gửi cờ  để logout chủ sân
+                if (Auth()->user()->Role == '3') {
+                    if (session('branch_active')->Branch_id == $req->Branch_id) {
+                        $isBranch = true;
+                    }
+                }
+
                 return response()->json([
                     'message' => 'Đã xóa 1 chi nhánh và gửi Email tới khách hàng',
                     'redirect' => route('pending.approval'), // Route chờ duyệt
-                    'branch_id' => $branchid
+                    'branch_id' => $branchid,
+                    'isBranch' => $isBranch
                 ], 201);
             } else {
                 // Tìm chi nhánh theo ID
                 $branch = Branch::find($branchid);
                 if ($branch->Status == 3) {
-                    $user->Role = '5';
-                    $user->save();
+                    // $user->Role = '5';
+                    $user->delete();
+                    $managertemp = Manager::find($managerid);
+                    if ($managertemp) {
+                        $managertemp->delete();
+                    }
                     // Xóa tất cả các phiên của người dùng này
                     // Session::where('User_id', $userid)->delete();
 
@@ -393,7 +439,10 @@ class BranchController extends Controller
                     });
                 } else {
                     $branch->delete();
-                    Manager::find($managerid)->delete();
+                    $managertemp = Manager::find($managerid);
+                    if ($managertemp) {
+                        $managertemp->delete();
+                    }
                     // User::find($userid)->delete();
                     // Gửi email
                     Mail::send('branch.mailTuChoi', compact('Email', 'user'), function ($email) use ($Email) {
@@ -407,10 +456,20 @@ class BranchController extends Controller
                 // Commit giao dịch nếu không có lỗi
                 DB::commit();
 
+                $isBranch = false;
+
+                // nếu xóa trúng branch hienenj tại thì gửi cờ  để logout chủ sân
+                if (Auth()->user()->Role == '3') {
+                    if (session('branch_active')->Branch_id == $req->Branch_id) {
+                        $isBranch = true;
+                    }
+                }
+
                 return response()->json([
-                    'message' => 'Đã từ chối đăng ký và gửi Email tới khách hàng',
+                    'message' => 'Đã xóa và gửi Email tới khách hàng',
                     'redirect' => route('pending.approval'), // Route chờ duyệt
-                    'branch_id' => $branchid
+                    'branch_id' => $branchid,
+                    'isBranch' => $isBranch
                 ], 201);
             }
         } catch (\Exception $e) {
