@@ -23,7 +23,7 @@ class MainController extends Controller
     public function index()
     {
         return view('admin.home', [
-            'title' => 'Trang Quản Trị',
+            'title' => 'Welcome!',
         ]);
 
         // return view('layouts.app2', [

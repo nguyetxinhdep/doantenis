@@ -5,9 +5,9 @@
         <form class="form-inline w-100 px-3" style="color: white">
             <div class="d-flex w-100">
                 <input name="search" class="form-control flex-grow-1 search-input" value="{{ request()->get('search', '') }}"
-                    style="margin-right: 5px; border-radius: 20px; border:1px solid #48c665;color: white;background-color: #48c665;"
+                    style="margin-right: 5px; border-radius: 20px; border:1px solid #ffffff;color: white;background-color: #51A7BF;"
                     type="search" placeholder="Tìm kiếm" aria-label="Search">
-                <button class="btn rounded-circle" style="background-color: #48c665;color:white" type="submit"><i
+                <button class="btn rounded-circle" style="background-color: #51A7BF;color:white; border:1px solid #ffffff" type="submit"><i
                         class="bi bi-search"></i></button>
             </div>
         </form>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-auto">
                             <a href="welcome-booking-calendar/?branch_id={{ $branch->Branch_id }}"
-                                class="btn btn-warning btn-sm" style="color:white"><b>Đặt Lịch</b></a>
+                                class="btn btn-warning btn-sm" style="color:#ffffff; background-color: #fba5a3; border:1px solid #fc9b98"><b>Đặt Lịch</b></a>
                         </div>
                     </div>
                 </div>

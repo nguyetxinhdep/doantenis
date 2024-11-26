@@ -76,7 +76,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/">
-                        Trang chủ</a>
+                        <i class="bi bi-house-heart-fill"></i>  Trang chủ</a>
                 </li>
                 @auth
                     @if (Auth::user()->Role == '3')
@@ -86,14 +86,14 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                Địa điểm {{ session('branch_active')->Name }}
+                                <i class="bi bi-geo-alt-fill"></i> Địa điểm {{ session('branch_active')->Name }}
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
                                 @foreach (session('all_branch') as $branch)
                                     @if ($branch->Branch_id != session('branch_active')->Branch_id)
                                         <li><a class="dropdown-item"
-                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}">Địa điểm
+                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}"> <i class="bi bi-geo-alt-fill"></i> Địa điểm
                                                 {{ $branch->Name }}</a>
                                         </li>
                                     @endif
@@ -101,15 +101,13 @@
                                 @if (count(session('all_branch')) == 1)
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
                                             thêm địa điểm</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
-                                            nhánh</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"><i class="bi bi-arrow-clockwise"></i></a></li>
                                 @else
                                     {{-- Thêm dấu gạch --}}
                                     <hr>
-                                    <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
-                                            thêm địa điểm kinh doanh</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}">Reload Chi
-                                            nhánh</a></li>
+                                    {{-- <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
+                                            thêm địa điểm kinh doanh</a></li> --}}
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"><i class="bi bi-arrow-clockwise"></i> Reload địa điểm kinh doanh</a></li>
                                 @endif
                             </ul>
                         </li>
@@ -129,7 +127,7 @@
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Đăng nhập</a>
+                            <a class="nav-link" href="{{ route('login') }}"> Đăng nhập</a>
                         </li>
                     @endif
 
@@ -147,17 +145,17 @@
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                Thông tin cá nhân
+                                <i class="bi bi-person-vcard"></i> Thông tin cá nhân
                             </a>
 
                             <a class="dropdown-item" href="{{ route('profile.changePassword') }}">
-                                Đổi mật khẩu
+                                <i class="bi bi-key"></i> Đổi mật khẩu
                             </a>
 
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                LogOut
+                               <i class="bi bi-box-arrow-right"></i> Đăng xuất
                             </a>
 
                             <form id="logout-form" action="{{ route('logout') }}" method="get" class="d-none">

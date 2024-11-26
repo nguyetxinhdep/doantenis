@@ -8,7 +8,7 @@
                     <th>STT</th>
                     <th>ID địa điểm</th>
                     <th>Tên địa điểm</th>
-                    <th>Địa Chỉ</th>
+                    <th>Địa chỉ</th>
                     <th>Hotline</th>
                     <th>Email</th>
                     {{-- <th>Người Đăng Ký</th> --}}

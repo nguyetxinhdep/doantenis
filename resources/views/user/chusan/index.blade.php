@@ -6,13 +6,13 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Account ID</th>
-                    <th>Name</th>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>Họ tên</th>
                     <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Actions</th>
+                    <th>Số điện thoại</th>
+                    <th>Vai trò</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>

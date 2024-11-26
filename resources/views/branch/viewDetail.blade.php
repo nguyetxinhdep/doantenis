@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                    <label for="Location" class="col-md-4 col-form-label text-md-end">Địa chỉ kinh doanh <span
                             style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="Location" type="text" class="form-control @error('Location') is-invalid @enderror"
@@ -91,7 +91,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="user_email" class="col-md-4 col-form-label text-md-end">Email Quản Lý <span
+                    <label for="user_email" class="col-md-4 col-form-label text-md-end">Email quản lý <span
                             style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="user_email" type="user_email"
@@ -106,7 +106,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Address" class="col-md-4 col-form-label text-md-end">Đ/Chỉ Nhà </label>
+                    <label for="Address" class="col-md-4 col-form-label text-md-end">Địa chỉ nhà </label>
                     <div class="col-md-6">
                         <input id="Address" type="text" class="form-control @error('Address') is-invalid @enderror"
                             name="user_address" value="{{ $data->user_address }}">
@@ -119,7 +119,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">SĐT Cá Nhân <span
+                    <label for="SDTCaNhan" class="col-md-4 col-form-label text-md-end">Số điện thoại cá nhân <span
                             style="color:red">*</span></label>
                     <div class="col-md-6">
                         <input id="SDTCaNhan" type="text" class="form-control @error('SDTCaNhan') is-invalid @enderror"
@@ -134,12 +134,12 @@
 
                 <div class="row mb-3">
                     <label for="link_map" class="col-md-4 col-form-label text-md-end">
-                        Vị Trí Sân <span style="color:red">*</span>
+                        Vị trí sân <span style="color:red">*</span>
                         <span
                             class="ms-2 bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
                             style="width: 20px; height: 20px; cursor: pointer;" data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title="Hướng dẫn: <br> 1. Vào Google Map nhập địa chỉ sân <br> 2. Click vào chia sẻ <br> 3. Click nhúng bản đồ <br> 4. Click sao chép HTML <br> 5. Dán vào trang web">
+                            title="Hướng dẫn: <br> 1. Vào Google Map nhập địa chỉ sân <br> 2. Click vào chia sẻ <br> 3. Click nhúng bản đồ <br> 4. Click sao chép HTML <br> 5. Dán vào trường 'Vị trí sân'">
                             ?
                             {{-- thêm dấu hỏi --}}
                         </span>
@@ -169,7 +169,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label for="Cover_image" class="col-md-4 col-form-label text-md-end">Ảnh Bìa</label>
+                    <label for="Cover_image" class="col-md-4 col-form-label text-md-end">Ảnh bìa</label>
                     <div class="col-md-6">
                         <input id="Cover_image" type="file"
                             class="form-control @error('Cover_image') is-invalid @enderror" name="Cover_image"
@@ -188,7 +188,7 @@
                             {{ __('Cập nhật') }}
                         </button>
                         <button type="reset" class="btn btn-secondary">
-                            {{ __('Reset') }}
+                            {{ __('Đặt lại') }}
                         </button>
                     </div>
                 </div>

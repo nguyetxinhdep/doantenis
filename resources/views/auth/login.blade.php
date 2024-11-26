@@ -52,7 +52,7 @@
                                             {{ old('remember') ? 'checked' : '' }}>
 
                                         <label class="form-check-label" for="remember">
-                                            {{ __('Remember Me') }}
+                                            {{ __('Ghi nhớ đăng nhập') }}
                                         </label>
                                     </div>
                                 </div>
@@ -61,11 +61,11 @@
                             <div class="row mb-0">
                                 <div class="col-md-8 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
-                                        Login
+                                        Đăng nhập
                                     </button>
 
                                     @if (Route::has('password.request'))
-                                        <a class="btn btn-link" href="{{ route('password.request') }}">
+                                        <a style="text-decoration: none" class="btn btn-link" href="{{ route('password.request') }}">
                                             Quên mật khẩu
                                         </a>
                                     @endif

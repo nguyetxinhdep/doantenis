@@ -5,15 +5,15 @@
         <div class="container ">
             <div class="row">
                 <!-- Left content area -->
-                <div class="col-md-6 d-flex align-items-center justify-content-center text-white background-bong-tenis">
+                <div class="col-md-6 d-flex align-items-center justify-content-center text-white ">
                     <div class="text-center">
-                        <h3>Chào mừng đến với hệ thống Đặt Sân Tennis</h3>
-                        <p>Hãy đặt sân ngay bây giờ và tận hưởng!</p>
+                        <h3>Tennis không giới hạn – Trải nghiệm không rào cản!</h3>
+                        <p>Tìm kiếm sân tại đây!</p>
 
 
                         <div class="position-relative">
                             <form class="d-flex" id="search-form">
-                                <input class="form-control" type="search" placeholder="Search" aria-label="Search"
+                                <input class="form-control" type="search" placeholder="Nhập tên địa điểm tìm kiếm..." aria-label="Search"
                                     id="search-input">
                                 {{-- <button class="btn btn-outline-light" type="submit">Search</button> --}}
                             </form>
@@ -26,7 +26,7 @@
                 <!-- Right image area -->
                 <div class="col-md-6 py-5 d-md-block text-center">
                     <!-- Đặt ảnh ở đây -->
-                    <img src="/images/khachhang/background_welcome.png" class="img-fluid"
+                    <img src="/images/khachhang/background.png" class="img-fluid"
                         style="background-color: transparent;" alt="Tennis Court Image">
                 </div>
             </div>
@@ -38,7 +38,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Thêm lớp modal-lg -->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="suggestionModalLabel">Court Details</h5>
+                    <h5 class="modal-title" id="suggestionModalLabel">Chi tiết địa điểm</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">

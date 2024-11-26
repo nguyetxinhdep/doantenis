@@ -1,5 +1,5 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-primary elevation-4" >
     <!-- Brand Logo -->
     <a href="{{ route('home') }}" class="brand-link" style="text-decoration: none; font-size: 16px">
         <img src="/template/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
@@ -45,7 +45,7 @@
                                 Sân {{ session('branch_active')->Name }}<br>
                                 Tên nhân viên: {{ Auth::user()->Name }}
                             @else
-                                Tên: {{ Auth::user()->Name }}
+                                Họ tên: {{ Auth::user()->Name }}
                             @endif
                             {{-- <p>Your email: {{ Auth::user()->email }}</p> --}}
                             {{-- <p>Your role: {{ Auth::user()->role }}</p> --}}
@@ -76,10 +76,10 @@
                                 : '' }}">
                             <a href="#" class="nav-link">
 
-                                <p>
+                                <p> <i class="bi bi-geo-alt-fill"></i>
                                     Quản lý địa điểm kinh doanh
                                     {{-- cấp 0 quản lí chi nhánh --}}
-                                    <i class="right fas fa-angle-left"></i>
+                                    {{-- <i class="right fas fa-angle-left"></i> --}}
                                 </p>
                             </a>
                             {{-- cấp 1 DS Chi Nhánh --}}
@@ -134,7 +134,7 @@
                                 request()->routeIs('admin.manage-account.detail')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p> <i class="bi bi-person-circle"></i>
                                     Quản lý tài khoản
                                 </p>
                             </a>
@@ -148,7 +148,7 @@
                                 request()->routeIs('admin.account.edit.khachang')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-person-vcard-fill"></i>
                                     Quản lý khách hàng
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -164,7 +164,7 @@
                                 request()->routeIs('admin.account.edit.nhanvien')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-people"></i>
                                     Quản lý nhân viên
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -180,7 +180,7 @@
                                 request()->routeIs('admin.account.edit.nhanvienhetong')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-people"></i>
                                     Quản lý nhân viên hệ thống
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -196,7 +196,7 @@
                                 request()->routeIs('admin.account.edit.chusan')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-person-hearts"></i>
                                     Quản lý chủ sân
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -218,10 +218,10 @@
                                 : '' }}">
                             <a href="#" class="nav-link">
 
-                                <p>
+                                <p> <i class="bi bi-geo-alt-fill"></i>
                                     Quản lý địa điểm kinh doanh
                                     {{-- cấp 0 quản lí chi nhánh --}}
-                                    <i class="right fas fa-angle-left"></i>
+                                    {{-- <i class="right fas fa-angle-left"></i> --}}
                                 </p>
                             </a>
                             {{-- cấp 1 DS Chi Nhánh --}}
@@ -275,7 +275,7 @@
                                 request()->routeIs('admin.manage-account.detail')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p> <i class="bi bi-person-circle"></i>
                                     Quản lý tài khoản
                                 </p>
                             </a>
@@ -289,7 +289,7 @@
                                 request()->routeIs('admin.account.edit.khachang')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-person-vcard-fill"></i>
                                     Quản lý khách hàng
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -305,7 +305,7 @@
                                 request()->routeIs('admin.account.edit.nhanvien')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-people"></i>
                                     Quản lý nhân viên
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -321,7 +321,7 @@
                                 request()->routeIs('admin.account.edit.chusan')
                                     ? 'bg-light'
                                     : '' }}">
-                                <p>
+                                <p><i class="bi bi-person-hearts"></i>
                                     Quản lý chủ sân
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -345,7 +345,7 @@
                                 : '' }}">
                             <a href="#" class="nav-link">
 
-                                <p>
+                                <p><i class="bi bi-geo-alt-fill"></i>
                                     Quản lý địa điểm
                                     {{-- cấp 0 quản lí chi nhánh --}}
                                     <i class="right fas fa-angle-left"></i>
@@ -392,7 +392,7 @@
                         <li class="nav-item">
                             <a href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}"
                                 class="nav-link {{ request()->routeIs('booking.calendar') ? 'bg-light' : '' }}">
-                                <p>
+                                <p><i class="bi bi-calendar-week-fill"></i>
                                     Lịch tổng quan
                                 </p>
                             </a>
@@ -407,7 +407,7 @@
                                 : '' }}"
                                 href="{{ route('manage-branches.viewStaff') }}">
                                 {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                <p>
+                                <p><i class="bi bi-people-fill"></i>
                                     {{-- Tạo nhân viên chi nhánh --}}
                                     Quản lý nhân viên
                                 </p>
@@ -423,7 +423,7 @@
                                 ? 'menu-open'
                                 : '' }}">
                             <a href="#" class="nav-link">
-                                <p>
+                                <p><i class="bi bi-bounding-box"></i>
                                     Quản lý sân
                                     {{-- cấp 0 quản lý sân --}}
                                     <i class="right fas fa-angle-left"></i>
@@ -435,10 +435,10 @@
                                     <a class="nav-link {{ request()->routeIs('courts.index') || request()->routeIs('courts.show') ? 'active' : '' }}"
                                         href="{{ route('courts.index') }}">
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p>
+                                        <p> 
                                             {{-- DS sân --}}
                                             Danh sách sân
-                                            {{-- <i class="right fas fa-angle-left"></i> --}}
+                                            {{-- <i class="right fas fa-angle-left"></i> --}} 
                                         </p>
                                     </a>
                                 </li>
@@ -464,7 +464,7 @@
                         <li
                             class="nav-item {{ request()->routeIs('price_list.create') || request()->routeIs('price_list.index') || request()->routeIs('price_list.edit') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link">
-                                <p>
+                                <p><i class="bi bi-coin"></i>
                                     Quản lý Bảng giá
                                     {{-- cấp 0 quản lý Bảng giá --}}
                                     <i class="right fas fa-angle-left"></i>
@@ -503,7 +503,7 @@
                         <li class="nav-item">
                             <a href="{{ route('manager.payment') }}"
                                 class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
-                                <p>
+                                <p><i class="bi bi-credit-card-2-back"></i>
                                     Quản lý thanh toán
                                     {{-- cấp 0 quản lý sân --}}
 
@@ -517,7 +517,7 @@
                         <li class="nav-item">
                             <a href="{{ route('booking.calendar', ['date' => date('Y-m-d')]) }}"
                                 class="nav-link {{ request()->routeIs('booking.calendar') ? 'bg-light' : '' }}">
-                                <p>
+                                <p><i class="bi bi-calendar-week-fill"></i>
                                     Lịch tổng quan
                                 </p>
                             </a>
@@ -532,7 +532,7 @@
                                 ? 'menu-open'
                                 : '' }}">
                             <a href="#" class="nav-link">
-                                <p>
+                                <p><i class="bi bi-bounding-box"></i>
                                     Quản lý sân
                                     {{-- cấp 0 quản lý sân --}}
                                     <i class="right fas fa-angle-left"></i>
@@ -558,7 +558,7 @@
                         <li
                             class="nav-item {{ request()->routeIs('price_list.create') || request()->routeIs('price_list.index') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link">
-                                <p>
+                                <p><i class="bi bi-coin"></i>
                                     Quản lý Bảng giá
                                     {{-- cấp 0 quản lý Bảng giá --}}
                                     <i class="right fas fa-angle-left"></i>
@@ -583,7 +583,7 @@
                         <li class="nav-item">
                             <a href="{{ route('manager.payment') }}"
                                 class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
-                                <p>
+                                <p><i class="bi bi-credit-card-2-back"></i>
                                     Quản lý thanh toán
                                     {{-- cấp 0 quản lý sân --}}
 

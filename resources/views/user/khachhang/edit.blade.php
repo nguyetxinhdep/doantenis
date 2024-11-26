@@ -24,7 +24,7 @@
 
 
 
-            <button type="submit" class="btn btn-success">Update Account</button>
+            <button type="submit" class="btn btn-success">Cập nhật thông tin</button>
             <a href="javascript:history.back()" class="btn btn-secondary">Trở lại</a>
             <a href="{{ route('manage-account.changePasswordForm', ['id' => $account->User_id]) }}"
                 class="btn btn-warning">Đổi mật khẩu</a>

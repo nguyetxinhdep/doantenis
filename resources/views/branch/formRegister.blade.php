@@ -25,7 +25,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa chỉ kinh doanh <span
                                     style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
@@ -72,16 +72,16 @@
                                     Đăng ký
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    Reset
+                                    Đặt lại
                                 </button>
                             </div>
 
                         </div>
                     </form>
-                    <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
+                    {{-- <div class="mt-3 text-center"><span style="color:red"><span class="fw-bold">Lưu ý:</span>
                             Nếu bạn muốn dùng 1
                             gmail để quản lý nhiều địa điểm kinh doanh thì vui lòng
-                            đăng nhập vào gmail mong muốn để đăng ký địa điểm kinh doanh khác!</span></div>
+                            đăng nhập vào gmail mong muốn để đăng ký địa điểm kinh doanh khác!</span></div> --}}
                 </div>
             </div>
         </div>

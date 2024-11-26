@@ -26,7 +26,7 @@
 
                 <!-- Ô input tìm kiếm trạng thái -->
                 <div class="col-md-3">
-                    <label for="role">Role</label>
+                    <label for="role">Vai trò</label>
                     <select class="form-control" id="role" name="role">
                         <option value="">Tất cả</option>
                         <option value="1" {{ request('role') == '1' ? 'selected' : '' }}>Admin</option>
@@ -49,13 +49,13 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Account ID</th>
-                    <th>Name</th>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>Họ tên</th>
                     <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Actions</th>
+                    <th>Số điện thoại</th>
+                    <th>Vai trò</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>

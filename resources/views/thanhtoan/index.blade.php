@@ -69,7 +69,7 @@
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Ngày Đặt</th>
+                    <th>Ngày đặt</th>
                     <th>Người đặt</th>
                     <th>Số điện thoại</th>
                     <th>Giờ vào</th>
@@ -87,6 +87,8 @@
                 @if (empty($groupedBookings))
                     <tr>
                         <td colspan="11" class="text-center">Chưa có lịch sử đặt sân nào.</td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 @else
                     @php $i = 1; @endphp

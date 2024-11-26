@@ -62,7 +62,7 @@
                                     Đăng ký
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    Reset
+                            Đặt lại
                                 </button>
                             </div>
                         </div>
