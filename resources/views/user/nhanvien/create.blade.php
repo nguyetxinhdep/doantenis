@@ -17,14 +17,14 @@
             </div>
 
             <div class="mb-3">
-                <label for="phone" class="form-label">Điện thoại <span style="color:red">*</span></label>
+                <label for="phone" class="form-label">Số điện thoại <span style="color:red">*</span></label>
                 <input type="text" name="phone" id="phone" class="form-control">
             </div>
 
             <div class="mb-3" id="branchSelection">
-                <label for="branch" class="form-label">Chọn địa điểm <span style="color:red">*</span></label>
+                <label for="branch" class="form-label">Địa điểm làm việc <span style="color:red">*</span></label>
                 <select name="branch_id" id="branch" class="form-control" required>
-                    <option value="">-- Choose Branch --</option>
+                    <option value="">-- Chọn địa điểm --</option>
                     @foreach ($branches as $branch)
                         <option value="{{ $branch->Branch_id }}">
                             {{ $branch->Name }}

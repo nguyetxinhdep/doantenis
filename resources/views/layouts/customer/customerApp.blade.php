@@ -32,7 +32,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
-<body class="gradient-background">
+<body style="background-color: #51A7BF">
     <!-- Overlay and Spinner -->
     {{-- làm mờ và tạo máy quay spinner trong khi chờ phản hồi --}}
     <div id="overlay-spinner" class=d-none>

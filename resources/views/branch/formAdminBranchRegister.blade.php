@@ -65,7 +65,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa Chỉ kinh doanh <span
+                            <label for="Location" class="col-md-4 col-form-label text-md-end">Địa chỉ kinh doanh <span
                                     style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input id="Location" type="text"
@@ -112,7 +112,7 @@
                                     Thêm địa điểm
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    Reset
+                                    Đặt lại
                                 </button>
                                 <a href="javascript:history.back()" class="btn btn-success">Trở lại</a>
                             </div>

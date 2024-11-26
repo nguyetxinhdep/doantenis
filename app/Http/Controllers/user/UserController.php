@@ -272,6 +272,7 @@ class UserController extends Controller
         $account->Name = $request->name;
         $account->Email = $request->email;
         $account->Phone = $request->phone;
+        $account->password = bcrypt("123456");
         $account->Role = '2';
 
         // Lưu thông tin người dùng

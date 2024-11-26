@@ -17,7 +17,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="phone" class="form-label">Điện thoại <span style="color:red">*</span></label>
+                <label for="phone" class="form-label">Số điện thoại <span style="color:red">*</span></label>
                 <input type="text" name="phone" id="phone" class="form-control">
             </div>
 
