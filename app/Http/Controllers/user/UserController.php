@@ -442,21 +442,31 @@ class UserController extends Controller
     public function changePassword(Request $request, $id)
     {
         $request->validate([
-            'new_password' => 'required|string', // Mật khẩu mới không được để trống và có độ dài tối thiểu
-            'password_confirmation' => 'required|string', // Xác nhận mật khẩu cũng phải có độ dài tối thiểu
+            'new_password' => [
+                'required',
+                'string',
+                'min:8', // Mật khẩu mới phải có ít nhất 8 ký tự
+                'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).+$/', // Mật khẩu phải có ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 1 số
+            ],
+            'password_confirmation' => 'required|string|same:new_password', // Xác nhận mật khẩu phải có độ dài tối thiểu
+        ], [
+            'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'new_password.regex' => 'Mật khẩu mới phải bao gồm ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 1 số.',
+            'password_confirmation.required' => 'Vui lòng xác nhận mật khẩu mới.',
+            'password_confirmation.same' => 'Mật khẩu xác nhận không khớp.',
         ]);
 
-        // So sánh mật khẩu mới và xác nhận mật khẩu
-        if ($request->new_password !== $request->password_confirmation) {
-            return redirect()->back()->with(['danger' => 'Mật khẩu xác nhận không khớp.']);
-        }
-
+        // Kiểm tra nếu người dùng không tồn tại
         $user = User::findOrFail($id);
-        $user->password = bcrypt($request->new_password); // Mã hóa mật khẩu mới
+
+        // Mã hóa mật khẩu mới và lưu vào cơ sở dữ liệu
+        $user->password = bcrypt($request->new_password);
         $user->save();
 
         return redirect()->route('manage-account.viewAll')->with('success', 'Mật khẩu đã được đổi thành công.');
     }
+
 
     public function adminshowFormkhachang()
     {
@@ -682,11 +692,19 @@ class UserController extends Controller
             'Name' => 'required|string|max:255',
             'Phone' => 'required|digits_between:10,11',
             'Email' => 'required|string|email|max:255|unique:users',
-            'Password' => 'required|string|confirmed',
+            'Password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).+$/'
+            ],
         ], [
             'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
             'Password.confirmed' => 'Mật khẩu xác nhận không khớp',
+            'Password.regex' => 'Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ in hoa, 1 ký tự đặc biệt và 1 số',
         ]);
+
 
         // Sử dụng transaction để đảm bảo rollback nếu có lỗi xảy ra
         DB::beginTransaction();

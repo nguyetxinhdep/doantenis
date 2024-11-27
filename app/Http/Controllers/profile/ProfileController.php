@@ -24,13 +24,21 @@ class ProfileController extends Controller
         // Validate dữ liệu
         $req->validate([
             'current_password' => 'required',
-            'new_password' => 'required|string|min:6|confirmed',
+            'new_password' => [
+                'required',
+                'string',
+                'min:8', // Tối thiểu 8 ký tự
+                'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).+$/', // Bao gồm 1 chữ in hoa, 1 ký tự đặc biệt, 1 số
+                'confirmed',
+            ],
         ], [
             'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
             'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
-            'new_password.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
+            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'new_password.regex' => 'Mật khẩu mới phải bao gồm ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 1 số.',
             'new_password.confirmed' => 'Mật khẩu nhập lại không khớp.'
         ]);
+
 
         // Kiểm tra mật khẩu hiện tại
         if (!Hash::check($req->current_password, Auth()->user()->password)) {

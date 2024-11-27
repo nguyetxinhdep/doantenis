@@ -149,7 +149,7 @@ class LoginController extends Controller
         });
 
         // Chuyển hướng đến route 'yeucauthanhcong' với thông báo thành công
-        return redirect()->route('login')->with('message', 'Email yêu cầu đổi mật khẩu đã được gửi!');
+        return redirect()->route('login')->with('success', 'Email yêu cầu đổi mật khẩu đã được gửi!');
     }
 
     public function accept(User $id, $token)
@@ -165,17 +165,28 @@ class LoginController extends Controller
     public function changPass(Request $req, User $id, $token)
     {
         if ($id->token_change_pass === $token) {
+            // Xác thực dữ liệu đầu vào
             $req->validate([
-                'password' => 'required',
-                'confirm-password' => 'required|same:password',
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8', // Tối thiểu 8 ký tự
+                    'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).+$/', // Bắt buộc 1 chữ in hoa, ký tự đặc biệt, và số
+                ],
+                'confirm_password' => 'required|same:password',
+            ], [
+                'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ in hoa, số và ký tự đặc biệt.',
+                'confirm_password.same' => 'Mật khẩu xác nhận không khớp.',
             ]);
+
             // dd($req->password);
             $pass_new = bcrypt($req->password);
+
             $id->update([
                 'password' => $pass_new,
                 'token_change_pass' => null,
             ]);
-            return redirect()->route('login')->with('message', 'Đặt lại mật khẩu thành công');
+            return redirect()->route('login')->with('success', 'Đặt lại mật khẩu thành công');
         } else {
             return abort(404);
         }

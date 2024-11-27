@@ -109,7 +109,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'nguyenthithunguyet.12092002@gmail.com'),
-        'name' => env('MAIL_FROM_NAME', 'Quản Lý Sân Tenis'),
+        'name' => env('MAIL_FROM_NAME', 'Quản Lý Sân Tennis'),
     ],
 
     /*
