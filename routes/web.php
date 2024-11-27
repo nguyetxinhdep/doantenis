@@ -54,7 +54,7 @@ Route::middleware('guest')->group(function () { //chưa đăng nhập mới vào
 Route::get('/forgot-password', [LoginController::class, 'forgotPass'])->name('password.request');
 Route::post('/forgot-password', [LoginController::class, 'sendMailCofirm'])->name('send.email.change.pass');
 Route::get('xacnhan/{id}/{token}', [LoginController::class, 'accept'])->name('xacnhan');
-Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass']);
+Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass'])->name('doimatkhau');
 
 //--------------------------------------------------------------------------------------------------
 
