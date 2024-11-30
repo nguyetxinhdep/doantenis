@@ -204,8 +204,7 @@ class BranchController extends Controller
                 'Location' => 'required',
                 'Phone' => 'required|numeric',
                 'Email' => 'required|email|',
-            ]
-            ,
+            ],
             [
                 'useremail.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
             ]
@@ -249,7 +248,7 @@ class BranchController extends Controller
             // Commit the transaction nếu không có lỗi
             DB::commit();
             $Email = $request->useremail;
-            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user','admin'), function ($email) use ($Email) {
+            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user', 'admin'), function ($email) use ($Email) {
                 $email->subject('Cấp tài khoản');
                 $email->to($Email);
             });
@@ -534,7 +533,7 @@ class BranchController extends Controller
 
             $admin = false;
             // Gửi email
-            Mail::send('branch.mailDongY', compact('Email', 'user', 'date', 'time','admin'), function ($email) use ($Email) {
+            Mail::send('branch.mailDongY', compact('Email', 'user', 'date', 'time', 'admin'), function ($email) use ($Email) {
                 $email->subject('Xác Nhận Đăng Ký');
                 $email->to($Email);
             });
@@ -590,8 +589,8 @@ class BranchController extends Controller
                 $user->save();
                 // Xóa tất cả các phiên của người dùng này
                 // Session::where('User_id', $userid)->delete();
-
-                Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
+                $admin = false;
+                Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user', 'admin'), function ($email) use ($Email) {
                     $email->subject('Cấp tài khoản');
                     $email->to($Email);
                 });
@@ -600,9 +599,6 @@ class BranchController extends Controller
                 $branch->Status = 3;
                 $branch->save();
             }
-
-
-
 
             // Nếu mọi thứ đều thành công, commit giao dịch
             DB::commit();
@@ -614,7 +610,7 @@ class BranchController extends Controller
         } catch (\Exception $e) {
             // Nếu có lỗi, rollback giao dịch
             DB::rollBack();
-
+            Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Đã có lỗi xảy ra. Vui lòng thử lại!',
                 'error' => $e->getMessage() // Thông báo lỗi (có thể bỏ đi nếu không muốn hiển thị)
