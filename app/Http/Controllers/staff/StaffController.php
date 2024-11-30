@@ -77,7 +77,7 @@ class StaffController extends Controller
                 'Phone' => $req->phone,
                 'Address' => $req->address,
                 'Role' => '4', // nhân viên chi nhánh
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('Tennis@123'),
             ]);
 
             // tạo nhân viên mới

@@ -199,16 +199,16 @@ class BranchController extends Controller
             [
                 'username' => 'required',
                 'userphone' => 'required|numeric',
-                'useremail' => 'required',
+                'useremail' => 'required|email|unique:users,Email',
                 'Name' => 'required',
                 'Location' => 'required',
                 'Phone' => 'required|numeric',
                 'Email' => 'required|email|',
             ]
-            // ,
-            // [
-            //     'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
-            // ]
+            ,
+            [
+                'useremail.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            ]
         );
         // Start a transaction
         DB::beginTransaction();
@@ -219,7 +219,7 @@ class BranchController extends Controller
             $user->Phone = $request->userphone;
             $user->Email = $request->useremail;
             $user->Role = '3';
-            $user->password = bcrypt('123456');
+            $user->password = bcrypt('Tennis@123');
             $user->save();
 
             $userId = $user->User_id;
@@ -245,10 +245,11 @@ class BranchController extends Controller
             $branch->Status = 3;
             $branch->save();
 
+            $admin = true;
             // Commit the transaction nếu không có lỗi
             DB::commit();
             $Email = $request->useremail;
-            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
+            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user','admin'), function ($email) use ($Email) {
                 $email->subject('Cấp tài khoản');
                 $email->to($Email);
             });
@@ -531,8 +532,9 @@ class BranchController extends Controller
                 $branch->save();
             }
 
+            $admin = false;
             // Gửi email
-            Mail::send('branch.mailDongY', compact('Email', 'user', 'date', 'time'), function ($email) use ($Email) {
+            Mail::send('branch.mailDongY', compact('Email', 'user', 'date', 'time','admin'), function ($email) use ($Email) {
                 $email->subject('Xác Nhận Đăng Ký');
                 $email->to($Email);
             });

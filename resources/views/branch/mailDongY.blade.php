@@ -8,11 +8,11 @@
 <table>
     <tr>
         <td>Địa chỉ</td>
-        <td>xxxx</td>
+        <td>800 Quang Trung, Phường 12, Quận Gò Vấp, TP. Hồ Chí Minh</td>
     </tr>
     <tr>
         <td>Số điện thoại</td>
-        <td>xxxx</td>
+        <td>0378344718</td>
     </tr>
     <tr>
         <td>Ngày</td>
