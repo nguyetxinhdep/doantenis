@@ -147,20 +147,23 @@
                         showAlert('success', response.message);
                     },
                     error: function(xhr) {
-                        $('#overlay-spinner').addClass('d-none');
-                        if (xhr.status === 422) { //dữ liệu không hợp lệ
+                        $('#overlay-spinner').addClass('d-none'); // Ẩn spinner khi có lỗi
+                        if (xhr.status === 422) { // Dữ liệu không hợp lệ
                             // Hiển thị lỗi xác thực
-                            var errors = xhr.responseJSON.errors;
-                            var errorMessage = '';
+                            var errors = xhr.responseJSON.errors; // Lấy danh sách lỗi từ phản hồi JSON
+                            var errorMessage = ''; // Tạo danh sách lỗi
                             $.each(errors, function(key, value) {
-                                errorMessage += value[0] +
-                                    '<br>'; // Lấy thông điệp lỗi đầu tiên
+                                errorMessage += value[0] + '<br>'; // Hiển thị thông điệp lỗi đầu tiên
                             });
+                            errorMessage += '</ul>';
                             showAlert('danger', errorMessage); // Hiển thị thông báo lỗi
+                        } else if (xhr.status === 500) { // Lỗi server
+                            showAlert('danger', 'Đã xảy ra lỗi trên máy chủ. Vui lòng liên hệ quản trị viên!');
                         } else {
-                            showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!');
+                            showAlert('danger', 'Đã có lỗi xảy ra. Vui lòng thử lại!'); // Các lỗi khác
                         }
                     }
+
                 });
             });
         });

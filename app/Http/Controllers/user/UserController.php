@@ -272,7 +272,7 @@ class UserController extends Controller
         $account->Name = $request->name;
         $account->Email = $request->email;
         $account->Phone = $request->phone;
-        $account->password = bcrypt("123456");
+        $account->password = bcrypt("Tennis@123");
         $account->Role = '2';
 
         // Lưu thông tin người dùng
@@ -358,16 +358,16 @@ class UserController extends Controller
             [
                 'username' => 'required',
                 'userphone' => 'required|numeric',
-                'useremail' => 'required',
+                'useremail' => 'required|email|unique:users,Email',
                 'Name' => 'required',
                 'Location' => 'required',
                 'Phone' => 'required|numeric',
                 'Email' => 'required|email|',
             ]
-            // ,
-            // [
-            //     'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
-            // ]
+            ,
+            [
+                'useremail.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
+            ]
         );
         // Start a transaction
         DB::beginTransaction();
@@ -378,7 +378,7 @@ class UserController extends Controller
             $user->Phone = $request->userphone;
             $user->Email = $request->useremail;
             $user->Role = '3';
-            $user->password = bcrypt('123456');
+            $user->password = bcrypt('Tennis@123');
             $user->save();
 
             $userId = $user->User_id;
@@ -404,10 +404,11 @@ class UserController extends Controller
             $branch->Status = 3;
             $branch->save();
 
+            $admin = true;
             // Commit the transaction nếu không có lỗi
             DB::commit();
             $Email = $request->useremail;
-            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user'), function ($email) use ($Email) {
+            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user','admin'), function ($email) use ($Email) {
                 $email->subject('Cấp tài khoản');
                 $email->to($Email);
             });
@@ -702,7 +703,10 @@ class UserController extends Controller
         ], [
             'Email.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
             'Password.confirmed' => 'Mật khẩu xác nhận không khớp',
-            'Password.regex' => 'Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ in hoa, 1 ký tự đặc biệt và 1 số',
+            'Password.min' => 'Mật khẩu phải chứa ít nhất 8 ký tự',
+            'Password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 1 số',
+            
+
         ]);
 
 

@@ -13,6 +13,12 @@
     </tr>
     <tr>
         <td>Mật khẩu</td>
-        <td>123456</td>
+        {{-- nếu là gửi mail khi admin thêm tài khoản thì gửi kèm mật khẩu --}}
+        @if ($admin)
+            <td>Tennis@123</td>
+        @else
+            <td>là mật khẩu Quý khách đã đăng ký trước đó</td>
+        @endif
+
     </tr>
 </table>
