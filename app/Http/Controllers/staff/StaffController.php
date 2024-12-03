@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StaffController extends Controller
 {
@@ -61,10 +62,21 @@ class StaffController extends Controller
         $req->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:15',
+            'phone' => 'required|regex:/^[0-9]{10,11}$/',
             'address' => 'required|string',
             'branch_id' => 'required|exists:branches,Branch_id',
+        ], [
+            'branch_id.required' => 'Vui lòng chọn địa điểm kinh doanh.',
+            'branch_id.exists' => 'Chi nhánh không hợp lệ.',
+            'name.required' => 'Tên nhân viên là bắt buộc.',
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Định dạng email không hợp lệ.',
+            'email.unique' => 'Email này đã tồn tại.',
+            'phone.required' => 'Số điện thoại là bắt buộc.',
+            'phone.regex' => 'Số điện thoại phải có 10-11 chữ số.',
+            // 'address.required' => 'Địa chỉ là bắt buộc.',
         ]);
+
 
         // Bắt đầu transaction
         DB::beginTransaction();
@@ -86,6 +98,17 @@ class StaffController extends Controller
                 'branch_id' => $req->branch_id,
             ]);
 
+            $branch = Branch::where('Branch_id', $req->branch_id)->first();
+
+            $Email = $req->email;
+
+            $user = $usernew;
+
+            Mail::send('staff.mailCreate', compact('Email', 'user', 'branch'), function ($email) use ($Email, $branch) {
+                $email->subject('Tạo Nhân viên');
+                $email->to($Email);
+            });
+
             // Commit transaction nếu không có lỗi
             DB::commit();
 
@@ -96,7 +119,7 @@ class StaffController extends Controller
             DB::rollBack();
 
             // Ghi lại lỗi và hiển thị thông báo lỗi
-            return redirect()->route('employees.create')->with('danger', 'Có lỗi xảy ra: ' . $e->getMessage());
+            return redirect()->route('manage-branches.createStaff')->with('danger', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
 

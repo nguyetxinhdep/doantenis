@@ -42,7 +42,7 @@
         </p>
         {{--  --}}
 
-        <div style="overflow-x: auto; overflow-y: auto; max-height: 70vh;">
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 70vh; font-size:12px">
             <table class="table table-bordered">
                 <thead>
                     <tr>

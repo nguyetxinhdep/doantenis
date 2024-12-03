@@ -213,6 +213,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('booking')->group(function () {
         // Route xem lịch đặt sân trong trong manager-role 3
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
+        Route::get('forDate', [PaymentController::class, 'index'])->name('booking.lichtheongay');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
         // lịch sử đặt sân customer
         Route::get('booking-history', [BookingController::class, 'bookingHistory'])->name('booking.history');
