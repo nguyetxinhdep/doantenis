@@ -6,41 +6,55 @@
             @csrf
             <!-- Chọn chi nhánh -->
             <div class="form-group">
-                <label for="branch">Địa điểm kinh doạn <span style="color:red">*</span></label>
+                <label for="branch">Địa điểm kinh doanh <span style="color:red">*</span></label>
                 <select name="branch_id" id="branch" class="form-control">
                     @foreach ($branches as $branch)
-                        <option {{ session('branch_active')->Branch_id == $branch->Branch_id ? 'selected' : '' }}
+                        <option
+                            {{ old('branch_id', session('branch_active')->Branch_id) == $branch->Branch_id ? 'selected' : '' }}
                             value="{{ $branch->Branch_id }}">{{ $branch->Name }}</option>
                     @endforeach
                 </select>
+                @error('branch_id')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
-            <!-- Nhập tên nhân viên -->
             <div class="form-group">
                 <label for="name">Tên Nhân Viên <span style="color:red">*</span></label>
                 <input type="text" name="name" id="name" class="form-control" placeholder="Nhập tên nhân viên"
-                    required>
+                    value="{{ old('name') }}" required>
+                @error('name')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
-            <!-- Nhập email -->
             <div class="form-group">
                 <label for="email">Email <span style="color:red">*</span></label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email" required>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Nhập email"
+                    value="{{ old('email') }}" required>
+                @error('email')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
-            <!-- Nhập số điện thoại -->
             <div class="form-group">
                 <label for="phone">Số Điện Thoại <span style="color:red">*</span></label>
                 <input type="text" name="phone" id="phone" class="form-control" placeholder="Nhập số điện thoại"
-                    required>
+                    value="{{ old('phone') }}" required>
+                @error('phone')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
-            <!-- Nhập chức vụ -->
             <div class="form-group">
                 <label for="address">Địa chỉ</label>
                 <input type="text" name="address" id="address" class="form-control" placeholder="Nhập địa chỉ"
-                    required>
+                    value="{{ old('address') }}" required>
+                @error('address')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
+
 
             <!-- Nút submit -->
             <button type="submit" class="btn btn-primary">Thêm Nhân Viên</button>

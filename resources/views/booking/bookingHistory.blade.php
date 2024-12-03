@@ -32,9 +32,9 @@
                     <label for="status">Trạng thái</label>
                     <select class="form-control" id="status" name="status">
                         <option value="">Tất cả</option>
-                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chưa thu đủ</option>
-                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã thu đủ</option>
-                        <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Cần thanh toán để giữ sân
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Đã đặt cọc</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã thanh toán</option>
+                        <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Chưa thanh toán
                         </option>
                         <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Đã hủy</option>
                     </select>
@@ -91,7 +91,6 @@
                         <td></td>
                         <td></td>
                     </tr>
-                    
                 @else
                     @php $i = 1; @endphp
                     @foreach ($groupedBookings as $bookingCode => $bookings)
@@ -181,15 +180,15 @@
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         @switch($booking->Status)
                                             @case(0)
-                                                <span class="badge bg-warning">Chưa thu đủ</span>
+                                                <span class="badge bg-warning">Đã đặt cọc</span>
                                             @break
 
                                             @case(1)
-                                                <span class="badge bg-success">Đã thu đủ</span>
+                                                <span class="badge bg-success">Đã thanh toán</span>
                                             @break
 
                                             @case(2)
-                                                <span class="badge bg-info">Cần thanh toán để giữ sân</span>
+                                                <span class="badge bg-info">Chưa thanh toán</span>
                                             @break
 
                                             @case(3)
@@ -219,7 +218,7 @@
                                                 <!-- Nút hủy chỉ hiển thị một lần cho mỗi nhóm -->
                                                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                                     data-target="#cancelModal-{{ $bookingCode }}">
-                                                    Hủy
+                                                    Hủy đặt sân
                                                 </button>
                                             </form>
                                         @else

@@ -1,5 +1,5 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4" >
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('home') }}" class="brand-link" style="text-decoration: none; font-size: 16px">
         <img src="/template/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
@@ -398,6 +398,16 @@
                             </a>
                         </li>
 
+                        {{-- level 0 Lịch theo ngày --}}
+                        {{-- <li class="nav-item">
+                            <a href="{{ route('booking.lichtheongay') }}"
+                                class="nav-link {{ request()->routeIs('booking.lichtheongay') ? 'bg-light' : '' }}">
+                                <p><i class="bi bi-calendar-week-fill"></i>
+                                    Lịch theo ngày
+                                </p>
+                            </a>
+                        </li> --}}
+
                         {{-- level 0 quản lý nhân viên --}}
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('manage-branches.viewStaff') ||
@@ -435,10 +445,10 @@
                                     <a class="nav-link {{ request()->routeIs('courts.index') || request()->routeIs('courts.show') ? 'active' : '' }}"
                                         href="{{ route('courts.index') }}">
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
-                                        <p> 
+                                        <p>
                                             {{-- DS sân --}}
                                             Danh sách sân
-                                            {{-- <i class="right fas fa-angle-left"></i> --}} 
+                                            {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
                                 </li>
@@ -502,7 +512,7 @@
                         {{-- level 0 Quản lý thanh toán --}}
                         <li class="nav-item">
                             <a href="{{ route('manager.payment') }}"
-                                class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
+                                class="nav-link {{ request()->routeIs('manager.payment') || request()->routeIs('manager.searchBookings') ? 'bg-light' : '' }}">
                                 <p><i class="bi bi-credit-card-2-back"></i>
                                     Quản lý thanh toán
                                     {{-- cấp 0 quản lý sân --}}
@@ -522,6 +532,16 @@
                                 </p>
                             </a>
                         </li>
+
+                        {{-- level 0 Lịch theo ngày --}}
+                        {{-- <li class="nav-item">
+                            <a href="{{ route('booking.lichtheongay') }}"
+                                class="nav-link {{ request()->routeIs('booking.lichtheongay') ? 'bg-light' : '' }}">
+                                <p><i class="bi bi-calendar-week-fill"></i>
+                                    Lịch theo ngày
+                                </p>
+                            </a>
+                        </li> --}}
 
                         {{-- level 0 Quản lý sân --}}
                         <li
@@ -582,7 +602,7 @@
                         {{-- level 0 Quản lý thanh toán --}}
                         <li class="nav-item">
                             <a href="{{ route('manager.payment') }}"
-                                class="nav-link {{ request()->routeIs('manager.payment') ? 'bg-light' : '' }}">
+                                class="nav-link {{ request()->routeIs('manager.payment') || request()->routeIs('manager.searchBookings') ? 'bg-light' : '' }}">
                                 <p><i class="bi bi-credit-card-2-back"></i>
                                     Quản lý thanh toán
                                     {{-- cấp 0 quản lý sân --}}

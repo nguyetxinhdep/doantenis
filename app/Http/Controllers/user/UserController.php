@@ -167,8 +167,18 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email', // Đảm bảo email là duy nhất
-            'phone' => 'required|max:15', // Giới hạn độ dài số điện thoại
+            'phone' => 'required|regex:/^[0-9]{10,11}$/', // Giới hạn độ dài số điện thoại
             'branch_id' => 'required|exists:branches,Branch_id', // Kiểm tra xem chi nhánh có tồn tại không
+        ], [
+            'branch_id.required' => 'Vui lòng chọn địa điểm kinh doanh.',
+            'branch_id.exists' => 'Chi nhánh không hợp lệ.',
+            'name.required' => 'Tên nhân viên là bắt buộc.',
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Định dạng email không hợp lệ.',
+            'email.unique' => 'Email này đã tồn tại.',
+            'phone.required' => 'Số điện thoại là bắt buộc.',
+            'phone.regex' => 'Số điện thoại phải có 10-11 chữ số.',
+            // 'address.required' => 'Địa chỉ là bắt buộc.',
         ]);
 
         // Tạo người dùng mới
@@ -176,6 +186,7 @@ class UserController extends Controller
         $account->Name = $request->name;
         $account->Email = $request->email;
         $account->Phone = $request->phone;
+        $account->password = bcrypt('Tennis@123');
         $account->Role = '4';
 
         // Lưu thông tin người dùng
@@ -185,6 +196,15 @@ class UserController extends Controller
         $staff->branch_id = $request->branch_id;
         $staff->user_id = $account->User_id;
         $staff->save();
+
+        $branch = Branch::where('Branch_id', $request->branch_id)->first();
+
+        $Email = $request->email;
+
+        Mail::send('staff.mailCreate', compact('Email', 'user', 'branch'), function ($email) use ($Email, $branch) {
+            $email->subject('Tạo Nhân viên');
+            $email->to($Email);
+        });
 
         // Quay lại với thông báo thành công
         return redirect()->route('admin.account.nhanvien')->with('success', 'Tài khoản đã được thêm thành công.');
@@ -363,8 +383,7 @@ class UserController extends Controller
                 'Location' => 'required',
                 'Phone' => 'required|numeric',
                 'Email' => 'required|email|',
-            ]
-            ,
+            ],
             [
                 'useremail.unique' => 'Email đã tồn tại', // thông báo lỗi khi email đã tồn tại
             ]
@@ -408,7 +427,7 @@ class UserController extends Controller
             // Commit the transaction nếu không có lỗi
             DB::commit();
             $Email = $request->useremail;
-            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user','admin'), function ($email) use ($Email) {
+            Mail::send('branch.mailCapTaiKhoan', compact('Email', 'user', 'admin'), function ($email) use ($Email) {
                 $email->subject('Cấp tài khoản');
                 $email->to($Email);
             });
@@ -705,7 +724,7 @@ class UserController extends Controller
             'Password.confirmed' => 'Mật khẩu xác nhận không khớp',
             'Password.min' => 'Mật khẩu phải chứa ít nhất 8 ký tự',
             'Password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 ký tự đặc biệt và 1 số',
-            
+
 
         ]);
 

@@ -56,6 +56,20 @@ class BookingController extends Controller
         return view('booking.calendar', compact('courts', 'bookings', 'title'));
     }
 
+    public function lichTheoNgay($date)
+    {
+        // Lấy danh sách sân và giờ đã đặt(bảng booking)
+        $courts = Court::where('branch_id', session('branch_active')->Branch_id)->get();
+        $bookings = Booking::where('branch_id', session('branch_active')->Branch_id)
+            ->where('Date_booking', $date) // Lấy tất cả đặt sân
+            ->where('Status', '!=', 3)->get();
+        $title = "Lịch";
+
+        return view('booking.lichTheoNgay', compact('courts', 'bookings', 'title'));
+    }
+
+
+
     // controller xử lý hiển thị lịch cho khách hàng xem
     public function bookingCalendarWelcome(Request $req)
     {
