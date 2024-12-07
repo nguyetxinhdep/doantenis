@@ -271,7 +271,7 @@ class StaffController extends Controller
 
             // $Email = $user->Email;
             $branch = Branch::where('Branch_id', $branch_id)->first();
-            // $Email = $user->Email;
+            $Email = $user->Email;
             $mailchusan = $branch->Email;
 
             Mail::send('staff.mailchusantuchoi', compact('Email', 'user'), function ($email) use ($mailchusan) {
