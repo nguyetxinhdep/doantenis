@@ -28,7 +28,7 @@ class BranchController extends Controller
             ->select('branches.*', 'users.User_id as User_id')
             ->get();
 
-        $title = "Yêu cầu xóa địa điểm";
+        $title = "Xóa địa điểm";
         return view('branch.viewDeleteRequired', compact('branches', 'title'));
     }
 
