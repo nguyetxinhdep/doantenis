@@ -292,8 +292,266 @@ class BookingController extends Controller
         }
     }
 
-    // Hàm xử lý yêu cầu đặt sân
+    // Hàm xử lý yêu cầu đặt sân bên trang chủ
     public function reserve(Request $request)
+    {
+        // Xác thực dữ liệu đầu vào: phải có 'selectedCells' và 'date'
+        $this->validate($request, [
+            'selectedCells' => 'required', // selectedCells phải là một mảng
+            'date' => 'required|date', // date phải là một ngày hợp lệ
+        ]);
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Bạn cần đăng nhập để đặt sân.'], 401);
+        }
+        // Bắt đầu transaction
+        DB::beginTransaction();
+        try {
+            $paymentOption = $request->input('paymentOption'); // Nhận hình thức thanh toán
+            // Log::debug($paymentOption);
+            $timestamp = strtotime($request->date); // Chuyển đổi ngày thành timestamp
+
+            if (date('N', $timestamp) >= 1 && date('N', $timestamp) <= 5) {
+                $time_slot_status = 1; // Ngày từ thứ Hai đến thứ Sáu
+            } else {
+                $time_slot_status = 2; // Ngày thứ Bảy hoặc Chủ nhật
+            }
+
+            $reservations = []; // Mảng để lưu trữ thông tin đặt sân tạm thời
+            // Log::debug($request->selectedCells);
+            // Lặp qua các ô đã chọn từ client
+            foreach ($request->selectedCells as $cell) {
+                $courtId = $cell['courtId'];
+                $timeStart = \Carbon\Carbon::createFromFormat('H:i', $cell['timeStart']); // Chuyển đổi thời gian bắt đầu
+                $timeEnd = \Carbon\Carbon::createFromFormat('H:i', $cell['timeEnd']); // Chuyển đổi thời gian kết thúc
+
+                // Kiểm tra xem đã có đặt sân cho sân này hay chưa
+                if (!isset($reservations[$courtId])) {
+                    $reservations[$courtId] = []; // Nếu chưa, khởi tạo một mảng trống cho sân này
+                }
+
+                // Thêm thông tin thời gian vào mảng đặt sân
+                $reservations[$courtId][] = [
+                    'timeStart' => $timeStart,
+                    'timeEnd' => $timeEnd,
+                ];
+            }
+
+            // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+            $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
+            // $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+            $customer_type_id = 1; //là vãng lai
+
+            // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+            // if (Auth()->user()->Role == 5) { //là khách hàng
+            //     $customerID = (Customer::where('user_id', Auth()->user()->User_id)->first())->Customer_id;
+            //     // $customer_type_id = (Customer::where('user_id', Auth()->user()->User_id)->first())->customer_type_id;
+            //     $customer_type_id = 1;
+            // } else { // là chủ sân hoặc nhân viên
+            //     $ten_kh = $request->input('name');
+            //     $sdt_kh = $request->input('phone');
+            //     $tien_da_tra = floatval($request->input('amount')); //tiền đã trả
+
+            //     $user_new = User::create([
+            //         'Name' => $ten_kh,
+            //         'Phone' => $sdt_kh,
+            //         'Role' => '5',
+            //     ]);
+
+            //     $kh_new = Customer::create([
+            //         'user_id' => $user_new->User_id,
+            //         // 'customer_type_id' => 1,
+            //     ]);
+
+            //     $customerID = $kh_new->Customer_id;
+            //     $customer_type_id = 1;
+            // }
+
+
+            $bookings = []; // Mảng chứa thông tin booking đã gộp
+            // Log::debug($reservations);
+            // Lặp qua từng sân
+            foreach ($reservations as $courtId => $times) {
+                // Sắp xếp các thời gian theo thời gian bắt đầu
+                usort($times, function ($a, $b) {
+                    return $a['timeStart']->timestamp <=> $b['timeStart']->timestamp;
+                });
+
+                // Khởi tạo thời gian bắt đầu và kết thúc gộp
+                $mergedStart = $times[0]['timeStart'];
+                $mergedEnd = $times[0]['timeEnd'];
+
+                // láy id chi nhánh
+                $branchID = Court::where('Court_id', $courtId)->first()->branch_id;
+
+                // lấy tất cả khung giờ theo id chi nhánh
+                $timeslots = TimeSlot::where('branch_id', $branchID)
+                    ->where('Status', $time_slot_status)
+                    ->orderBy('Start_time', 'asc') // Sắp xếp theo Start_time tăng dần
+                    ->get();
+
+                // Lặp qua từng khoảng thời gian
+                foreach ($times as $key => $time) {
+                    if ($time['timeStart']->lessThanOrEqualTo($mergedEnd)) {
+                        // Nếu thời gian tiếp theo liên tục với thời gian trước đó
+                        $mergedEnd = max($mergedEnd, $time['timeEnd']);
+                    }
+                }
+                // -----------end foreach
+
+                // tạo mảng lưu giá trị có slot để xử lý nếu đặt ở 2 khung giờ khác nhau với giá khác nhau
+                $arraytimeslot = [];
+
+                foreach ($timeslots as $slot) {
+                    $arraytimeslot[] = $slot;
+
+                    // Chuyển đổi thời gian bắt đầu và kết thúc của khung giờ thành định dạng Carbon
+                    $startTime = Carbon::createFromFormat('H:i:s', $slot->Start_time); // assuming it's stored in 'H:i:s' format
+                    $endTime = Carbon::createFromFormat('H:i:s', $slot->End_time);
+
+                    // Kiểm tra nếu khoảng thời gian nhận được nằm trong khoảng từ start_time đến end_time
+                    // Log các giá trị debug
+                    // Log::debug('merstart:', ['merstart' => $mergedStart]);
+                    // Log::debug('merend', ['merend' => $mergedEnd]);
+                    // Log::debug('start:', ['start' => $startTime]);
+                    // Log::debug('end', ['end' => $endTime]);
+                    if ($mergedStart->greaterThanOrEqualTo($startTime) && $mergedEnd->lessThanOrEqualTo($endTime)) {
+                        $timeslot_id = $slot->Time_slot_id; // Ghi lại khung giờ phù hợp
+                        break; // Thoát khỏi vòng lặp nếu đã tìm thấy khung giờ phù hợp
+                    }
+                }
+
+                if (isset($timeslot_id)) {
+                    // lấy ra bảng giá phù hợp
+                    $pricelist = PriceList::where('time_slot_id', $timeslot_id)->where('customer_type_id', $customer_type_id)->first();
+                    // lấy max booking_code để tạo bookingcode mới 
+                    $maxBookingCode = Booking::max('booking_code') ?? 0;
+                    $bookingcodeNew = $maxBookingCode + 1;
+
+                    // Thêm booking cuối cùng vào mảng
+                    $bookings[] = [
+                        'court_id' => $courtId,
+                        'Date_booking' => $request->date,
+                        'Start_time' => $mergedStart->format('H:i'),
+                        'End_time' => $mergedEnd->format('H:i'),
+                        'Status' => 2,
+                        'time_slot_id' => $timeslot_id,
+                        'customer_id' => $customerID,
+                        'price_list_id' => $pricelist->Price_list_id,
+                        'branch_id' => $branchID,
+                        'booking_code' => $bookingcodeNew
+                    ];
+                } else {
+                    // nếu giờ đặt nằm ở 2 khung giờ thì tách ra 2 booking
+                    for ($i = 0; $i < count($arraytimeslot); $i++) {
+                        $slottemp = $arraytimeslot[$i];
+                        if (
+                            $mergedStart->greaterThanOrEqualTo($slottemp->Start_time)
+                            && $mergedEnd->greaterThan($slottemp->End_time)
+                            && $mergedEnd->lessThan($arraytimeslot[$i + 1]->End_time)
+                        ) {
+                            // lấy max booking_code để tạo bookingcode mới 
+                            $maxBookingCode = Booking::max('booking_code') ?? 0;
+                            $bookingcodeNew = $maxBookingCode + 1;
+                            // Log::debug('code:', [$bookingcodeNew]);
+                            // lấy ra bảng giá phù hợp
+                            $pricelist1 = PriceList::where('time_slot_id', $arraytimeslot[$i]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
+                            $pricelist2 = PriceList::where('time_slot_id', $arraytimeslot[$i + 1]->Time_slot_id)->where('customer_type_id', $customer_type_id)->first();
+                            $bookings[] = [
+                                'court_id' => $courtId,
+                                'Date_booking' => $request->date,
+                                'Start_time' => $mergedStart->format('H:i'),
+                                'End_time' => $arraytimeslot[$i]->End_time,
+                                'Status' => 2,
+                                'time_slot_id' => $arraytimeslot[$i]->Time_slot_id,
+                                'customer_id' => $customerID,
+                                'price_list_id' => $pricelist1->Price_list_id,
+                                'branch_id' => $branchID,
+                                'booking_code' => $bookingcodeNew
+                            ];
+
+                            $bookings[] = [
+                                'court_id' => $courtId,
+                                'Date_booking' => $request->date,
+                                'Start_time' => $arraytimeslot[$i]->End_time,
+                                'End_time' => $mergedEnd->format('H:i'),
+                                'Status' => 2,
+                                'time_slot_id' => $arraytimeslot[$i + 1]->Time_slot_id,
+                                'customer_id' => $customerID,
+                                'price_list_id' => $pricelist2->Price_list_id,
+                                'branch_id' => $branchID,
+                                'booking_code' => $bookingcodeNew
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // -------------------
+            // Lưu các booking vào cơ sở dữ liệu
+            foreach ($bookings as $booking) {
+                $bookingcreate = Booking::create($booking); // Tạo bản ghi mới trong bảng bookings
+                $price_list = PriceList::where('Price_list_id', $booking['price_list_id'])->first();
+                // Tính tổng tiền
+                $total = $this->calculatePrice($price_list->Price, $booking['Start_time'], $booking['End_time']);
+
+                // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+                Payment::create([
+                    'Amount' => $total,
+                    'Payment_method' => 'Bank',
+                    'Debt' => $total, //còn nợ
+                    'Paid' => 0,
+                    'Status' => 0,
+                    'branch_id' => $booking['branch_id'],
+                    'booking_id' => $bookingcreate->Booking_id
+                ]);
+
+                // -----kiểm tra ai là người tạo để lấy customerid và customer type id
+                // if (Auth()->user()->Role == 5) { //là khách hàng
+                //     Payment::create([
+                //         'Amount' => $total,
+                //         'Payment_method' => 'Bank',
+                //         'Debt' => $total, //còn nợ
+                //         'Paid' => 0,
+                //         'Status' => 0,
+                //         'branch_id' => $booking['branch_id'],
+                //         'booking_id' => $bookingcreate->Booking_id
+                //     ]);
+                // } else { // là chủ sân hoặc nhân viên
+                //     $con_no = $total - $tien_da_tra;
+                //     if ($con_no == 0) { // trả đủ rồi
+                //         $status = 1;
+                //     } else {
+                //         $status = 0; //chưa trả đủ
+                //     }
+                //     Payment::create([
+                //         'Amount' => $total,
+                //         'Payment_method' => 'Bank',
+                //         'Debt' => $con_no,
+                //         'Paid' => $tien_da_tra,
+                //         'Status' => $status,
+                //         'branch_id' => $booking['branch_id'],
+                //         'booking_id' => $bookingcreate->Booking_id
+                //     ]);
+                // }
+            }
+
+            // Commit transaction nếu mọi thứ thành công
+            DB::commit();
+            // Log::debug($total);
+
+            // Trả về phản hồi cho client
+            return response()->json(['success' => true, 'total' => $total]);
+        } catch (\Exception $e) {
+            // Rollback transaction nếu có lỗi
+            DB::rollBack();
+            Log::error('Error occurred while reserving: ' . $e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Đặt sân thất bại.'], 500);
+        }
+    }
+
+    // Hàm xử lý yêu cầu đặt sân bên trang quản lý
+    public function managerreserve(Request $request)
     {
         // Xác thực dữ liệu đầu vào: phải có 'selectedCells' và 'date'
         $this->validate($request, [
@@ -736,6 +994,7 @@ class BookingController extends Controller
                 // Kiểm tra sự tồn tại của booking
                 $existingBooking = Booking::where('court_id', $booking['court_id'])
                     ->where('Date_booking', $booking['Date_booking'])
+                    ->where('status', '!=', 3) // Thêm điều kiện status khác 3(3 là sân đã hủy)
                     ->where(function ($query) use ($booking) {
                         $query->whereBetween('Start_time', [$booking['Start_time'], $booking['End_time']])
                             ->orWhereBetween('End_time', [$booking['Start_time'], $booking['End_time']])
@@ -797,7 +1056,8 @@ class BookingController extends Controller
             // Trả về thông tin thành công
             // Lưu trữ thông báo vào session
             session()->flash('success', 'Đặt sân cố định thành công');
-            if (Auth()->user()->Role == 5) {
+            // if (Auth()->user()->Role == 5) {
+            if ($request->input('khachhang') == 1) {
                 return response()->json([
                     'success' => true,
                     'redirect' => route('booking.history')

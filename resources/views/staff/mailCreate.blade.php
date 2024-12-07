@@ -6,6 +6,7 @@
         <br>Tài khoản: {{ $user->Email }}
         <br>Mật khẩu: Tennis@123
         <br>Sau khi đăng nhập, vui lòng đổi mật khẩu để đảm bảo quy tắc bảo mật.
+        <br>Nếu trước đó bạn đã có tài khoản và mật khẩu vui lòng đăng nhập bằng tài khoản và mật khẩu cũ!
         <br>Tennis cảm ơn!
     </p>
 </div>

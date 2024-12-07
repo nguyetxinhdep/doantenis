@@ -103,7 +103,7 @@ Route::middleware(['auth'])->group(function () {
     //     Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
     // });
 
-    // Nhóm quản lý chi nhánh
+    // Nhóm quản lý chi nhánh chủ sân
     Route::prefix('manage-branches')->group(function () {
         Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
         Route::get('reload-branches', [BranchController::class, 'reloadBranch'])->name('manage-branches.reload');
@@ -116,6 +116,11 @@ Route::middleware(['auth'])->group(function () {
         // ------------staff-----------
         // view tạo nhân viên cho chi nhánh
         Route::get('create-staff', [StaffController::class, 'createStaff'])->name('manage-branches.createStaff');
+        // Route::post('send-mail-create', [StaffController::class, 'sendmailcreate'])->name('manage-branches.sendmail.createStaff');
+
+        Route::get('/staff/confirm/{token}/{branch_id}', [StaffController::class, 'confirmStaff'])->name('staff.confirm');
+        Route::get('/staff/reject/{token}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
+
         Route::post('store-staff', [StaffController::class, 'storeStaff'])->name('manage-branches.storeStaff');
         Route::get('view-staff', [StaffController::class, 'viewStaff'])->name('manage-branches.viewStaff');
         Route::get('view-editStaff/{id}', [StaffController::class, 'editStaff'])->name('manage-branches.editStaff');
@@ -221,7 +226,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 
         // quản lý và nhân viên đặt sân
-        Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'reserve'])->name('manager.booking.reserve');
+        Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'managerreserve'])->name('manager.booking.reserve');
         // đặt lịch cố định
         Route::post('dat-co-dinh-booking-calendar/', [BookingController::class, 'datCoDinh'])->name('dat.co.dinh.booking.reserve');
     });

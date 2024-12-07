@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
 
 class UserController extends Controller
 {
@@ -161,53 +163,66 @@ class UserController extends Controller
         return view('user.nhanvien.create', compact('title', 'branches'));
     }
 
-    public function storenhanvien(Request $request)
+    public function storenhanvien(Request $req)
     {
-        // Xác thực dữ liệu
-        $request->validate([
+        $req->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email', // Đảm bảo email là duy nhất
-            'phone' => 'required|regex:/^[0-9]{10,11}$/', // Giới hạn độ dài số điện thoại
-            'branch_id' => 'required|exists:branches,Branch_id', // Kiểm tra xem chi nhánh có tồn tại không
+            'email' => 'required|email',
+            'phone' => 'required|regex:/^[0-9]{10,11}$/',
+            'address' => 'string',
+            'branch_id' => 'required|exists:branches,Branch_id',
         ], [
             'branch_id.required' => 'Vui lòng chọn địa điểm kinh doanh.',
             'branch_id.exists' => 'Chi nhánh không hợp lệ.',
             'name.required' => 'Tên nhân viên là bắt buộc.',
             'email.required' => 'Email là bắt buộc.',
             'email.email' => 'Định dạng email không hợp lệ.',
-            'email.unique' => 'Email này đã tồn tại.',
             'phone.required' => 'Số điện thoại là bắt buộc.',
             'phone.regex' => 'Số điện thoại phải có 10-11 chữ số.',
-            // 'address.required' => 'Địa chỉ là bắt buộc.',
         ]);
 
-        // Tạo người dùng mới
-        $account = new User();
-        $account->Name = $request->name;
-        $account->Email = $request->email;
-        $account->Phone = $request->phone;
-        $account->password = bcrypt('Tennis@123');
-        $account->Role = '4';
 
-        // Lưu thông tin người dùng
-        $account->save();
+        // Gửi email xác nhận
+        $token = Str::random(32); // Tạo token ngẫu nhiên để xác nhận
+        $Email = $req->email;
 
-        $staff = new Staff();
-        $staff->branch_id = $request->branch_id;
-        $staff->user_id = $account->User_id;
-        $staff->save();
+        // Kiểm tra xem email đã tồn tại trong hệ thống chưa
+        $user = User::where('email', $Email)->first();
 
-        $branch = Branch::where('Branch_id', $request->branch_id)->first();
 
-        $Email = $request->email;
+        if ($user) {
+            $customer = Customer::where('user_id', $user->User_id)->first();
+            if ($customer && $user->Role == '5') {
+                // Nếu email là khách hàng, cập nhật token
+                $user->update([
+                    'token_staff' => $token, // Cập nhật token cho khách hàng
+                ]);
+            } else {
+                return redirect()->route('admin.account.create.nhanvien')->with('danger', 'Email này đã được dùng để đăng ký chủ sân hoặc đã là nhân viên ở địa điểm khác!');
+            }
+        } else {
+            // Nếu email chưa tồn tại, tạo mới một nhân viên
+            User::create([
+                'Name' => $req->name,
+                'Email' => $req->email,
+                'Phone' => $req->phone,
+                'Address' => $req->address,
+                'Role' => '6', // Chờ Nhân viên xác nhân
+                'password' => bcrypt('Tennis@123'),
+                'token_staff' => $token, //tạo token cho khách hàng
+            ]);
+        }
 
-        Mail::send('staff.mailCreate', compact('Email', 'user', 'branch'), function ($email) use ($Email, $branch) {
-            $email->subject('Tạo Nhân viên');
+        $confirmationUrl = route('staff.confirm', ['token' => $token, 'branch_id' => $req->branch_id]); // URL xác nhận
+        $rejectionUrl = route('staff.reject', ['token' => $token]); // URL từ chối
+
+        Mail::send('staff.mailConfirm', compact('confirmationUrl', 'rejectionUrl'), function ($email) use ($Email) {
+            $email->subject('Thư mời nhận việc');
             $email->to($Email);
         });
 
         // Quay lại với thông báo thành công
-        return redirect()->route('admin.account.nhanvien')->with('success', 'Tài khoản đã được thêm thành công.');
+        return redirect()->route('admin.account.nhanvien')->with('success', 'Đã gửi mail xác nhận');
     }
 
     // ------------end nhân viên-------------
@@ -401,6 +416,10 @@ class UserController extends Controller
             $user->save();
 
             $userId = $user->User_id;
+
+            $customer = new Customer();
+            $customer->user_id = $userId;
+            $customer->save();
             // $user->Role = '3';
             // $user->save();
 
