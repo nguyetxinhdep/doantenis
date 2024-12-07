@@ -381,7 +381,7 @@
                                         {{-- <i class="far fa-circle nav-icon"></i> --}}
                                         <p>
                                             {{-- DS Chi Nhánh --}}
-                                            Yêu cầu xóa địa điểm
+                                            Xóa địa điểm
                                             {{-- <i class="right fas fa-angle-left"></i> --}}
                                         </p>
                                     </a>
@@ -399,14 +399,14 @@
                         </li>
 
                         {{-- level 0 Lịch theo ngày --}}
-                        {{-- <li class="nav-item">
+                        <li class="nav-item">
                             <a href="{{ route('booking.lichtheongay') }}"
                                 class="nav-link {{ request()->routeIs('booking.lichtheongay') ? 'bg-light' : '' }}">
                                 <p><i class="bi bi-calendar-week-fill"></i>
                                     Lịch theo ngày
                                 </p>
                             </a>
-                        </li> --}}
+                        </li>
 
                         {{-- level 0 quản lý nhân viên --}}
                         <li class="nav-item">
@@ -534,14 +534,14 @@
                         </li>
 
                         {{-- level 0 Lịch theo ngày --}}
-                        {{-- <li class="nav-item">
+                        <li class="nav-item">
                             <a href="{{ route('booking.lichtheongay') }}"
                                 class="nav-link {{ request()->routeIs('booking.lichtheongay') ? 'bg-light' : '' }}">
                                 <p><i class="bi bi-calendar-week-fill"></i>
                                     Lịch theo ngày
                                 </p>
                             </a>
-                        </li> --}}
+                        </li>
 
                         {{-- level 0 Quản lý sân --}}
                         <li
