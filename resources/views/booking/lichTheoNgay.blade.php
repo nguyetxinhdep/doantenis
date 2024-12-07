@@ -78,9 +78,9 @@
                     <th>Sân</th>
                     {{-- <th>Tổng tiền</th>
                     <th>Đã trả</th>
-                    <th>Còn nợ</th>
+                    <th>Còn nợ</th> --}}
                     <th>Trạng thái</th>
-                    <th>Hành động</th> --}}
+                    {{-- <th>Hành động</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -168,7 +168,7 @@
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         {{ number_format($totalDebt, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
-                                    </td>
+                                    </td> --}}
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         @switch($booking->Status)
                                             @case(0)
@@ -190,7 +190,7 @@
                                             @default
                                                 <span class="badge bg-secondary">Không xác định</span>
                                         @endswitch
-                                    </td> --}}
+                                    </td>
                                     {{-- <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         @if ($booking->Debt != 0 && $booking->Status != 3)
                                             <!-- Nút mở modal thanh toán -->
