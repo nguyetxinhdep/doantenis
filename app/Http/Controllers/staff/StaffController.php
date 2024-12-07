@@ -283,7 +283,7 @@ class StaffController extends Controller
 
             if ($customer) {
                 $user->token_staff = null;
-                $user->save;
+                $user->save();
             } else {
                 $user->delete();
             }
