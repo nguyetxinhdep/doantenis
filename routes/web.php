@@ -57,6 +57,9 @@ Route::get('xacnhan/{id}/{token}', [LoginController::class, 'accept'])->name('xa
 Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass'])->name('doimatkhau');
 
 //--------------------------------------------------------------------------------------------------
+// xác nhận nhân viên
+Route::get('/staff/confirm/{token}/{branch_id}', [StaffController::class, 'confirmStaff'])->name('staff.confirm');
+Route::get('/staff/reject/{token}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
 
 //đăng nhập rồi mới vào những route bên dưới được
 Route::middleware(['auth'])->group(function () {
@@ -117,9 +120,6 @@ Route::middleware(['auth'])->group(function () {
         // view tạo nhân viên cho chi nhánh
         Route::get('create-staff', [StaffController::class, 'createStaff'])->name('manage-branches.createStaff');
         // Route::post('send-mail-create', [StaffController::class, 'sendmailcreate'])->name('manage-branches.sendmail.createStaff');
-
-        Route::get('/staff/confirm/{token}/{branch_id}', [StaffController::class, 'confirmStaff'])->name('staff.confirm');
-        Route::get('/staff/reject/{token}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
 
         Route::post('store-staff', [StaffController::class, 'storeStaff'])->name('manage-branches.storeStaff');
         Route::get('view-staff', [StaffController::class, 'viewStaff'])->name('manage-branches.viewStaff');
