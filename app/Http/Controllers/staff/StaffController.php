@@ -192,7 +192,7 @@ class StaffController extends Controller
         }
 
         $confirmationUrl = route('staff.confirm', ['token' => $token, 'branch_id' => $req->branch_id]); // URL xác nhận
-        $rejectionUrl = route('staff.reject', ['token' => $token]); // URL từ chối
+        $rejectionUrl = route('staff.reject', ['token' => $token, 'branch_id' => $req->branch_id]); // URL từ chối
 
         Mail::send('staff.mailConfirm', compact('confirmationUrl', 'rejectionUrl'), function ($email) use ($Email) {
             $email->subject('Thư mời nhận việc');
@@ -242,15 +242,16 @@ class StaffController extends Controller
 
             $branch = Branch::where('Branch_id', $branch_id)->first();
             $Email = $user->Email;
+            $mailchusan = $branch->Email;
 
             Mail::send('staff.mailCreate', compact('Email', 'user', 'branch'), function ($email) use ($Email, $branch) {
                 $email->subject('Tạo Nhân viên');
                 $email->to($Email);
             });
 
-            Mail::send('staff.mailchusan', compact('Email', 'user', 'branch'), function ($email) use ($Email, $branch) {
+            Mail::send('staff.mailchusan', compact('Email', 'user', 'branch'), function ($email) use ($mailchusan, $branch) {
                 $email->subject('Xác nhận lời mời nhân viên');
-                $email->to($Email);
+                $email->to($mailchusan);
             });
 
             return redirect()->route('welcome')->with('success', 'Bạn đã xác nhận, hãy kiểm tra email!');
@@ -261,18 +262,21 @@ class StaffController extends Controller
         }
     }
 
-    public function rejectStaff($token)
+    public function rejectStaff($token, $branch_id)
     {
         // Xóa nhân viên đang chờ nếu bị từ chối
         $user = User::where('token_staff', $token)->first();
 
         if ($user) {
 
-            $Email = $user->Email;
+            // $Email = $user->Email;
+            $branch = Branch::where('Branch_id', $branch_id)->first();
+            // $Email = $user->Email;
+            $mailchusan = $branch->Email;
 
-            Mail::send('staff.mailchusantuchoi', compact('Email', 'user'), function ($email) use ($Email) {
+            Mail::send('staff.mailchusantuchoi', compact('Email', 'user'), function ($email) use ($mailchusan) {
                 $email->subject('Từ chối lời mời nhân viên');
-                $email->to($Email);
+                $email->to($mailchusan);
             });
 
             $customer = Customer::where('user_id', $user->User_id)->first();

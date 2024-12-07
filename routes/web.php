@@ -59,7 +59,7 @@ Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass'])->n
 //--------------------------------------------------------------------------------------------------
 // xác nhận nhân viên
 Route::get('/staff/confirm/{token}/{branch_id}', [StaffController::class, 'confirmStaff'])->name('staff.confirm');
-Route::get('/staff/reject/{token}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
+Route::get('/staff/reject/{token}/{branch_id}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
 
 //đăng nhập rồi mới vào những route bên dưới được
 Route::middleware(['auth'])->group(function () {
@@ -218,7 +218,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('booking')->group(function () {
         // Route xem lịch đặt sân trong trong manager-role 3
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
-        Route::get('forDate', [PaymentController::class, 'index'])->name('booking.lichtheongay');
+        Route::get('forDate', [PaymentController::class, 'lichtheongay'])->name('booking.lichtheongay');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
         // lịch sử đặt sân customer
         Route::get('booking-history', [BookingController::class, 'bookingHistory'])->name('booking.history');

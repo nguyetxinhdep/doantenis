@@ -74,7 +74,7 @@
                     <th>Số điện thoại</th>
                     <th>Giờ vào</th>
                     <th>Giờ ra</th>
-                    <th>Chi Nhánh</th>
+                    <th>Địa điểm</th>
                     <th>Sân</th>
                     <th>Tổng tiền</th>
                     <th>Đã trả</th>

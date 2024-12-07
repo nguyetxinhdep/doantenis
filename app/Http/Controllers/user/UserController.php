@@ -214,7 +214,7 @@ class UserController extends Controller
         }
 
         $confirmationUrl = route('staff.confirm', ['token' => $token, 'branch_id' => $req->branch_id]); // URL xác nhận
-        $rejectionUrl = route('staff.reject', ['token' => $token]); // URL từ chối
+        $rejectionUrl = route('staff.reject', ['token' => $token, 'branch_id' => $req->branch_id]); // URL từ chối
 
         Mail::send('staff.mailConfirm', compact('confirmationUrl', 'rejectionUrl'), function ($email) use ($Email) {
             $email->subject('Thư mời nhận việc');

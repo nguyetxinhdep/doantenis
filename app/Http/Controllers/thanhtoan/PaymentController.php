@@ -119,6 +119,70 @@ class PaymentController extends Controller
         return view('thanhtoan.index', compact('history', 'title'));
     }
 
+    public function lichtheongay(Request $req)
+    {
+        $title = "Quản lý thanh toán";
+
+        // Tạo đối tượng query ban đầu
+        $history = Booking::join('customers', 'bookings.customer_id', '=', 'customers.Customer_id')
+            ->join('users', 'users.User_id', '=', 'customers.user_id')
+            ->join('courts', 'bookings.court_id', '=', 'courts.Court_id')
+            ->join('payments', 'bookings.Booking_id', '=', 'payments.booking_id')
+            ->select(
+                'bookings.booking_code',
+                // 'bookings.Booking_id',
+                DB::raw('GROUP_CONCAT(bookings.Date_booking SEPARATOR ", ") as Date_booking'),
+                DB::raw('GROUP_CONCAT(bookings.Start_time SEPARATOR ", ") as Start_time'),
+                DB::raw('GROUP_CONCAT(bookings.End_time SEPARATOR ", ") as End_time'),
+                DB::raw('MAX(bookings.Status) as Status'),
+                DB::raw('MAX(users.Name) as user_name'),
+                DB::raw('MAX(users.Phone) as user_phone'),
+                DB::raw('GROUP_CONCAT(courts.name SEPARATOR ", ") as court_name'),
+                DB::raw('SUM(payments.Debt) as Debt'),
+                DB::raw('SUM(payments.Paid) as Paid'),
+                DB::raw('SUM(payments.Amount) as Amount'),
+                DB::raw('GROUP_CONCAT(payments.Payment_id SEPARATOR ", ") as Payment_id'),
+                DB::raw('MAX(bookings.created_at) as created_at') // Thêm trường created_at để sắp xếp
+            )
+            ->groupBy('bookings.booking_code', 'bookings.Date_booking') // Nhóm theo booking_code
+            ->orderBy('created_at', 'desc'); // Sắp xếp theo thời gian tạo mới nhất
+
+        // In ra câu truy vấn SQL
+        // dd($history->toSql(), $history->getBindings());
+        // Tìm kiếm theo số điện thoại (loại bỏ số 0 đầu tiên)
+        if ($req->filled('phone')) {
+            $phone = ltrim($req->phone, '0');
+            $history->where('users.Phone', 'like', '%' . $phone . '%');
+        }
+
+        // Tìm kiếm theo tên
+        if ($req->filled('name')) {
+            $history->where(
+                'users.Name',
+                'like',
+                '%' . $req->name . '%'
+            );
+        }
+
+        // Tìm kiếm theo ngày đặt
+        if ($req->filled('date')) {
+            $history->whereDate(
+                'bookings.Date_booking',
+                $req->date
+            );
+        }
+
+        // Tìm kiếm theo trạng thái
+        if ($req->filled('status')) {
+            $history->where('bookings.Status', $req->status);
+        }
+        $history->where('bookings.branch_id', session('branch_active')->Branch_id);
+        // Thực hiện phân trang với 10 bản ghi trên mỗi trang
+        $history = $history->paginate(10);
+
+        return view('booking.lichTheoNgay', compact('history', 'title'));
+    }
+
 
 
     public function paymentCourt(Request $req)
