@@ -216,8 +216,8 @@
                                                 @endif
 
                                                 <!-- Nút hủy chỉ hiển thị một lần cho mỗi nhóm -->
-                                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                                    data-target="#cancelModal-{{ $bookingCode }}">
+                                                <button type="button" class="btn btn-danger btn-sm mt-1"
+                                                    data-toggle="modal" data-target="#cancelModal-{{ $bookingCode }}">
                                                     Hủy đặt sân
                                                 </button>
                                             </form>

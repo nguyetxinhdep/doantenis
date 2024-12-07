@@ -5,6 +5,7 @@ namespace App\Http\Controllers\branch;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\Customer;
 use App\Models\Manager;
 use App\Models\Staff;
 use App\Models\User;
@@ -587,6 +588,10 @@ class BranchController extends Controller
             if ($user->Role == '5') { // Cập nhật role user là 5 -> khách hàng với tài khoản đăng ký kinh doanh lần đầu
                 $user->Role = '3';
                 $user->save();
+
+                $customer = new Customer();
+                $customer->user_id = $user->User_id;
+                $customer->save();
                 // Xóa tất cả các phiên của người dùng này
                 // Session::where('User_id', $userid)->delete();
                 $admin = false;

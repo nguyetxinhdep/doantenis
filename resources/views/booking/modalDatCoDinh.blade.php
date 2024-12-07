@@ -9,7 +9,8 @@
                 <form id="fixedScheduleForm">
                     @csrf
                     @auth
-                        @if (Auth()->user()->Role != 5)
+                        {{-- @if (Auth()->user()->Role != 5) --}}
+                        @if (Route::currentRouteName() != 'welcome.booking.calendar' && Route::currentRouteName() != 'customer.calendar.search')
                             <!-- Thêm input cho tên khách hàng và số điện thoại -->
                             <div class="mb-3">
                                 <label class="form-label"><b>Khách hàng: <span style="color:red">*</span></b></label><br>
@@ -126,44 +127,44 @@
             newScheduleGroup.style.borderRadius = '5px';
 
             newScheduleGroup.innerHTML = `
-        <div class="row mb-3">
-            <div class="col">
-                <label for="days" class="form-label">Chọn thứ <span
-                                    style="color:red">*</span></label>
-                <select class="form-select days">
-                    <option >--Chọn Thứ--</option>
-                    <option value="1">Thứ Hai</option>
-                    <option value="2">Thứ Ba</option>
-                    <option value="3">Thứ Tư</option>
-                    <option value="4">Thứ Năm</option>
-                    <option value="5">Thứ Sáu</option>
-                    <option value="6">Thứ Bảy</option>
-                    <option value="0">Chủ Nhật</option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-danger btn-sm removeSchedule">-</button>
-            </div>
-        </div>
-        <div class="scheduleDetails" style="display: none;">
-            <div class="courtsContainer mb-3">
-                <label for="courts" class="form-label">Chọn sân <span
-                                    style="color:red">*</span></label>
-                <div class="court-group">
-                    <div class="input-group mb-2 px-4">
-                        <select class="form-select courts">
-                            <option >--Chọn sân--</option>
-                            @foreach ($courts as $court)
-                                <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
-                            @endforeach
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="days" class="form-label">Chọn thứ <span
+                                            style="color:red">*</span></label>
+                        <select class="form-select days">
+                            <option >--Chọn Thứ--</option>
+                            <option value="1">Thứ Hai</option>
+                            <option value="2">Thứ Ba</option>
+                            <option value="3">Thứ Tư</option>
+                            <option value="4">Thứ Năm</option>
+                            <option value="5">Thứ Sáu</option>
+                            <option value="6">Thứ Bảy</option>
+                            <option value="0">Chủ Nhật</option>
                         </select>
-                        <button type="button" class="btn btn-secondary btn-sm addCourt">+</button>
                     </div>
-                    <div class="timesContainer"></div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger btn-sm removeSchedule">-</button>
+                    </div>
                 </div>
-            </div>
-        </div>
-    `;
+                <div class="scheduleDetails" style="display: none;">
+                    <div class="courtsContainer mb-3">
+                        <label for="courts" class="form-label">Chọn sân <span
+                                            style="color:red">*</span></label>
+                        <div class="court-group">
+                            <div class="input-group mb-2 px-4">
+                                <select class="form-select courts">
+                                    <option >--Chọn sân--</option>
+                                    @foreach ($courts as $court)
+                                        <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-secondary btn-sm addCourt">+</button>
+                            </div>
+                            <div class="timesContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
 
             scheduleContainer.appendChild(newScheduleGroup);
 
@@ -200,17 +201,17 @@
                 courtGroup.classList.add('court-group', 'mb-2');
 
                 courtGroup.innerHTML = `
-            <div class="input-group px-4">
-                <select class="form-select courts">
-                    <option >--Chọn sân--</option>
-                    @foreach ($courts as $court)
-                        <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
-                    @endforeach
-                </select>
-                <button type="button" class="btn btn-danger btn-sm removeCourt">-</button>
-            </div>
-            <div class="timesContainer mb-2"></div>
-        `;
+                    <div class="input-group px-4">
+                        <select class="form-select courts">
+                            <option >--Chọn sân--</option>
+                            @foreach ($courts as $court)
+                                <option value="{{ $court->Court_id }}">{{ $court->Name }}</option>
+                            @endforeach
+                        </select>
+                        <button type="button" class="btn btn-danger btn-sm removeCourt">-</button>
+                    </div>
+                    <div class="timesContainer mb-2"></div>
+                `;
 
                 courtsContainer.appendChild(courtGroup);
 
@@ -280,10 +281,12 @@
         document.getElementById('submitFixedSchedule').addEventListener('click', function() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            if (@json(Auth()->user()->Role == '5')) {
+            // if (@json(Auth()->user()->Role == '5')) {
+            if (@json(in_array(Route::currentRouteName(), ['welcome.booking.calendar', 'customer.calendar.search']))) {
                 var user_Name = @json(Auth()->user()->Name);
                 var user_phone = @json(Auth()->user()->Phone);
                 var user_id = @json(Auth()->user()->User_id);
+                var khachhang = 1;
             } else {
                 var user_Name = document.getElementById('customerName').value;
                 var user_phone = document.getElementById('customerPhone').value;
@@ -328,6 +331,7 @@
                 startDate: startDate,
                 endDate: endDate,
                 schedules: schedules,
+                khachhang: khachhang,
             };
 
             // console.log(dataToSend); // Hiển thị dữ liệu ra console

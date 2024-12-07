@@ -18,7 +18,7 @@
     <div class="container my-3">
         <!-- Form tìm kiếm -->
         <!-- Form tìm kiếm -->
-        <form action="{{ route('manager.searchBookings') }}" method="GET" class="mb-4">
+        <form action="{{ route('booking.lichtheongay') }}" method="GET" class="mb-4">
             <div class="row">
                 <!-- Ô input tìm kiếm tên -->
                 <div class="col-md-3">
@@ -30,7 +30,9 @@
                 <!-- Ô input tìm kiếm ngày tháng năm -->
                 <div class="col-md-3">
                     <label for="date">Ngày đặt</label>
-                    <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
+                    <input type="date" class="form-control" id="date" name="date"
+                        value="{{ request('date', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+
                 </div>
 
                 <!-- Ô input tìm kiếm số điện thoại -->
@@ -74,13 +76,13 @@
                     <th>Số điện thoại</th>
                     <th>Giờ vào</th>
                     <th>Giờ ra</th>
-                    <th>Chi Nhánh</th>
+                    <th>Địa điểm</th>
                     <th>Sân</th>
-                    <th>Tổng tiền</th>
+                    {{-- <th>Tổng tiền</th>
                     <th>Đã trả</th>
-                    <th>Còn nợ</th>
+                    <th>Còn nợ</th> --}}
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    {{-- <th>Hành động</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -160,7 +162,7 @@
                                         @endphp
                                         {!! implode('<br>', array_map('trim', $courtNames)) !!} <!-- In ra các sân, mỗi sân trên một dòng -->
                                     </td>
-                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                    {{-- <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         {{ number_format($totalAmount, 0, ',', '.') }} đ <!-- Hiển thị tổng tiền -->
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
@@ -168,7 +170,7 @@
                                     </td>
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         {{ number_format($totalDebt, 0, ',', '.') }} đ <!-- Hiển thị tổng nợ -->
-                                    </td>
+                                    </td> --}}
                                     <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         @switch($booking->Status)
                                             @case(0)
@@ -191,7 +193,7 @@
                                                 <span class="badge bg-secondary">Không xác định</span>
                                         @endswitch
                                     </td>
-                                    <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
+                                    {{-- <td style="vertical-align: middle;" rowspan="{{ $totalBookings }}">
                                         @if ($booking->Debt != 0 && $booking->Status != 3)
                                             <!-- Nút mở modal thanh toán -->
                                             <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
@@ -206,7 +208,7 @@
                                         @else
                                             <span class="text-muted">Không có hành động nào</span>
                                         @endif
-                                    </td>
+                                    </td> --}}
                                 @else
                                     <td>
                                         @php
@@ -274,8 +276,7 @@
                                                     <input class="form-check-input" type="radio" name="PaymentAmount"
                                                         id="halfPayment-{{ $bookingCode }}" value="half"
                                                         onclick="selectPaymentOption('halfPaymentAmount', 'fullPaymentAmount', {{ $totalDebt / 2 }}, '{{ $bookingCode }}')">
-                                                    <label class="form-check-label"
-                                                        for="halfPayment-{{ $bookingCode }}">
+                                                    <label class="form-check-label" for="halfPayment-{{ $bookingCode }}">
                                                         Thanh toán 1/2 số tiền nợ:
                                                         {{ number_format($totalDebt / 2, 0, ',', '.') }} đ
                                                     </label>
@@ -286,8 +287,7 @@
                                                     <input class="form-check-input" type="radio" name="PaymentAmount"
                                                         id="fullPayment-{{ $bookingCode }}" value="full"
                                                         onclick="selectPaymentOption('fullPaymentAmount', 'halfPaymentAmount', {{ $totalDebt }}, '{{ $bookingCode }}')">
-                                                    <label class="form-check-label"
-                                                        for="fullPayment-{{ $bookingCode }}">
+                                                    <label class="form-check-label" for="fullPayment-{{ $bookingCode }}">
                                                         Thanh toán đủ: {{ number_format($totalDebt, 0, ',', '.') }} đ
                                                     </label>
                                                 </div>

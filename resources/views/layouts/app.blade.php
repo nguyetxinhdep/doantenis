@@ -32,6 +32,7 @@
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
     <script src="/template/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
     <!-- Scripts -->
@@ -76,7 +77,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/">
-                        <i class="bi bi-house-heart-fill"></i>  Trang chủ</a>
+                        <i class="bi bi-house-heart-fill"></i> Trang chủ</a>
                 </li>
                 @auth
                     @if (Auth::user()->Role == '3')
@@ -93,7 +94,8 @@
                                 @foreach (session('all_branch') as $branch)
                                     @if ($branch->Branch_id != session('branch_active')->Branch_id)
                                         <li><a class="dropdown-item"
-                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}"> <i class="bi bi-geo-alt-fill"></i> Địa điểm
+                                                href="{{ route('setBranchActive', [$branch->Branch_id]) }}"> <i
+                                                    class="bi bi-geo-alt-fill"></i> Địa điểm
                                                 {{ $branch->Name }}</a>
                                         </li>
                                     @endif
@@ -101,13 +103,15 @@
                                 @if (count(session('all_branch')) == 1)
                                     <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
                                             thêm địa điểm</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"> Reload địa điểm kinh doanh <i class="bi bi-arrow-clockwise"></i></a></li>
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"> Reload địa
+                                            điểm kinh doanh <i class="bi bi-arrow-clockwise"></i></a></li>
                                 @else
                                     {{-- Thêm dấu gạch --}}
                                     <hr>
                                     {{-- <li><a class="dropdown-item" href="{{ route('branch.email.exists') }}">Đăng ký
                                             thêm địa điểm kinh doanh</a></li> --}}
-                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"> Reload địa điểm kinh doanh <i class="bi bi-arrow-clockwise"></i></a></li>
+                                    <li><a class="dropdown-item" href="{{ route('manage-branches.reload') }}"> Reload địa
+                                            điểm kinh doanh <i class="bi bi-arrow-clockwise"></i></a></li>
                                 @endif
                             </ul>
                         </li>
@@ -155,7 +159,7 @@
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                               <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
                             </a>
 
                             <form id="logout-form" action="{{ route('logout') }}" method="get" class="d-none">

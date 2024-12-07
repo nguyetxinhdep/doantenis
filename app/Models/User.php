@@ -29,7 +29,8 @@ class User extends Authenticatable
         'Address',
         'password',
         'Role',
-        'token_change_pass'
+        'token_change_pass',
+        'token_staff',
     ];
 
     public function customer()

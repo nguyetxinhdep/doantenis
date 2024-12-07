@@ -103,6 +103,12 @@ class LoginController extends Controller
                 return redirect()->route('home')->with('success', 'Đăng nhập thành công');
             }
 
+            if (Auth::user()->Role == '6') {
+                Auth::logout();
+                // Log::debug('error:Quyền hạn của bạn không đủ để đăng nhập!');
+                return redirect()->back()->with('danger', 'Đăng nhập thất bại');
+            }
+
             // Nếu role bằng 0, đăng xuất người dùng
             Auth::logout();
             Log::debug('error:Quyền hạn của bạn không đủ để đăng nhập!');

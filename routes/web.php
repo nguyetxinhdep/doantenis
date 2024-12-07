@@ -57,6 +57,9 @@ Route::get('xacnhan/{id}/{token}', [LoginController::class, 'accept'])->name('xa
 Route::post('doimatkhau/{id}/{token}', [LoginController::class, 'changPass'])->name('doimatkhau');
 
 //--------------------------------------------------------------------------------------------------
+// xác nhận nhân viên
+Route::get('/staff/confirm/{token}/{branch_id}', [StaffController::class, 'confirmStaff'])->name('staff.confirm');
+Route::get('/staff/reject/{token}/{branch_id}', [StaffController::class, 'rejectStaff'])->name('staff.reject');
 
 //đăng nhập rồi mới vào những route bên dưới được
 Route::middleware(['auth'])->group(function () {
@@ -103,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
     //     Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
     // });
 
-    // Nhóm quản lý chi nhánh
+    // Nhóm quản lý chi nhánh chủ sân
     Route::prefix('manage-branches')->group(function () {
         Route::get('viewAll', [BranchController::class, 'viewAll'])->name('manage-branches.viewAll');
         Route::get('reload-branches', [BranchController::class, 'reloadBranch'])->name('manage-branches.reload');
@@ -116,6 +119,8 @@ Route::middleware(['auth'])->group(function () {
         // ------------staff-----------
         // view tạo nhân viên cho chi nhánh
         Route::get('create-staff', [StaffController::class, 'createStaff'])->name('manage-branches.createStaff');
+        // Route::post('send-mail-create', [StaffController::class, 'sendmailcreate'])->name('manage-branches.sendmail.createStaff');
+
         Route::post('store-staff', [StaffController::class, 'storeStaff'])->name('manage-branches.storeStaff');
         Route::get('view-staff', [StaffController::class, 'viewStaff'])->name('manage-branches.viewStaff');
         Route::get('view-editStaff/{id}', [StaffController::class, 'editStaff'])->name('manage-branches.editStaff');
@@ -213,7 +218,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('booking')->group(function () {
         // Route xem lịch đặt sân trong trong manager-role 3
         Route::get('booking-calendar/{date}', [BookingController::class, 'bookingCalendar'])->name('booking.calendar');
-        Route::get('forDate', [PaymentController::class, 'index'])->name('booking.lichtheongay');
+        Route::get('forDate', [PaymentController::class, 'lichtheongay'])->name('booking.lichtheongay');
         Route::get('booking-calendar-search', [BookingController::class, 'bookingCalendarSearch'])->name('booking.calendar.search');
         // lịch sử đặt sân customer
         Route::get('booking-history', [BookingController::class, 'bookingHistory'])->name('booking.history');
@@ -221,7 +226,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('dat-booking-calendar/', [BookingController::class, 'reserve'])->name('booking.reserve');
 
         // quản lý và nhân viên đặt sân
-        Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'reserve'])->name('manager.booking.reserve');
+        Route::post('quanly-dat-booking-calendar/', [BookingController::class, 'managerreserve'])->name('manager.booking.reserve');
         // đặt lịch cố định
         Route::post('dat-co-dinh-booking-calendar/', [BookingController::class, 'datCoDinh'])->name('dat.co.dinh.booking.reserve');
     });
