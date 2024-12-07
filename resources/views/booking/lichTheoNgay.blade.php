@@ -30,7 +30,9 @@
                 <!-- Ô input tìm kiếm ngày tháng năm -->
                 <div class="col-md-3">
                     <label for="date">Ngày đặt</label>
-                    <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
+                    <input type="date" class="form-control" id="date" name="date"
+                        value="{{ request('date', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+
                 </div>
 
                 <!-- Ô input tìm kiếm số điện thoại -->

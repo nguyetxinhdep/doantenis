@@ -164,11 +164,17 @@ class PaymentController extends Controller
             );
         }
 
+
         // Tìm kiếm theo ngày đặt
         if ($req->filled('date')) {
             $history->whereDate(
                 'bookings.Date_booking',
                 $req->date
+            );
+        } else {
+            $history->whereDate(
+                'bookings.Date_booking',
+                now()
             );
         }
 
