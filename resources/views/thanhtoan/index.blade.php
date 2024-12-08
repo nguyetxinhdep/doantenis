@@ -65,7 +65,7 @@
         {{-- ----------------------------------------- --}}
 
         {{-- Bảng hiển thị nội dung --}}
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="font-size:12px">
             <thead>
                 <tr>
                     <th>STT</th>

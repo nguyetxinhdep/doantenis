@@ -66,7 +66,7 @@
         {{-- ----------------------------------------- --}}
 
         {{-- Bảng hiển thị nội dung --}}
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="font-size: 12px">
             <thead>
                 <tr>
                     <th>STT</th>
@@ -216,7 +216,7 @@
                                                 @endif
 
                                                 <!-- Nút hủy chỉ hiển thị một lần cho mỗi nhóm -->
-                                                <button type="button" class="btn btn-danger btn-sm mt-1"
+                                                <button type="button" class="btn btn-danger btn-sm"
                                                     data-toggle="modal" data-target="#cancelModal-{{ $bookingCode }}">
                                                     Hủy đặt sân
                                                 </button>
