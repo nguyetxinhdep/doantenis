@@ -70,7 +70,7 @@
                         @if (Auth::user()->Role != '5')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('home') }}">
-                                    <b class="text-white" style="font-size: 17px"> Trang Quản Lý</b>
+                                    <span class="text-white" style="font-size: 17px"> Trang Quản Lý</span>
                                 </a>
                             </li>
                         @endif

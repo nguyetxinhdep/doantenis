@@ -26,8 +26,8 @@
             @guest
                 <span style="color:yellow">
                     Vui lòng đăng nhập để đặt sân hoặc liên hệ qua Zalo:
-                    <a href="https://zalo.me/0378344718" target="_blank" style="color: yellow; text-decoration: underline;">
-                        0378344718
+                    <a href="https://zalo.me/0{{$branch->Phone}}" target="_blank" style="color: yellow; text-decoration: underline;">
+                        0{{$branch->Phone}}
                     </a>
                 </span>
 

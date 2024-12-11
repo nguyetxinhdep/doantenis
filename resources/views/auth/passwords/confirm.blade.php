@@ -6,7 +6,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        {{ __('Nhập mật khẩu mới') }}
+                        {{ __('') }}
                         {{-- {{ dd($token) }} --}}
                         <form method="POST" action="{{ Route('doimatkhau', ['id' => $id->User_id, 'token' => $token]) }}">
                             @csrf

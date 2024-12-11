@@ -47,7 +47,7 @@ class BookingController extends Controller
     public function bookingCalendar($date)
     {
         // Lấy danh sách sân và giờ đã đặt(bảng booking)
-        $courts = Court::where('branch_id', session('branch_active')->Branch_id)->get();
+        $courts = Court::where('branch_id', session('branch_active')->Branch_id)->where('Availability',  1)->get();
         $bookings = Booking::where('branch_id', session('branch_active')->Branch_id)
             ->where('Date_booking', $date) // Lấy tất cả đặt sân
             ->where('Status', '!=', 3)->get();
@@ -78,10 +78,11 @@ class BookingController extends Controller
         $branch_id = $req->input('branch_id');
 
         // Lấy danh sách sân và giờ đã đặt(bảng booking)
-        $courts = Court::where('branch_id', $branch_id)->get();
+        $courts = Court::where('branch_id', $branch_id)->where('Availability',  1)->get();
         $bookings = Booking::where('branch_id', $branch_id)
             ->where('Date_booking', $date) // Lấy tất cả đặt sân
             ->where('Status', '!=', 3)->get();
+            
 
         // giát tiền
         $groupedList = $this->layBangGia($branch_id);
@@ -98,7 +99,7 @@ class BookingController extends Controller
         if (isset($req->date)) {
             $dateSearch = $req->date;
             // Lấy danh sách sân và giờ đã đặt(bảng booking)
-            $courts = Court::where('branch_id', session('branch_active')->Branch_id)->get();
+            $courts = Court::where('branch_id', session('branch_active')->Branch_id)->where('Availability',  1)->get();
             $bookings = Booking::where('branch_id', session('branch_active')->Branch_id)
                 ->where('Date_booking', $dateSearch)->get(); // Lấy tất cả đặt sân
             $title = "Lịch";
@@ -114,7 +115,7 @@ class BookingController extends Controller
         if (isset($req->date)) {
             $dateSearch = $req->date;
             // Lấy danh sách sân và giờ đã đặt(bảng booking)
-            $courts = Court::where('branch_id', $req->branch_id)->get();
+            $courts = Court::where('branch_id', $req->branch_id)->where('Availability',  1)->get();
             $bookings = Booking::where('branch_id', $req->branch_id)
                 ->where('Date_booking', $dateSearch)->get(); // Lấy tất cả đặt sân
             $title = "Lịch";

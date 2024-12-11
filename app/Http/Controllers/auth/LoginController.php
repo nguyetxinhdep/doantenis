@@ -161,7 +161,7 @@ class LoginController extends Controller
     public function accept(User $id, $token)
     {
         if ($id->token_change_pass === $token) {
-            $title = 'Reset pass';
+            $title = 'Cập nhật mật khẩu';
             return view('auth.passwords.confirm', compact('id', 'title', 'token'));
         } else {
             return abort(404);
