@@ -176,7 +176,7 @@ class BookingController extends Controller
 
         // Lấy danh sách các Branch tương ứng với các branch_id duy nhất
         $branches = Branch::whereIn('Branch_id', $branchIds)->get();
-
+        // dd($bookingtemp);
         // dd($branchIds);
         // In ra câu truy vấn SQL
         // dd($history->toSql(), $history->getBindings());
@@ -210,7 +210,7 @@ class BookingController extends Controller
 
         // Thêm điều kiện tìm kiếm theo tên nếu có
         if ($req->filled('branch')) {
-            $history->where('branches.Name', 'LIKE', '%' . $req->branch . '%');
+            $history->where('branches.Branch_id', $req->branch );
         }
 
         // Thực hiện phân trang với 10 bản ghi trên mỗi trang

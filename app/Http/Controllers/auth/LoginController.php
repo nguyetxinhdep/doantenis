@@ -57,7 +57,8 @@ class LoginController extends Controller
                     // Lưu ID chi nhánh vào session
                     session(['branch_active' => $branches->first()]);
                     session(['all_branch' => $branches]);
-
+                    $customer = Customer::where('user_id', (Auth::user()->User_id))->first();
+                    session(['customer_id' => $customer->Customer_id]);
                     // Trả về phản hồi đăng nhập thành công
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công');
                 }
@@ -83,6 +84,8 @@ class LoginController extends Controller
                     // Lưu ID chi nhánh vào session
                     session(['branch_active' => $branches]);
                     // session(['all_branch' => $branches]);
+                    $customer = Customer::where('user_id', (Auth::user()->User_id))->first();
+                    session(['customer_id' => $customer->Customer_id]);
 
                     // Trả về phản hồi đăng nhập thành công
                     return redirect()->route('home')->with('success', 'Đăng nhập thành công');
