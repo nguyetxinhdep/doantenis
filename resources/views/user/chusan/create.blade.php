@@ -10,7 +10,7 @@
                     <form id="branch-form">
                         @csrf
                         <div class="row mb-3">
-                            <label for="username" class="col-md-4 col-form-label text-md-end">Họ tên Khách hàng <span
+                            <label for="username" class="col-md-4 col-form-label text-md-end">Họ tên <span
                                     style="color:red">*</span></label>
                             <div class="col-md-6">
                                 <input type="text" class="form-control @error('username') is-invalid @enderror"
@@ -109,7 +109,7 @@
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    Đăng ký
+                                    Thêm tài khoản
                                 </button>
 
                                 <a href="javascript:history.back()" class="btn btn-secondary">Trở lại</a>
