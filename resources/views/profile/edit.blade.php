@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label for="address">Địa chỉ</label>
                 <input type="text" class="form-control" id="address" name="address"
-                    value="{{ old('address', Auth::user()->Address) }}" {{ Auth::user()->Role == '5' ? '' : 'required' }}>
+                    value="{{ old('address', Auth::user()->Address) }}" {{ Auth::user()->Role == '5' ? '' : '' }}>
             </div>
 
             <button type="submit" class="btn btn-primary">Cập nhật</button>
