@@ -299,7 +299,8 @@ class StaffController extends Controller
         // Lấy thông tin nhân viên theo ID
         $staff = Staff::where('user_id', $id)->first();
         // dd(113);
-        $branches = Branch::all(); // Lấy danh sách chi nhánh để hiển thị trong dropdown
+        $br_temp = Branch::where('Branch_id', $staff->branch_id)->first();
+        $branches = Branch::where('manager_id', $br_temp->manager_id)->get(); // Lấy danh sách chi nhánh để hiển thị trong dropdown
         $title = "Sửa nhân viên";
         return view('staff.edit', compact('staff', 'branches', 'title'));
     }
